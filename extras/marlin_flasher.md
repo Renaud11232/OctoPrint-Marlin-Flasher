@@ -5,14 +5,14 @@ id: marlin_flasher
 title: OctoPrint-Marlin-Flasher
 description: Plugin that allows you to flash your printer to the latest Marlin version
 author: Renaud Gaspard
-license: AGPLv3
+license: MIT
 
 # TODO
 date: today's date in format YYYY-MM-DD, e.g. 2015-04-21
 
-homepage: https://github.com/you/OctoPrint-Marlin-Flasher
-source: https://github.com/you/OctoPrint-Marlin-Flasher
-archive: https://github.com/you/OctoPrint-Marlin-Flasher/archive/master.zip
+homepage:https://gitlab.com/Renaud11232/octoprint-marlin-flasher
+source: https://gitlab.com/Renaud11232/octoprint-marlin-flasher
+archive: https://gitlab.com/Renaud11232/octoprint-marlin-flasher/archive/master.zip
 
 # TODO
 # Set this to true if your plugin uses the dependency_links setup parameter to include
