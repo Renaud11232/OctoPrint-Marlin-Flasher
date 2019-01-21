@@ -1,0 +1,4 @@
+include README.md
+recursive-include octoprint_marlin_flasher/templates *
+recursive-include octoprint_marlin_flasher/translations *
+recursive-include octoprint_marlin_flasher/static *
