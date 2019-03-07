@@ -11,7 +11,7 @@ from __future__ import absolute_import
 
 import octoprint.plugin
 
-class Marlin_flasherPlugin(octoprint.plugin.SettingsPlugin,
+class MarlinFlasherPlugin(octoprint.plugin.SettingsPlugin,
                            octoprint.plugin.AssetPlugin,
                            octoprint.plugin.TemplatePlugin):
 
@@ -63,7 +63,7 @@ __plugin_name__ = "Marlin_flasher Plugin"
 
 def __plugin_load__():
 	global __plugin_implementation__
-	__plugin_implementation__ = Marlin_flasherPlugin()
+	__plugin_implementation__ = MarlinFlasherPlugin()
 
 	global __plugin_hooks__
 	__plugin_hooks__ = {
