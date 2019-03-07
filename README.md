@@ -1,16 +1,13 @@
 # OctoPrint-Marlin-Flasher
 
-**TODO:** Describe what your plugin does.
+This plugins makes the upgrade of your Marlin (or any Arduino based) firmware possible directly within OctoPrint.
 
 ## Setup
 
 Install via the bundled [Plugin Manager](https://github.com/foosel/OctoPrint/wiki/Plugin:-Plugin-Manager)
 or manually using this URL:
 
-    https://github.com/you/OctoPrint-Marlin-Flasher/archive/master.zip
-
-**TODO:** Describe how to install your plugin, if more needs to be done than just installing it via pip or through
-the plugin manager.
+    https://https://gitlab.com/Renaud11232/octoprint-marlin-flasher/-/archive/master/octoprint-marlin-flasher-master.zip
 
 ## Configuration
 
