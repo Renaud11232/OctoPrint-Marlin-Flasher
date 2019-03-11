@@ -5,7 +5,8 @@ import octoprint.plugin
 
 class MarlinFlasherPlugin(octoprint.plugin.SettingsPlugin,
 							octoprint.plugin.AssetPlugin,
-							octoprint.plugin.TemplatePlugin):
+							octoprint.plugin.TemplatePlugin,
+							octoprint.plugin.WizardPlugin):
 
 	def get_settings_defaults(self):
 		return dict(
@@ -17,6 +18,19 @@ class MarlinFlasherPlugin(octoprint.plugin.SettingsPlugin,
 			js=["js/marlin_flasher.js"],
 			css=["css/marlin_flasher.css"]
 		)
+
+	def get_template_configs(self):
+		return [
+			dict(
+				type="settings", custom_bindings=False
+			),
+			dict(
+				type="wizard", custom_bindings=False
+			)
+		]
+
+	def is_wizard_required(self):
+		return self._settings.get(["arduino_path"]) is None
 
 	def get_update_information(self):
 		return dict(
