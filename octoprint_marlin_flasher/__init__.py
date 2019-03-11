@@ -22,10 +22,17 @@ class MarlinFlasherPlugin(octoprint.plugin.SettingsPlugin,
 	def get_template_configs(self):
 		return [
 			dict(
-				type="settings", custom_bindings=False
+				type="settings",
+				custom_bindings=False
 			),
 			dict(
-				type="wizard", custom_bindings=False
+				type="wizard",
+				custom_bindings=False,
+				mandatory=True
+			),
+			dict(
+				type="tab",
+				custom_bindings=False
 			)
 		]
 
