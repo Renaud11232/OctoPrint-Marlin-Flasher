@@ -1,11 +1,5 @@
-/*
- * View model for OctoPrint-Marlin-Flasher
- *
- * Author: Renaud Gaspard
- * License: AGPLv3
- */
 $(function() {
-    function Marlin_flasherViewModel(parameters) {
+    function MarlinFlasherViewModel(parameters) {
         var self = this;
 
         // assign the injected parameters, e.g.:
@@ -20,7 +14,7 @@ $(function() {
      * and a full list of the available options.
      */
     OCTOPRINT_VIEWMODELS.push({
-        construct: Marlin_flasherViewModel,
+        construct: MarlinFlasherViewModel,
         // ViewModels your plugin depends on, e.g. loginStateViewModel, settingsViewModel, ...
         dependencies: [ /* "loginStateViewModel", "settingsViewModel" */ ],
         // Elements to bind to, e.g. #settings_plugin_marlin_flasher, #tab_plugin_marlin_flasher, ...
