@@ -27,8 +27,7 @@ class MarlinFlasherPlugin(octoprint.plugin.SettingsPlugin,
 			),
 			dict(
 				type="wizard",
-				custom_bindings=False,
-				mandatory=True
+				custom_bindings=False
 			),
 			dict(
 				type="tab",
