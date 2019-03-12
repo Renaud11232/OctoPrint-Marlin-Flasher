@@ -1,14 +1,5 @@
 <h3>{{ _('Marlin Flasher Wizard') }}</h3>
 <div>
     <p>The path to arduino-cli has not yet been set up, in order to user Marlin Flasher, you need to configure this</p>
-    <form class="form-horizontal">
-        <div class="control-group">
-            <label class="control-label" for="arduino_path">{{ _('Path to arduino-cli') }}</label>
-            <div class="controls">
-                <div class="input-append">
-                    <input type="text" class="input-block-level" data-bind="value: settings.settings.plugins.marlin_flasher.arduino_path" id="arduino_path">
-                </div>
-            </div>
-        </div>
-    </form>
+    {% include "includes/config.jinja2" %}
 </div>

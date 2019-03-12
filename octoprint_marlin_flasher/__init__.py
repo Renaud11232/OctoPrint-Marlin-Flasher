@@ -19,22 +19,6 @@ class MarlinFlasherPlugin(octoprint.plugin.SettingsPlugin,
 			css=["css/marlin_flasher.css"]
 		)
 
-	def get_template_configs(self):
-		return [
-			dict(
-				type="settings",
-				custom_bindings=False
-			),
-			dict(
-				type="wizard",
-				custom_bindings=False
-			),
-			dict(
-				type="tab",
-				custom_bindings=False
-			)
-		]
-
 	def is_wizard_required(self):
 		return self._settings.get(["arduino_path"]) is None
 
@@ -65,4 +49,3 @@ def __plugin_load__():
 	__plugin_hooks__ = {
 		"octoprint.plugin.softwareupdate.check_config": __plugin_implementation__.get_update_information
 	}
-
