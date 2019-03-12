@@ -7,7 +7,7 @@ This plugins makes the upgrade of your Marlin (or any Arduino based) firmware po
 Install via the bundled [Plugin Manager](https://github.com/foosel/OctoPrint/wiki/Plugin:-Plugin-Manager)
 or manually using this URL:
 
-    https://https://gitlab.com/Renaud11232/octoprint-marlin-flasher/-/archive/master/octoprint-marlin-flasher-master.zip
+    https://github.com/Renaud11232/Octoprint-Marlin-Flasher/archive/master.zip
 
 ## Configuration
 

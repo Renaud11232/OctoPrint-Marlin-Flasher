@@ -5,7 +5,7 @@ plugin_version = "0.0.1"
 plugin_description = """Plugin that allows you to flash your printer with the latest Marlin version, or Arduino code"""
 plugin_author = "Renaud Gaspard"
 plugin_author_email = "gaspardrenaud@hotmail.com"
-plugin_url = "https://gitlab.com/Renaud11232/octoprint-marlin-flasher"
+plugin_url = "https://github.com/Renaud11232/Octoprint-Marlin-Flasher"
 plugin_license = "MIT"
 plugin_requires = [
 	"pyduinocli"
