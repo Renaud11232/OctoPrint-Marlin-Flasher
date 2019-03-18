@@ -1,12 +1,14 @@
 # coding=utf-8
 from __future__ import absolute_import
 import octoprint.plugin
+import flask
 
 
 class MarlinFlasherPlugin(octoprint.plugin.SettingsPlugin,
 							octoprint.plugin.AssetPlugin,
 							octoprint.plugin.TemplatePlugin,
-							octoprint.plugin.WizardPlugin):
+							octoprint.plugin.WizardPlugin,
+							octoprint.plugin.BlueprintPlugin):
 
 	def get_settings_defaults(self):
 		return dict(
@@ -18,6 +20,11 @@ class MarlinFlasherPlugin(octoprint.plugin.SettingsPlugin,
 			js=["js/marlin_flasher.js"],
 			css=["css/marlin_flasher.css"]
 		)
+
+	@octoprint.plugin.BlueprintPlugin.route("/upload_sketch", methods=["POST"])
+	def upload_sketch(self):
+		self._logger.debug("dindon")
+		return flask.make_response("ez", 200)
 
 	def is_wizard_required(self):
 		return self._settings.get(["arduino_path"]) is None
