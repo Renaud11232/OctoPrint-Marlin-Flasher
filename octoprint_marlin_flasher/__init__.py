@@ -23,7 +23,7 @@ class MarlinFlasherPlugin(octoprint.plugin.SettingsPlugin,
 
 	@octoprint.plugin.BlueprintPlugin.route("/upload_sketch", methods=["POST"])
 	def upload_sketch(self):
-		self._logger.debug("dindon")
+		self._logger.info(flask.request.values)
 		return flask.make_response("ez", 200)
 
 	def is_wizard_required(self):

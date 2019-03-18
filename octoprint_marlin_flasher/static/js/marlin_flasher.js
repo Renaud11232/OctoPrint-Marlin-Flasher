@@ -7,7 +7,13 @@ $(function() {
             dataType: "json",
             maxNumberOfFiles: 1,
             autoUpload: true,
-            headers: OctoPrint.getRequestHeaders()
+            headers: OctoPrint.getRequestHeaders(),
+            done: function(e, data) {
+
+            },
+            error: function(jqXHR, status, error) {
+
+            }
         });
     }
 
