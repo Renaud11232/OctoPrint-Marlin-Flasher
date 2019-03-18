@@ -2,6 +2,9 @@
 from __future__ import absolute_import
 import octoprint.plugin
 import flask
+import zipfile
+import shutil
+import os
 
 
 class MarlinFlasherPlugin(octoprint.plugin.SettingsPlugin,
@@ -12,7 +15,8 @@ class MarlinFlasherPlugin(octoprint.plugin.SettingsPlugin,
 
 	def get_settings_defaults(self):
 		return dict(
-			arduino_path=None
+			arduino_path=None,
+			last_sketch=None
 		)
 
 	def get_assets(self):
@@ -23,15 +27,23 @@ class MarlinFlasherPlugin(octoprint.plugin.SettingsPlugin,
 
 	@octoprint.plugin.BlueprintPlugin.route("/upload_sketch", methods=["POST"])
 	def upload_sketch(self):
-		sketch_file = "sketch_file"
-		upload_name = sketch_file + "." + self._settings.global_get(["server", "uploads", "nameSuffix"])
-		upload_path = sketch_file + "." + self._settings.global_get(["server", "uploads", "pathSuffix"])
-		if upload_path not in flask.request.values or upload_name not in flask.request.values:
-			self._logger.warn(u"File was not included in the request")
-			return flask.make_response(u"File not included", 400)
-		filename = flask.request.values[upload_name]
+		upload_path = "sketch_file." + self._settings.global_get(["server", "uploads", "pathSuffix"])
+		if upload_path not in flask.request.values:
+			self._logger.warn("sketch_file was not included in the request")
+			return flask.make_response("sketch_file not included", 400)
 		path = flask.request.values[upload_path]
-		return flask.make_response(path, 200)
+		with zipfile.ZipFile(path, "r") as zip:
+			self._settings.set(["last_sketch"], None)
+			shutil.rmtree(self.get_plugin_data_folder())
+			zip.extractall(self.get_plugin_data_folder())
+			for root, dirs, files in os.walk(self.get_plugin_data_folder()):
+				for file in files:
+					if file == "Marlin.ino":
+						sketch_path = os.path.join(root, file)
+						self._settings.set(["last_sketch"], sketch_path)
+						return flask.make_response(sketch_path, 200)
+		self._logger.warn("Unable to extract the given zip file")
+		return flask.make_response("Unable to extract the given zip file", 500)
 
 	def is_wizard_required(self):
 		return self._settings.get(["arduino_path"]) is None
