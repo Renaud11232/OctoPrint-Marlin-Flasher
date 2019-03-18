@@ -16,7 +16,8 @@ class MarlinFlasherPlugin(octoprint.plugin.SettingsPlugin,
 	def get_settings_defaults(self):
 		return dict(
 			arduino_path=None,
-			last_sketch=None
+			last_sketch=None,
+			sketch_ino="Marlin.ino"
 		)
 
 	def get_assets(self):
@@ -38,7 +39,7 @@ class MarlinFlasherPlugin(octoprint.plugin.SettingsPlugin,
 			zip.extractall(self.get_plugin_data_folder())
 			for root, dirs, files in os.walk(self.get_plugin_data_folder()):
 				for file in files:
-					if file == "Marlin.ino":
+					if file == self._settings.get(["sketch_ino"]):
 						self._settings.set(["last_sketch"], root)
 						return flask.make_response(root, 200)
 		self._logger.warn("Unable to extract the given zip file")
