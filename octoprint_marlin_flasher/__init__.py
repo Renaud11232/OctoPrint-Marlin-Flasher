@@ -23,8 +23,15 @@ class MarlinFlasherPlugin(octoprint.plugin.SettingsPlugin,
 
 	@octoprint.plugin.BlueprintPlugin.route("/upload_sketch", methods=["POST"])
 	def upload_sketch(self):
-		self._logger.info(flask.request.values)
-		return flask.make_response("ez", 200)
+		sketch_file = "sketch_file"
+		upload_name = sketch_file + "." + self._settings.global_get(["server", "uploads", "nameSuffix"])
+		upload_path = sketch_file + "." + self._settings.global_get(["server", "uploads", "pathSuffix"])
+		if upload_path not in flask.request.values or upload_name not in flask.request.values:
+			self._logger.warn(u"File was not included in the request")
+			return flask.make_response(u"File not included", 400)
+		filename = flask.request.values[upload_name]
+		path = flask.request.values[upload_path]
+		return flask.make_response(path, 200)
 
 	def is_wizard_required(self):
 		return self._settings.get(["arduino_path"]) is None
