@@ -39,9 +39,8 @@ class MarlinFlasherPlugin(octoprint.plugin.SettingsPlugin,
 			for root, dirs, files in os.walk(self.get_plugin_data_folder()):
 				for file in files:
 					if file == "Marlin.ino":
-						sketch_path = os.path.join(root, file)
-						self._settings.set(["last_sketch"], sketch_path)
-						return flask.make_response(sketch_path, 200)
+						self._settings.set(["last_sketch"], root)
+						return flask.make_response(root, 200)
 		self._logger.warn("Unable to extract the given zip file")
 		return flask.make_response("Unable to extract the given zip file", 500)
 
