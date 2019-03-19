@@ -30,24 +30,25 @@ class MarlinFlasherPlugin(octoprint.plugin.SettingsPlugin,
 	def upload_sketch(self):
 		upload_path = "sketch_file." + self._settings.global_get(["server", "uploads", "pathSuffix"])
 		if upload_path not in flask.request.values:
-			self._logger.warn("sketch_file was not included in the request")
 			return flask.make_response("sketch_file not included", 400)
 		path = flask.request.values[upload_path]
-		with zipfile.ZipFile(path, "r") as zip_file:
-			self._settings.set(["last_sketch"], None)
-			sketch_dir = os.path.join(self.get_plugin_data_folder(), "extracted_sketch")
-			if os.path.exists(sketch_dir):
+		try:
+			with zipfile.ZipFile(path, "r") as zip_file:
+				self._settings.set(["last_sketch"], None)
+				sketch_dir = os.path.join(self.get_plugin_data_folder(), "extracted_sketch")
+				if os.path.exists(sketch_dir):
+					shutil.rmtree(sketch_dir)
+				os.makedirs(sketch_dir)
+				zip_file.extractall(sketch_dir)
+				for root, dirs, files in os.walk(sketch_dir):
+					for f in files:
+						if f == self._settings.get(["sketch_ino"]):
+							self._settings.set(["last_sketch"], root)
+							return flask.make_response(root, 200)
 				shutil.rmtree(sketch_dir)
-			os.makedirs(sketch_dir)
-			zip_file.extractall(sketch_dir)
-			for root, dirs, files in os.walk(sketch_dir):
-				for f in files:
-					if f == self._settings.get(["sketch_ino"]):
-						self._settings.set(["last_sketch"], root)
-						return flask.make_response(root, 200)
-			shutil.rmtree(sketch_dir)
-		self._logger.warn("Unable to extract the given zip file")
-		return flask.make_response("Unable to extract the given zip file", 500)
+				return flask.make_response("No sketch found in that file", 500)
+		except zipfile.BadZipfile:
+			return flask.make_response("The given file was not a zip file", 500)
 
 	def is_wizard_required(self):
 		return self._settings.get(["arduino_path"]) is None
