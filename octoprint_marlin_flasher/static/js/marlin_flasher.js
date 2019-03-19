@@ -21,25 +21,6 @@ $(function() {
                 });
             }
         });
-        $("#arduino_config").fileupload({
-            maxNumberOfFiles: 1,
-            headers: OctoPrint.getRequestHeaders(),
-            done: function(e, data) {
-                new PNotify({
-                    title: "Config upload successful",
-                    text: "The file was successfully uploaded to the server",
-                    type: "success"
-                });
-            },
-            error: function(jqXHR, status, error) {
-                new PNotify({
-                    title: "Config upload failed",
-                    text: "The server could not handle that file. Was it a valid configuration file ?",
-                    type: "error",
-                    hide: false
-                });
-            }
-        });
     }
 
     OCTOPRINT_VIEWMODELS.push({
