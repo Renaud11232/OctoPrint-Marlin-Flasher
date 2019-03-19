@@ -2,6 +2,8 @@
 from __future__ import absolute_import
 import octoprint.plugin
 import flask
+import yaml
+import pyduinocli
 import zipfile
 import shutil
 import os
@@ -56,6 +58,34 @@ class MarlinFlasherPlugin(octoprint.plugin.SettingsPlugin,
 				return flask.make_response("No sketch found in that file", 500)
 		except zipfile.BadZipfile:
 			return flask.make_response("The given file was not a zip file", 500)
+
+	@octoprint.plugin.BlueprintPlugin.route("/config", methods=["POST"])
+	def upload_config(self):
+		config_path = "arduino_config." + self._settings.global_get(["server", "uploads", "pathSuffix"])
+		if config_path not in flask.request.values:
+			return flask.make_response("config file not included", 400)
+		path = flask.request.values[config_path]
+		with open(path, 'r') as f:
+			try:
+				yaml.safe_load(f)
+				dest = os.path.join(self.get_plugin_data_folder(), "arduino-cli.yaml")
+				shutil.copyfile(path, dest)
+				result = dict(
+					file=dest
+				)
+				return flask.make_response(flask.jsonify(result), 200)
+			except:
+				return flask.make_response("Invalid file syntax", 500)
+
+	def __get_arduino(self):
+		arduino_path = self._settings.get(["arduino_path"])
+		if arduino_path is None:
+			return None
+		config_path = os.path.join(self.get_plugin_data_folder(), "arduino-cli.yaml")
+		if os.path.isfile(config_path):
+			return pyduinocli.Arduino(arduino_path, config_path)
+		else:
+			return pyduinocli.Arduino(arduino_path)
 
 	def is_wizard_required(self):
 		return self._settings.get(["arduino_path"]) is None

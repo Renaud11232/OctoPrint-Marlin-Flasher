@@ -2,7 +2,6 @@ $(function() {
     function MarlinFlasherViewModel(parameters) {
         var self = this;
         self.settingsViewModel = parameters[0];
-        self.sketchName = ko.observable();
         $("#sketch_file").fileupload({
             maxNumberOfFiles: 1,
             headers: OctoPrint.getRequestHeaders(),
@@ -12,12 +11,30 @@ $(function() {
                     text: data.result.ino,
                     type: "success"
                 });
-                self.sketchName(data.result.ino)
             },
             error: function(jqXHR, status, error) {
                 new PNotify({
                     title: "Sketch upload failed",
                     text: "Was it a zip file containing a valid sketch. If so check plugin settings",
+                    type: "error",
+                    hide: false
+                });
+            }
+        });
+        $("#arduino_config").fileupload({
+            maxNumberOfFiles: 1,
+            headers: OctoPrint.getRequestHeaders(),
+            done: function(e, data) {
+                new PNotify({
+                    title: "Config upload successful",
+                    text: "The file was successfully uploaded to the server",
+                    type: "success"
+                });
+            },
+            error: function(jqXHR, status, error) {
+                new PNotify({
+                    title: "Config upload failed",
+                    text: "The server could not handle that file. Was it a valid configuration file ?",
                     type: "error",
                     hide: false
                 });
