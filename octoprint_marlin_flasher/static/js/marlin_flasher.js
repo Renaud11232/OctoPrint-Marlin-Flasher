@@ -3,8 +3,7 @@ $(function() {
         var self = this;
         self.settingsViewModel = parameters[0];
         self.sketchName = ko.observable();
-        self.sketchFile = $("#sketch_file");
-        self.sketchFile .fileupload({
+        $("#sketch_file").fileupload({
             maxNumberOfFiles: 1,
             headers: OctoPrint.getRequestHeaders(),
             done: function(e, data) {
