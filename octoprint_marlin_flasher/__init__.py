@@ -33,15 +33,19 @@ class MarlinFlasherPlugin(octoprint.plugin.SettingsPlugin,
 			self._logger.warn("sketch_file was not included in the request")
 			return flask.make_response("sketch_file not included", 400)
 		path = flask.request.values[upload_path]
-		with zipfile.ZipFile(path, "r") as zip:
+		with zipfile.ZipFile(path, "r") as zip_file:
 			self._settings.set(["last_sketch"], None)
-			shutil.rmtree(self.get_plugin_data_folder())
-			zip.extractall(self.get_plugin_data_folder())
-			for root, dirs, files in os.walk(self.get_plugin_data_folder()):
-				for file in files:
-					if file == self._settings.get(["sketch_ino"]):
+			sketch_dir = os.path.join(self.get_plugin_data_folder(), "extracted_sketch")
+			if os.path.exists(sketch_dir):
+				shutil.rmtree(sketch_dir)
+			os.makedirs(sketch_dir)
+			zip_file.extractall(sketch_dir)
+			for root, dirs, files in os.walk(sketch_dir):
+				for f in files:
+					if f == self._settings.get(["sketch_ino"]):
 						self._settings.set(["last_sketch"], root)
 						return flask.make_response(root, 200)
+			shutil.rmtree(sketch_dir)
 		self._logger.warn("Unable to extract the given zip file")
 		return flask.make_response("Unable to extract the given zip file", 500)
 
