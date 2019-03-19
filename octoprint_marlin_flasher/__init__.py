@@ -11,12 +11,15 @@ class MarlinFlasherPlugin(octoprint.plugin.SettingsPlugin,
 							octoprint.plugin.AssetPlugin,
 							octoprint.plugin.TemplatePlugin,
 							octoprint.plugin.WizardPlugin,
-							octoprint.plugin.BlueprintPlugin):
+							octoprint.plugin.BlueprintPlugin,
+							octoprint.plugin.StartupPlugin):
+
+	def on_after_startup(self):
+		self.__aketch = None
 
 	def get_settings_defaults(self):
 		return dict(
 			arduino_path=None,
-			last_sketch=None,
 			sketch_ino="Marlin.ino"
 		)
 
@@ -34,7 +37,7 @@ class MarlinFlasherPlugin(octoprint.plugin.SettingsPlugin,
 		path = flask.request.values[upload_path]
 		try:
 			with zipfile.ZipFile(path, "r") as zip_file:
-				self._settings.set(["last_sketch"], None)
+				self.__sketch = None
 				sketch_dir = os.path.join(self.get_plugin_data_folder(), "extracted_sketch")
 				if os.path.exists(sketch_dir):
 					shutil.rmtree(sketch_dir)
@@ -43,8 +46,12 @@ class MarlinFlasherPlugin(octoprint.plugin.SettingsPlugin,
 				for root, dirs, files in os.walk(sketch_dir):
 					for f in files:
 						if f == self._settings.get(["sketch_ino"]):
-							self._settings.set(["last_sketch"], root)
-							return flask.make_response(root, 200)
+							self.__sketch = root
+							result = dict(
+								path=root,
+								ino=f
+							)
+							return flask.make_response(flask.jsonify(result), 200)
 				shutil.rmtree(sketch_dir)
 				return flask.make_response("No sketch found in that file", 500)
 		except zipfile.BadZipfile:
