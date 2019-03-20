@@ -21,6 +21,31 @@ $(function() {
                 });
             }
         });
+        $("#cores-table").bootstrapTable({
+            columns: [
+                {
+                    field: "ID",
+                    title: "ID"
+                },
+                {
+                    field: "Version",
+                    title: "Version"
+                },
+                {
+                    field: "Name",
+                    title: "Name"
+                }
+            ]
+        });
+        $("#test-button").click(function() {
+            $("#cores-table").bootstrapTable("load", [
+                {
+                    ID: "test-id",
+                    Version: "1.2.5",
+                    Name: "Test Name"
+                }
+            ]);
+        });
     }
 
     OCTOPRINT_VIEWMODELS.push({

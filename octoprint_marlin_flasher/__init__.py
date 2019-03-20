@@ -2,7 +2,6 @@
 from __future__ import absolute_import
 import octoprint.plugin
 import flask
-import yaml
 import pyduinocli
 import zipfile
 import shutil
@@ -27,8 +26,14 @@ class MarlinFlasherPlugin(octoprint.plugin.SettingsPlugin,
 
 	def get_assets(self):
 		return dict(
-			js=["js/marlin_flasher.js"],
-			css=["css/marlin_flasher.css"]
+			js=[
+				"js/bootstrap-table.js",
+				"js/marlin_flasher.js"
+			],
+			css=[
+				"css/bootstrap-table.css",
+				"css/marlin_flasher.css"
+			]
 		)
 
 	@octoprint.plugin.BlueprintPlugin.route("/upload_sketch", methods=["POST"])
