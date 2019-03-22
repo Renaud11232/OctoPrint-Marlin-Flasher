@@ -73,12 +73,30 @@ class MarlinFlasherPlugin(octoprint.plugin.SettingsPlugin,
 			return flask.make_response("No query given", 400)
 		try:
 			arduino.core_update_index()
-			result = arduino.core_search(flask.request.values["query"])
+			result = arduino.core_search(*flask.request.values["query"].split(" "))
 		except RuntimeError:
 			return flask.make_response("The arduino path is not correct", 500)
 		if result is None:
 			result = dict(
 				Platforms=[]
+			)
+		return flask.make_response(flask.jsonify(result), 200)
+
+	@octoprint.plugin.BlueprintPlugin.route("/libs/search", methods=["GET"])
+	def search_libs(self):
+		arduino = self.__get_arduino()
+		if arduino is None:
+			return flask.make_response("Arduino path is not configure", 500)
+		if "query" not in flask.request.values:
+			return flask.make_response("No query given", 400)
+		try:
+			arduino.lib_update_index()
+			result = arduino.lib_search(*flask.request.values["query"].split(" "))
+		except RuntimeError:
+			return flask.make_response("The arduino path is not correct", 500)
+		if result is None:
+			result = dict(
+				libraries=[]
 			)
 		return flask.make_response(flask.jsonify(result), 200)
 

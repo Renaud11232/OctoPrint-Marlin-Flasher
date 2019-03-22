@@ -126,6 +126,53 @@ $(function() {
                 $("#cores-table").bootstrapTable("hideLoading");
             });
         });
+        $("#libs-table").bootstrapTable({
+            columns: [
+                {
+                    field: "Name",
+                    title: "Name"
+                },
+                {
+                    field: "dl_btn",
+                    title: '<i class="icon-download-alt"></i>',
+                    width: "54px",
+                    halign: "center"
+                },
+                {
+                    field: "rm_btn",
+                    title: '<i class="icon-trash"></i>',
+                    width: "54px",
+                    halign: "center"
+                }
+            ]
+        });
+        $("#libs-search-form").submit(function(event) {
+            $("#libs-table").bootstrapTable("showLoading");
+            $.ajax({
+                type: "GET",
+                url: "/plugin/marlin_flasher/libs/search",
+                data: {
+                    query: $("#libs-search-text").val()
+                }
+            }).done(function (data) {
+                var tableData = data.libraries;
+                tableData.forEach(function(element) {
+                    element.dl_btn = '<button class="btn btn-primary lib-install-btn" type="button" value="' + element.Name + '"><i class="icon-download-alt"></i></button>'
+                    element.rm_btn = '<button class="btn btn-danger lib-uninstall-btn" type="button" value="' + element.Name + '"><i class="icon-trash"></i></button>'
+                });
+                $("#libs-table").bootstrapTable("load", tableData);
+            }).fail(function() {
+                new PNotify({
+                    title: "Lib search failed",
+                    text: "Is the plugin properly configured ?",
+                    type: "error",
+                    hide: false
+                });
+            }).always(function() {
+                $("#libs-table").bootstrapTable("hideLoading");
+            });
+            event.preventDefault();
+        });
     }
 
     OCTOPRINT_VIEWMODELS.push({
