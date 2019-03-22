@@ -41,7 +41,10 @@ class MarlinFlasherPlugin(octoprint.plugin.SettingsPlugin,
 	def upload_sketch(self):
 		upload_path = "sketch_file." + self._settings.global_get(["server", "uploads", "pathSuffix"])
 		if upload_path not in flask.request.values:
-			return flask.make_response("sketch_file not included", 400)
+			result = dict(
+				error="Missing sketch_file"
+			)
+			return flask.make_response(flask.jsonify(result), 400)
 		path = flask.request.values[upload_path]
 		try:
 			with zipfile.ZipFile(path, "r") as zip_file:
@@ -61,9 +64,15 @@ class MarlinFlasherPlugin(octoprint.plugin.SettingsPlugin,
 							)
 							return flask.make_response(flask.jsonify(result), 200)
 				shutil.rmtree(sketch_dir)
-				return flask.make_response("No sketch found in that file", 400)
+				result = dict(
+					error="No valid sketch found in the given file"
+				)
+				return flask.make_response(flask.jsonify(result), 400)
 		except zipfile.BadZipfile:
-			return flask.make_response("The given file was not a zip file", 400)
+			result = dict(
+				error="The given file was not a zip file"
+			)
+			return flask.make_response(flask.jsonify(result), 400)
 
 	@octoprint.plugin.BlueprintPlugin.route("/cores/search", methods=["GET"])
 	def search_cores(self):
