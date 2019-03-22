@@ -77,50 +77,62 @@ class MarlinFlasherPlugin(octoprint.plugin.SettingsPlugin,
 	@octoprint.plugin.BlueprintPlugin.route("/cores/search", methods=["GET"])
 	def search_cores(self):
 		arduino = self.__get_arduino()
-		if arduino is None:
-			return flask.make_response("Arduino path is not configured", 500)
 		if "query" not in flask.request.values:
-			return flask.make_response("No query given", 400)
+			result = dict(
+				error="Missing query"
+			)
+			return flask.make_response(flask.jsonify(result), 400)
 		try:
 			arduino.core_update_index()
-			result = arduino.core_search(*flask.request.values["query"].split(" "))
-		except RuntimeError:
-			return flask.make_response("The arduino path is not correct", 500)
-		if result is None:
+			search_result = arduino.core_search(*flask.request.values["query"].split(" "))
+		except pyduinocli.ArduinoError as e:
 			result = dict(
+				error=e.error_info["Message"]
+			)
+			return flask.make_response(flask.jsonify(result), 500)
+		if "Platforms" not in search_result:
+			search_result = dict(
 				Platforms=[]
 			)
-		return flask.make_response(flask.jsonify(result), 200)
+		return flask.make_response(flask.jsonify(search_result), 200)
 
 	@octoprint.plugin.BlueprintPlugin.route("/libs/search", methods=["GET"])
 	def search_libs(self):
 		arduino = self.__get_arduino()
-		if arduino is None:
-			return flask.make_response("Arduino path is not configure", 500)
 		if "query" not in flask.request.values:
-			return flask.make_response("No query given", 400)
+			result = dict(
+				error="Missing query"
+			)
+			return flask.make_response(flask.jsonify(result), 400)
 		try:
 			arduino.lib_update_index()
-			result = arduino.lib_search(*flask.request.values["query"].split(" "))
-		except RuntimeError:
-			return flask.make_response("The arduino path is not correct", 500)
-		if result is None:
+			search_result = arduino.lib_search(*flask.request.values["query"].split(" "))
+		except pyduinocli.ArduinoError as e:
 			result = dict(
+				error=e.error_info["Message"]
+			)
+			return flask.make_response(flask.jsonify(result), 500)
+		if "libraries" not in search_result:
+			search_result = dict(
 				libraries=[]
 			)
-		return flask.make_response(flask.jsonify(result), 200)
+		return flask.make_response(flask.jsonify(search_result), 200)
 
 	@octoprint.plugin.BlueprintPlugin.route("/cores/install", methods=["POST"])
 	def install_core(self):
 		arduino = self.__get_arduino()
-		if arduino is None:
-			return flask.make_response("Arduino path is not configured", 500)
 		if "core" not in flask.request.values:
-			return flask.make_response("No core given", 400)
+			result = dict(
+				error="Missing core"
+			)
+			return flask.make_response(flask.jsonify(result), 400)
 		try:
 			arduino.core_install(flask.request.values["core"])
-		except RuntimeError:
-			return flask.make_response("The arduino path is not correct", 500)
+		except pyduinocli.ArduinoError as e:
+			result = dict(
+				error=e.error_info["Message"]
+			)
+			return flask.make_response(flask.jsonify(result), 500)
 		result = dict(
 			core=flask.request.values["core"]
 		)
@@ -129,14 +141,18 @@ class MarlinFlasherPlugin(octoprint.plugin.SettingsPlugin,
 	@octoprint.plugin.BlueprintPlugin.route("/libs/install", methods=["POST"])
 	def install_lib(self):
 		arduino = self.__get_arduino()
-		if arduino is None:
-			return flask.make_response("Arduino path is not configured", 500)
 		if "lib" not in flask.request.values:
-			return flask.make_response("No lib given", 400)
+			result = dict(
+				error="Missing lib"
+			)
+			return flask.make_response(flask.jsonify(result), 400)
 		try:
 			arduino.lib_install(flask.request.values["lib"])
-		except RuntimeError:
-			return flask.make_response("The arduino path is not correct", 500)
+		except pyduinocli.ArduinoError as e:
+			result = dict(
+				error=e.error_info["Message"]
+			)
+			return flask.make_response(flask.jsonify(result), 500)
 		result = dict(
 			lib=flask.request.values["lib"]
 		)
@@ -145,14 +161,18 @@ class MarlinFlasherPlugin(octoprint.plugin.SettingsPlugin,
 	@octoprint.plugin.BlueprintPlugin.route("/cores/uninstall", methods=["POST"])
 	def uninstall_core(self):
 		arduino = self.__get_arduino()
-		if arduino is None:
-			return flask.make_response("Arduino path is not configured", 500)
 		if "core" not in flask.request.values:
-			return flask.make_response("No core given", 400)
+			result = dict(
+				error="Missing core"
+			)
+			return flask.make_response(flask.jsonify(result), 400)
 		try:
 			arduino.core_uninstall(flask.request.values["core"])
-		except RuntimeError:
-			return flask.make_response("The arduino path is not correct", 500)
+		except pyduinocli.ArduinoError as e:
+			result = dict(
+				error=e.error_info["Message"]
+			)
+			return flask.make_response(flask.jsonify(result), 500)
 		result = dict(
 			core=flask.request.values["core"]
 		)
@@ -161,14 +181,18 @@ class MarlinFlasherPlugin(octoprint.plugin.SettingsPlugin,
 	@octoprint.plugin.BlueprintPlugin.route("/libs/uninstall", methods=["POST"])
 	def uninstall_lib(self):
 		arduino = self.__get_arduino()
-		if arduino is None:
-			return flask.make_response("Arduino path is not configured", 500)
 		if "lib" not in flask.request.values:
-			return flask.make_response("No lib given", 400)
+			result = dict(
+				error="Missing lib"
+			)
+			return flask.make_response(flask.jsonify(result), 400)
 		try:
 			arduino.lib_uninstall(flask.request.values["lib"])
-		except RuntimeError:
-			return flask.make_response("The arduino path is not correct", 500)
+		except pyduinocli.ArduinoError as e:
+			result = dict(
+				error=e.error_info["Message"]
+			)
+			return flask.make_response(flask.jsonify(result), 500)
 		result = dict(
 			core=flask.request.values["lib"]
 		)
@@ -176,8 +200,6 @@ class MarlinFlasherPlugin(octoprint.plugin.SettingsPlugin,
 
 	def __get_arduino(self):
 		arduino_path = self._settings.get(["arduino_path"])
-		if arduino_path is None:
-			return None
 		return pyduinocli.Arduino(arduino_path)
 
 	def is_wizard_required(self):
