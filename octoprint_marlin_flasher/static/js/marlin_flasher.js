@@ -15,7 +15,7 @@ $(function() {
             error: function(jqXHR, status, error) {
                 new PNotify({
                     title: "Sketch upload failed",
-                    text: "Was it a zip file containing a valid sketch. If so check plugin settings",
+                    text: jqXHR.responseJSON.error,
                     type: "error",
                     hide: false
                 });
@@ -64,10 +64,10 @@ $(function() {
                     element.rm_btn = '<button class="btn btn-danger core-uninstall-btn" type="button" value="' + element.ID + '"><i class="icon-trash"></i></button>'
                 });
                 $("#cores-table").bootstrapTable("load", tableData);
-            }).fail(function() {
+            }).fail(function(jqXHR, status, error) {
                 new PNotify({
                     title: "Core search failed",
-                    text: "Is the plugin properly configured ?",
+                    text: jqXHR.responseJSON.error,
                     type: "error",
                     hide: false
                 });
@@ -90,10 +90,10 @@ $(function() {
                     text: "Successfully installed " + data.core,
                     type: "success"
                 });
-            }).fail(function() {
+            }).fail(function(jqXHR, status, error) {
                 new PNotify({
                     title: "Core install failed",
-                    text: "Is the plugin properly configured ?",
+                    text: jqXHR.responseJSON.error,
                     type: "error",
                     hide: false
                 });
@@ -115,10 +115,10 @@ $(function() {
                     text: "Successfully uninstalled " + data.core,
                     type: "success"
                 });
-            }).fail(function() {
+            }).fail(function(jqXHR, status, error) {
                 new PNotify({
                     title: "Core uninstall failed",
-                    text: "Was it installed ? Is the plugin properly configured ?",
+                    text: jqXHR.responseJSON.error,
                     type: "error",
                     hide: false
                 });
@@ -161,10 +161,10 @@ $(function() {
                     element.rm_btn = '<button class="btn btn-danger lib-uninstall-btn" type="button" value="' + element.Name + '"><i class="icon-trash"></i></button>'
                 });
                 $("#libs-table").bootstrapTable("load", tableData);
-            }).fail(function() {
+            }).fail(function(jqXHR, status, error) {
                 new PNotify({
                     title: "Lib search failed",
-                    text: "Is the plugin properly configured ?",
+                    text: jqXHR.responseJSON.error,
                     type: "error",
                     hide: false
                 });
@@ -187,10 +187,10 @@ $(function() {
                     text: "Successfully installed " + data.lib,
                     type: "success"
                 });
-            }).fail(function() {
+            }).fail(function(jqXHR, status, error) {
                 new PNotify({
                     title: "Lib install failed",
-                    text: "Is the plugin properly configured ?",
+                    text: jqXHR.responseJSON.error,
                     type: "error",
                     hide: false
                 });
@@ -212,10 +212,10 @@ $(function() {
                     text: "Successfully uninstalled " + data.lib,
                     type: "success"
                 });
-            }).fail(function() {
+            }).fail(function(jqXHR, status, error) {
                 new PNotify({
                     title: "Lib uninstall failed",
-                    text: "Was it installed ? Is the plugin properly configured ?",
+                    text: jqXHR.responseJSON.error,
                     type: "error",
                     hide: false
                 });

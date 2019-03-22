@@ -89,7 +89,7 @@ class MarlinFlasherPlugin(octoprint.plugin.SettingsPlugin,
 			result = dict(
 				error=e.error_info["Message"]
 			)
-			return flask.make_response(flask.jsonify(result), 500)
+			return flask.make_response(flask.jsonify(result), 400)
 		if "Platforms" not in search_result:
 			search_result = dict(
 				Platforms=[]
@@ -111,7 +111,7 @@ class MarlinFlasherPlugin(octoprint.plugin.SettingsPlugin,
 			result = dict(
 				error=e.error_info["Message"]
 			)
-			return flask.make_response(flask.jsonify(result), 500)
+			return flask.make_response(flask.jsonify(result), 400)
 		if "libraries" not in search_result:
 			search_result = dict(
 				libraries=[]
@@ -132,7 +132,7 @@ class MarlinFlasherPlugin(octoprint.plugin.SettingsPlugin,
 			result = dict(
 				error=e.error_info["Message"]
 			)
-			return flask.make_response(flask.jsonify(result), 500)
+			return flask.make_response(flask.jsonify(result), 400)
 		result = dict(
 			core=flask.request.values["core"]
 		)
@@ -152,7 +152,7 @@ class MarlinFlasherPlugin(octoprint.plugin.SettingsPlugin,
 			result = dict(
 				error=e.error_info["Message"]
 			)
-			return flask.make_response(flask.jsonify(result), 500)
+			return flask.make_response(flask.jsonify(result), 400)
 		result = dict(
 			lib=flask.request.values["lib"]
 		)
@@ -172,7 +172,7 @@ class MarlinFlasherPlugin(octoprint.plugin.SettingsPlugin,
 			result = dict(
 				error=e.error_info["Message"]
 			)
-			return flask.make_response(flask.jsonify(result), 500)
+			return flask.make_response(flask.jsonify(result), 400)
 		result = dict(
 			core=flask.request.values["core"]
 		)
@@ -192,7 +192,7 @@ class MarlinFlasherPlugin(octoprint.plugin.SettingsPlugin,
 			result = dict(
 				error=e.error_info["Message"]
 			)
-			return flask.make_response(flask.jsonify(result), 500)
+			return flask.make_response(flask.jsonify(result), 400)
 		result = dict(
 			core=flask.request.values["lib"]
 		)
