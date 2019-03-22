@@ -60,9 +60,9 @@ class MarlinFlasherPlugin(octoprint.plugin.SettingsPlugin,
 							)
 							return flask.make_response(flask.jsonify(result), 200)
 				shutil.rmtree(sketch_dir)
-				return flask.make_response("No sketch found in that file", 500)
+				return flask.make_response("No sketch found in that file", 400)
 		except zipfile.BadZipfile:
-			return flask.make_response("The given file was not a zip file", 500)
+			return flask.make_response("The given file was not a zip file", 400)
 
 	@octoprint.plugin.BlueprintPlugin.route("/cores", methods=["GET"])
 	def search_cores(self):
@@ -72,6 +72,7 @@ class MarlinFlasherPlugin(octoprint.plugin.SettingsPlugin,
 		if "query" not in flask.request.values:
 			return flask.make_response("No query given", 400)
 		try:
+			arduino.core_update_index()
 			result = arduino.core_search(flask.request.values["query"])
 		except RuntimeError:
 			return flask.make_response("The arduino path is not correct", 500)
@@ -79,6 +80,38 @@ class MarlinFlasherPlugin(octoprint.plugin.SettingsPlugin,
 			result = dict(
 				Platforms=[]
 			)
+		return flask.make_response(flask.jsonify(result), 200)
+
+	@octoprint.plugin.BlueprintPlugin.route("/cores/install", methods=["POST"])
+	def install_core(self):
+		arduino = self.__get_arduino()
+		if arduino is None:
+			return flask.make_response("Arduino path is not configured", 500)
+		if "core" not in flask.request.values:
+			return flask.make_response("No core given", 400)
+		try:
+			arduino.core_install(flask.request.values["core"])
+		except RuntimeError:
+			return flask.make_response("The arduino path is not correct", 500)
+		result = dict(
+			core=flask.request.values["core"]
+		)
+		return flask.make_response(flask.jsonify(result), 200)
+
+	@octoprint.plugin.BlueprintPlugin.route("/cores/uninstall", methods=["POST"])
+	def uninstall_core(self):
+		arduino = self.__get_arduino()
+		if arduino is None:
+			return flask.make_response("Arduino path is not configured", 500)
+		if "core" not in flask.request.values:
+			return flask.make_response("No core given", 400)
+		try:
+			arduino.core_uninstall(flask.request.values["core"])
+		except RuntimeError:
+			return flask.make_response("The arduino path is not correct", 500)
+		result = dict(
+			core=flask.request.values["core"]
+		)
 		return flask.make_response(flask.jsonify(result), 200)
 
 	def __get_arduino(self):
