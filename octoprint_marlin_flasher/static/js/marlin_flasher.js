@@ -34,17 +34,43 @@ $(function() {
                 {
                     field: "Name",
                     title: "Name"
+                },
+                {
+                    field: "dl_btn",
+                    title: '<i class="icon-download-alt"></i>',
+                    width: "54px",
+                    halign: "center"
+                },
+                {
+                    field: "rm_btn",
+                    title: '<i class="icon-trash"></i>',
+                    width: "54px",
+                    halign: "center"
                 }
             ]
         });
-        $("#test-button").click(function() {
-            $("#cores-table").bootstrapTable("load", [
-                {
-                    ID: "test-id",
-                    Version: "1.2.5",
-                    Name: "Test Name"
-                }
-            ]);
+        $("#cores-search-form").submit(function(event) {
+            $("#cores-table").bootstrapTable("showLoading");
+            $.getJSON("/plugin/marlin_flasher/cores", {
+                query: $("#cores-search-text").val()
+            }).done(function (data) {
+                var tableData = data.Platforms;
+                tableData.forEach(function(element) {
+                    element.dl_btn = '<button class="btn btn-primary" type="button" value="' + element.ID + '@' + element.Version + '"><i class="icon-download-alt"></i></button>'
+                    element.rm_btn = '<button class="btn btn-danger" type="button" value="' + element.ID + '"><i class="icon-trash"></i></button>'
+                });
+                $("#cores-table").bootstrapTable("load", tableData);
+            }).fail(function() {
+                new PNotify({
+                    title: "Core search failed",
+                    text: "Is the plugin properly configured ?",
+                    type: "error",
+                    hide: false
+                });
+            }).always(function() {
+                $("#cores-table").bootstrapTable("hideLoading");
+            });
+            event.preventDefault();
         });
     }
 

@@ -64,6 +64,19 @@ class MarlinFlasherPlugin(octoprint.plugin.SettingsPlugin,
 		except zipfile.BadZipfile:
 			return flask.make_response("The given file was not a zip file", 500)
 
+	@octoprint.plugin.BlueprintPlugin.route("/cores", methods=["GET"])
+	def search_cores(self):
+		arduino = self.__get_arduino()
+		if arduino is None:
+			return flask.make_response("Arduino path is not configured", 500)
+		if "query" not in flask.request.values:
+			return flask.make_response("No query given", 400)
+		try:
+			result = arduino.core_search(flask.request.values["query"])
+		except RuntimeError:
+			return flask.make_response("The arduino path is not correct", 500)
+		return flask.make_response(flask.jsonify(result), 200)
+
 	def __get_arduino(self):
 		arduino_path = self._settings.get(["arduino_path"])
 		if arduino_path is None:
