@@ -53,7 +53,7 @@ $(function() {
             $("#cores-table").bootstrapTable("showLoading");
             $.ajax({
                 type: "GET",
-                url: "/plugin/marlin_flasher/cores",
+                url: "/plugin/marlin_flasher/cores/search",
                 data: {
                     query: $("#cores-search-text").val()
                 }

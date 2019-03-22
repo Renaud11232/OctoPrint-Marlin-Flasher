@@ -64,7 +64,7 @@ class MarlinFlasherPlugin(octoprint.plugin.SettingsPlugin,
 		except zipfile.BadZipfile:
 			return flask.make_response("The given file was not a zip file", 400)
 
-	@octoprint.plugin.BlueprintPlugin.route("/cores", methods=["GET"])
+	@octoprint.plugin.BlueprintPlugin.route("/cores/search", methods=["GET"])
 	def search_cores(self):
 		arduino = self.__get_arduino()
 		if arduino is None:
