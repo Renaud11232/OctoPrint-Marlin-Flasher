@@ -8,6 +8,7 @@ import shutil
 import os
 
 
+# TODO refactor & cleanup + better error handling
 class MarlinFlasherPlugin(octoprint.plugin.SettingsPlugin,
 							octoprint.plugin.AssetPlugin,
 							octoprint.plugin.TemplatePlugin,
@@ -116,6 +117,22 @@ class MarlinFlasherPlugin(octoprint.plugin.SettingsPlugin,
 		)
 		return flask.make_response(flask.jsonify(result), 200)
 
+	@octoprint.plugin.BlueprintPlugin.route("/libs/install", methods=["POST"])
+	def install_lib(self):
+		arduino = self.__get_arduino()
+		if arduino is None:
+			return flask.make_response("Arduino path is not configured", 500)
+		if "lib" not in flask.request.values:
+			return flask.make_response("No lib given", 400)
+		try:
+			arduino.lib_install(flask.request.values["lib"])
+		except RuntimeError:
+			return flask.make_response("The arduino path is not correct", 500)
+		result = dict(
+			lib=flask.request.values["lib"]
+		)
+		return flask.make_response(flask.jsonify(result), 200)
+
 	@octoprint.plugin.BlueprintPlugin.route("/cores/uninstall", methods=["POST"])
 	def uninstall_core(self):
 		arduino = self.__get_arduino()
@@ -129,6 +146,22 @@ class MarlinFlasherPlugin(octoprint.plugin.SettingsPlugin,
 			return flask.make_response("The arduino path is not correct", 500)
 		result = dict(
 			core=flask.request.values["core"]
+		)
+		return flask.make_response(flask.jsonify(result), 200)
+
+	@octoprint.plugin.BlueprintPlugin.route("/libs/uninstall", methods=["POST"])
+	def uninstall_lib(self):
+		arduino = self.__get_arduino()
+		if arduino is None:
+			return flask.make_response("Arduino path is not configured", 500)
+		if "lib" not in flask.request.values:
+			return flask.make_response("No lib given", 400)
+		try:
+			arduino.lib_uninstall(flask.request.values["lib"])
+		except RuntimeError:
+			return flask.make_response("The arduino path is not correct", 500)
+		result = dict(
+			core=flask.request.values["lib"]
 		)
 		return flask.make_response(flask.jsonify(result), 200)
 

@@ -173,6 +173,56 @@ $(function() {
             });
             event.preventDefault();
         });
+        $(document).on("click", "button.lib-install-btn", function() {
+            $("#libs-table").bootstrapTable("showLoading");
+            $.ajax({
+                type: "POST",
+                url: "/plugin/marlin_flasher/libs/install",
+                data: {
+                    lib: $(this).val()
+                }
+            }).done(function(data) {
+                new PNotify({
+                    title: "Lib install successful",
+                    text: "Successfully installed " + data.lib,
+                    type: "success"
+                });
+            }).fail(function() {
+                new PNotify({
+                    title: "Lib install failed",
+                    text: "Is the plugin properly configured ?",
+                    type: "error",
+                    hide: false
+                });
+            }).always(function() {
+                $("#libs-table").bootstrapTable("hideLoading");
+            });
+        });
+        $(document).on("click", "button.lib-uninstall-btn", function() {
+            $("#libs-table").bootstrapTable("showLoading");
+            $.ajax({
+                type: "POST",
+                url: "/plugin/marlin_flasher/libs/uninstall",
+                data: {
+                    lib: $(this).val()
+                }
+            }).done(function(data) {
+                new PNotify({
+                    title: "Lib uninstall successful",
+                    text: "Successfully uninstalled " + data.lib,
+                    type: "success"
+                });
+            }).fail(function() {
+                new PNotify({
+                    title: "Lib uninstall failed",
+                    text: "Was it installed ? Is the plugin properly configured ?",
+                    type: "error",
+                    hide: false
+                });
+            }).always(function() {
+                $("#libs-table").bootstrapTable("hideLoading");
+            });
+        });
     }
 
     OCTOPRINT_VIEWMODELS.push({
