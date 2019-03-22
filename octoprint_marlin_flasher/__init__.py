@@ -75,6 +75,10 @@ class MarlinFlasherPlugin(octoprint.plugin.SettingsPlugin,
 			result = arduino.core_search(flask.request.values["query"])
 		except RuntimeError:
 			return flask.make_response("The arduino path is not correct", 500)
+		if result is None:
+			result = dict(
+				Platforms=[]
+			)
 		return flask.make_response(flask.jsonify(result), 200)
 
 	def __get_arduino(self):
