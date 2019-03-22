@@ -16,8 +16,7 @@ $(function() {
                 new PNotify({
                     title: "Sketch upload failed",
                     text: jqXHR.responseJSON.error,
-                    type: "error",
-                    hide: false
+                    type: "error"
                 });
             }
         });
@@ -68,8 +67,7 @@ $(function() {
                 new PNotify({
                     title: "Core search failed",
                     text: jqXHR.responseJSON.error,
-                    type: "error",
-                    hide: false
+                    type: "error"
                 });
             }).always(function() {
                 $("#cores-table").bootstrapTable("hideLoading");
@@ -94,8 +92,7 @@ $(function() {
                 new PNotify({
                     title: "Core install failed",
                     text: jqXHR.responseJSON.error,
-                    type: "error",
-                    hide: false
+                    type: "error"
                 });
             }).always(function() {
                 $("#cores-table").bootstrapTable("hideLoading");
@@ -119,8 +116,7 @@ $(function() {
                 new PNotify({
                     title: "Core uninstall failed",
                     text: jqXHR.responseJSON.error,
-                    type: "error",
-                    hide: false
+                    type: "error"
                 });
             }).always(function() {
                 $("#cores-table").bootstrapTable("hideLoading");
@@ -165,8 +161,7 @@ $(function() {
                 new PNotify({
                     title: "Lib search failed",
                     text: jqXHR.responseJSON.error,
-                    type: "error",
-                    hide: false
+                    type: "error"
                 });
             }).always(function() {
                 $("#libs-table").bootstrapTable("hideLoading");
@@ -191,8 +186,7 @@ $(function() {
                 new PNotify({
                     title: "Lib install failed",
                     text: jqXHR.responseJSON.error,
-                    type: "error",
-                    hide: false
+                    type: "error"
                 });
             }).always(function() {
                 $("#libs-table").bootstrapTable("hideLoading");
@@ -216,8 +210,7 @@ $(function() {
                 new PNotify({
                     title: "Lib uninstall failed",
                     text: jqXHR.responseJSON.error,
-                    type: "error",
-                    hide: false
+                    type: "error"
                 });
             }).always(function() {
                 $("#libs-table").bootstrapTable("hideLoading");
