@@ -216,6 +216,9 @@ $(function() {
                 $("#libs-table").bootstrapTable("hideLoading");
             });
         });
+        $("#form-flash").submit(function(event) {
+            event.preventDefault();
+        });
     }
 
     OCTOPRINT_VIEWMODELS.push({

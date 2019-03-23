@@ -1,12 +1,24 @@
 <div class="accordion-group">
     <div class="accordion-heading">
-        <a class="accordion-toggle" data-toggle="collapse" data-parent="#marlin_flasher_accordion" href="#collapseTwo">
+        <a class="accordion-toggle" data-toggle="collapse" data-parent="#marlin_flasher_accordion" href="#flash">
             Flash
         </a>
     </div>
-    <div id="collapseTwo" class="accordion-body collapse in">
+    <div id="flash" class="accordion-body collapse in">
         <div class="accordion-inner">
-            Anim pariatur cliche...
+            <form id="form-flash" class="form-horizontal">
+                <div class="control-group">
+                    <label class="control-label" for="flash-board">Board</label>
+                    <div class="controls">
+                        <input type="text" id="flash-board" placeholder="Email">
+                    </div>
+                </div>
+                <div class="control-group">
+                    <div class="controls">
+                        <button class="btn btn-warning" type="submit"><i class="icon-warning-sign"></i> Flash</button>
+                    </div>
+                </div>
+            </form>
         </div>
     </div>
 </div>
