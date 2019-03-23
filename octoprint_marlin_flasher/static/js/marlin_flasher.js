@@ -83,6 +83,7 @@ $(function() {
                     core: $(this).val()
                 }
             }).done(function(data) {
+                self.loadSelectOptions();
                 new PNotify({
                     title: "Core install successful",
                     text: "Successfully installed " + data.core,
@@ -107,6 +108,7 @@ $(function() {
                     core: $(this).val()
                 }
             }).done(function(data) {
+                self.loadSelectOptions();
                 new PNotify({
                     title: "Core uninstall successful",
                     text: "Successfully uninstalled " + data.core,
@@ -216,7 +218,50 @@ $(function() {
                 $("#libs-table").bootstrapTable("hideLoading");
             });
         });
+        self.loadSelectOptions = function() {
+            $("#fqbn").empty();
+            $.ajax({
+                type: "GET",
+                url: "/plugin/marlin_flasher/board/listall",
+            }).done(function (data) {
+                if(data.boards) {
+                    data.boards.forEach(function(board) {
+                        var option = new Option(board.name, board.fqbn);
+                        $("#fqbn").append($(option));
+                    });
+                }
+            }).fail(function(jqXHR, status, error) {
+                new PNotify({
+                    title: "Board list fetch failed",
+                    text: jqXHR.responseJSON.error,
+                    type: "error"
+                });
+            });
+        };
+        self.loadSelectOptions();
         $("#form-flash").submit(function(event) {
+            $("#flash-button").button("loading");
+            $.ajax({
+                type: "POST",
+                url: "/plugin/marlin_flasher/flash",
+                data: {
+                    board: $("#fqbn").val()
+                }
+            }).done(function (data) {
+                new PNotify({
+                    title: "Flashing successful",
+                    text: data.message,
+                    type: "success"
+                });
+            }).fail(function(jqXHR, status, error) {
+                new PNotify({
+                    title: "Flashing failed",
+                    text: jqXHR.responseJSON.error,
+                    type: "error"
+                });
+            }).always(function() {
+                $("#flash-button").button("reset");
+            });
             event.preventDefault();
         });
     }

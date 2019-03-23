@@ -17,7 +17,7 @@ class MarlinFlasherPlugin(octoprint.plugin.SettingsPlugin,
 							octoprint.plugin.StartupPlugin):
 
 	def on_after_startup(self):
-		self.__aketch = None
+		self.__sketch = None
 
 	def get_settings_defaults(self):
 		return dict(
@@ -198,9 +198,21 @@ class MarlinFlasherPlugin(octoprint.plugin.SettingsPlugin,
 		)
 		return flask.make_response(flask.jsonify(result), 200)
 
+	@octoprint.plugin.BlueprintPlugin.route("/board/listall", methods=["GET"])
+	def board_listall(self):
+		arduino = self.__get_arduino()
+		try:
+			result = arduino.board_listall()
+			return flask.make_response(flask.jsonify(result), 200)
+		except pyduinocli.ArduinoError as e:
+			result = dict(
+				error=e.error_info["Message"]
+			)
+			return flask.make_response(flask.jsonify(result), 400)
+
 	@octoprint.plugin.BlueprintPlugin.route("/flash", methods=["POST"])
 	def flash(self):
-		if "board" not in flask.request.values:
+		if "board" not in flask.request.values or not flask.request.values["board"]:
 			result = dict(
 				error="Missing board"
 			)
