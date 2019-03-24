@@ -61,26 +61,28 @@ $(function() {
                     query: $("#cores-search-text").val()
                 }
             }).done(function (data) {
-                var tableData = data.Platforms;
-                tableData.forEach(function(element) {
-                    element.dl_btn = $("<button>", {
-                        class: "btn btn-primary core-install-btn",
-                        type: "button",
-                        value: element.ID + "@" + element.Version,
-                        html: $("<i>", {
-                            class: "icon-download-alt"
-                        }).prop("outerHTML")
-                    }).prop("outerHTML");
-                    element.rm_btn = $("<button>", {
-                        class: "btn btn-danger core-uninstall-btn",
-                        type: "button",
-                        value: element.ID,
-                        html: $("<i>", {
-                            class: "icon-trash"
-                        }).prop("outerHTML")
-                    }).prop("outerHTML");
-                });
-                $("#cores-table").bootstrapTable("load", tableData);
+                if(data.hasOwnProperty("Platforms")) {
+                    var tableData = data.Platforms;
+                    tableData.forEach(function(element) {
+                        element.dl_btn = $("<button>", {
+                            class: "btn btn-primary core-install-btn",
+                            type: "button",
+                            value: element.ID + "@" + element.Version,
+                            html: $("<i>", {
+                                class: "icon-download-alt"
+                            }).prop("outerHTML")
+                        }).prop("outerHTML");
+                        element.rm_btn = $("<button>", {
+                            class: "btn btn-danger core-uninstall-btn",
+                            type: "button",
+                            value: element.ID,
+                            html: $("<i>", {
+                                class: "icon-trash"
+                            }).prop("outerHTML")
+                        }).prop("outerHTML");
+                    });
+                    $("#cores-table").bootstrapTable("load", tableData);
+                }
             }).fail(function(jqXHR, status, error) {
                 new PNotify({
                     title: "Core search failed",
@@ -175,26 +177,28 @@ $(function() {
                     query: $("#libs-search-text").val()
                 }
             }).done(function (data) {
-                var tableData = data.libraries;
-                tableData.forEach(function(element) {
-                    element.dl_btn = $("<button>", {
-                        class: "btn btn-primary lib-install-btn",
-                        type: "button",
-                        value: element.Name,
-                        html: $("<i>", {
-                            class: "icon-download-alt"
-                        }).prop("outerHTML")
-                    }).prop("outerHTML");
-                    element.rm_btn = $("<button>", {
-                        class: "btn btn-danger lib-uninstall-btn",
-                        type: "button",
-                        value: element.Name,
-                        html: $("<i>", {
-                            class: "icon-trash"
-                        }).prop("outerHTML")
-                    }).prop("outerHTML");
-                });
-                $("#libs-table").bootstrapTable("load", tableData);
+                if(data.hasOwnProperty("libraries")) {
+                    var tableData = data.libraries;
+                    tableData.forEach(function(element) {
+                        element.dl_btn = $("<button>", {
+                            class: "btn btn-primary lib-install-btn",
+                            type: "button",
+                            value: element.Name,
+                            html: $("<i>", {
+                                class: "icon-download-alt"
+                            }).prop("outerHTML")
+                        }).prop("outerHTML");
+                        element.rm_btn = $("<button>", {
+                            class: "btn btn-danger lib-uninstall-btn",
+                            type: "button",
+                            value: element.Name,
+                            html: $("<i>", {
+                                class: "icon-trash"
+                            }).prop("outerHTML")
+                        }).prop("outerHTML");
+                    });
+                    $("#libs-table").bootstrapTable("load", tableData);
+                }
             }).fail(function(jqXHR, status, error) {
                 new PNotify({
                     title: "Lib search failed",
