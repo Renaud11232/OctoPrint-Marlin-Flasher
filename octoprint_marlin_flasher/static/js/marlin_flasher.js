@@ -36,13 +36,17 @@ $(function() {
                 },
                 {
                     field: "dl_btn",
-                    title: '<i class="icon-download-alt"></i>',
+                    title: $("<i>", {
+                        class: "icon-download-alt"
+                    }).prop("outerHTML"),
                     width: "54px",
                     halign: "center"
                 },
                 {
                     field: "rm_btn",
-                    title: '<i class="icon-trash"></i>',
+                    title: $("<i>", {
+                        class: "icon-trash"
+                    }).prop("outerHTML"),
                     width: "54px",
                     halign: "center"
                 }
@@ -59,8 +63,22 @@ $(function() {
             }).done(function (data) {
                 var tableData = data.Platforms;
                 tableData.forEach(function(element) {
-                    element.dl_btn = '<button class="btn btn-primary core-install-btn" type="button" value="' + element.ID + '@' + element.Version + '"><i class="icon-download-alt"></i></button>'
-                    element.rm_btn = '<button class="btn btn-danger core-uninstall-btn" type="button" value="' + element.ID + '"><i class="icon-trash"></i></button>'
+                    element.dl_btn = $("<button>", {
+                        class: "btn btn-primary core-install-btn",
+                        type: "button",
+                        value: element.ID + "@" + element.Version,
+                        html: $("<i>", {
+                            class: "icon-download-alt"
+                        }).prop("outerHTML")
+                    }).prop("outerHTML");
+                    element.rm_btn = $("<button>", {
+                        class: "btn btn-danger core-uninstall-btn",
+                        type: "button",
+                        value: element.ID,
+                        html: $("<i>", {
+                            class: "icon-trash"
+                        }).prop("outerHTML")
+                    }).prop("outerHTML");
                 });
                 $("#cores-table").bootstrapTable("load", tableData);
             }).fail(function(jqXHR, status, error) {
@@ -83,7 +101,7 @@ $(function() {
                     core: $(this).val()
                 }
             }).done(function(data) {
-                self.loadSelectOptions();
+                self.loadBoardSelectOptions();
                 new PNotify({
                     title: "Core install successful",
                     text: "Successfully installed " + data.core,
@@ -108,7 +126,7 @@ $(function() {
                     core: $(this).val()
                 }
             }).done(function(data) {
-                self.loadSelectOptions();
+                self.loadBoardSelectOptions();
                 new PNotify({
                     title: "Core uninstall successful",
                     text: "Successfully uninstalled " + data.core,
@@ -132,13 +150,17 @@ $(function() {
                 },
                 {
                     field: "dl_btn",
-                    title: '<i class="icon-download-alt"></i>',
+                    title: $("<i>", {
+                        class: "icon-download-alt"
+                    }).prop("outerHTML"),
                     width: "54px",
                     halign: "center"
                 },
                 {
                     field: "rm_btn",
-                    title: '<i class="icon-trash"></i>',
+                    title: $("<i>", {
+                        class: "icon-trash"
+                    }).prop("outerHTML"),
                     width: "54px",
                     halign: "center"
                 }
@@ -155,8 +177,22 @@ $(function() {
             }).done(function (data) {
                 var tableData = data.libraries;
                 tableData.forEach(function(element) {
-                    element.dl_btn = '<button class="btn btn-primary lib-install-btn" type="button" value="' + element.Name + '"><i class="icon-download-alt"></i></button>'
-                    element.rm_btn = '<button class="btn btn-danger lib-uninstall-btn" type="button" value="' + element.Name + '"><i class="icon-trash"></i></button>'
+                    element.dl_btn = $("<button>", {
+                        class: "btn btn-primary lib-install-btn",
+                        type: "button",
+                        value: element.Name,
+                        html: $("<i>", {
+                            class: "icon-download-alt"
+                        }).prop("outerHTML")
+                    }).prop("outerHTML");
+                    element.rm_btn = $("<button>", {
+                        class: "btn btn-danger lib-uninstall-btn",
+                        type: "button",
+                        value: element.Name,
+                        html: $("<i>", {
+                            class: "icon-trash"
+                        }).prop("outerHTML")
+                    }).prop("outerHTML");
                 });
                 $("#libs-table").bootstrapTable("load", tableData);
             }).fail(function(jqXHR, status, error) {
@@ -218,16 +254,25 @@ $(function() {
                 $("#libs-table").bootstrapTable("hideLoading");
             });
         });
-        self.loadSelectOptions = function() {
+        self.loadBoardSelectOptions = function() {
             $("#fqbn").empty();
+            $("#fqbn").append($("<option>", {
+                disabled: true,
+                selected: true,
+                value: "",
+                text: "Please select one"
+            }));
+            $("#flash-options").empty();
             $.ajax({
                 type: "GET",
                 url: "/plugin/marlin_flasher/board/listall",
             }).done(function (data) {
                 if(data.boards) {
                     data.boards.forEach(function(board) {
-                        var option = new Option(board.name, board.fqbn);
-                        $("#fqbn").append($(option));
+                        $("#fqbn").append($("<option>", {
+                            text: board.name,
+                            value: board.fqbn
+                        }));
                     });
                 }
             }).fail(function(jqXHR, status, error) {
@@ -238,15 +283,13 @@ $(function() {
                 });
             });
         };
-        self.loadSelectOptions();
+        self.loadBoardSelectOptions();
         $("#form-flash").submit(function(event) {
             $("#flash-button").button("loading");
             $.ajax({
                 type: "POST",
                 url: "/plugin/marlin_flasher/flash",
-                data: {
-                    board: $("#fqbn").val()
-                }
+                data: $("#form-flash").serialize()
             }).done(function (data) {
                 new PNotify({
                     title: "Flashing successful",
@@ -263,6 +306,56 @@ $(function() {
                 $("#flash-button").button("reset");
             });
             event.preventDefault();
+        });
+        $("#fqbn").change(function() {
+            $("#flash-options").empty();
+            $.ajax({
+                type: "GET",
+                url: "/plugin/marlin_flasher/board/details",
+                data: {
+                    fqbn: $("#fqbn").val()
+                }
+            }).done(function (data) {
+                if(data) {
+                    data.ConfigOptions.forEach(function(o) {
+                        var controlGroup = $("<div>", {
+                            class: "control-group"
+                        });
+                        controlGroup.append($("<label>", {
+                            class: "control-label",
+                            for: "flash-option-" + o.Option,
+                            text: o.OptionLabel
+                        }));
+                        var controls = $("<div>", {
+                            class: "controls"
+                        });
+                        var select = $("<select>", {
+                            id: "flash-option-" + o.Option,
+                            name: o.Option,
+                            required: true
+                        });
+                        o.Values.forEach(function(v) {
+                            var option = $("<option>", {
+                                value: v.Value,
+                                text: v.ValueLabel
+                            });
+                            if(v.hasOwnProperty("Selected") && v.Selected) {
+                                option.prop("selected", true)
+                            }
+                            select.append(option);
+                        });
+                        controls.append(select);
+                        controlGroup.append(controls);
+                        $("#flash-options").append(controlGroup);
+                    });
+                }
+            }).fail(function(jqXHR, status, error) {
+                new PNotify({
+                    title: "Board option fetch failed",
+                    text: jqXHR.responseJSON.error,
+                    type: "error"
+                });
+            });
         });
     }
 

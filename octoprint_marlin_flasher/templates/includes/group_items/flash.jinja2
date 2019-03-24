@@ -8,11 +8,12 @@
         <div class="accordion-inner">
             <form id="form-flash" class="form-horizontal">
                 <div class="control-group">
-                    <label class="control-label" for="flash-board">Board</label>
+                    <label class="control-label" for="fqbn">Board</label>
                     <div class="controls">
-                        <select id="fqbn"></select>
+                        <select name="fqbn" id="fqbn" required="required"></select>
                     </div>
                 </div>
+                <div id="flash-options"></div>
                 <div class="control-group">
                     <div class="controls">
                         <button id="flash-button" class="btn btn-warning" type="submit" data-loading-text="Flashing..." ><i class="icon-warning-sign"></i> Flash</button>

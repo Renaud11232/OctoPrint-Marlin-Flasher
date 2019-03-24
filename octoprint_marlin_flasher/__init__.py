@@ -210,14 +210,31 @@ class MarlinFlasherPlugin(octoprint.plugin.SettingsPlugin,
 			)
 			return flask.make_response(flask.jsonify(result), 400)
 
-	@octoprint.plugin.BlueprintPlugin.route("/flash", methods=["POST"])
-	def flash(self):
-		if "board" not in flask.request.values or not flask.request.values["board"]:
+	@octoprint.plugin.BlueprintPlugin.route("/board/details", methods=["GET"])
+	def board_detail(self):
+		if "fqbn" not in flask.request.values or not flask.request.values["fqbn"]:
 			result = dict(
-				error="Missing board"
+				error="Missing fqbn"
 			)
 			return flask.make_response(flask.jsonify(result), 400)
-		fqbn = flask.request.values["board"]
+		arduino = self.__get_arduino()
+		try:
+			result = arduino.board_details(flask.request.values["fqbn"])
+			return flask.make_response(flask.jsonify(result), 200)
+		except pyduinocli.ArduinoError as e:
+			result = dict(
+				error=e.error_info["Message"]
+			)
+			return flask.make_response(flask.jsonify(result), 400)
+
+	@octoprint.plugin.BlueprintPlugin.route("/flash", methods=["POST"])
+	def flash(self):
+		if "fqbn" not in flask.request.values or not flask.request.values["fqbn"]:
+			result = dict(
+				error="Missing fqbn"
+			)
+			return flask.make_response(flask.jsonify(result), 400)
+		fqbn = flask.request.values["fqbn"]
 		if self.__sketch is None:
 			result = dict(
 				error="No sketch uploaded"
