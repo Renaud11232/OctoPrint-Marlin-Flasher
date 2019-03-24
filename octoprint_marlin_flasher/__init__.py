@@ -234,7 +234,6 @@ class MarlinFlasherPlugin(octoprint.plugin.SettingsPlugin,
 				error="Missing fqbn"
 			)
 			return flask.make_response(flask.jsonify(result), 400)
-		fqbn = flask.request.values["fqbn"]
 		if self.__sketch is None:
 			result = dict(
 				error="No sketch uploaded"
@@ -245,6 +244,14 @@ class MarlinFlasherPlugin(octoprint.plugin.SettingsPlugin,
 				error="The printer is currently not ready"
 			)
 			return flask.make_response(flask.jsonify(result), 409)
+		options = []
+		for param in flask.request.values:
+			if param != "fqbn":
+				options.append("%s=%s" % (param, flask.request.values[param]))
+		options = ",".join(options)
+		fqbn = flask.request.values["fqbn"]
+		if options:
+			fqbn = "%s:%s" % (fqbn, options)
 		connection_string, port, baudrate, profile = self._printer.get_current_connection()
 		self._printer.disconnect()
 		arduino = self.__get_arduino()
