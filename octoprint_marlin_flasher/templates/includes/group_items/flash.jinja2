@@ -1,14 +1,14 @@
 <div class="accordion-group">
     <div class="accordion-heading">
         <a class="accordion-toggle" data-toggle="collapse" data-parent="#marlin_flasher_accordion" href="#flash">
-            Flash
+            {{ _('Flash') }}
         </a>
     </div>
     <div id="flash" class="accordion-body collapse in">
         <div class="accordion-inner">
             <form id="form-flash" class="form-horizontal">
                 <div class="control-group">
-                    <label class="control-label" for="fqbn">Board</label>
+                    <label class="control-label" for="fqbn">{{ _('Board') }}</label>
                     <div class="controls">
                         <select name="fqbn" id="fqbn" required="required"></select>
                     </div>
@@ -16,7 +16,7 @@
                 <div id="flash-options"></div>
                 <div class="control-group">
                     <div class="controls">
-                        <button id="flash-button" class="btn btn-warning" type="submit" data-loading-text="Flashing..." ><i class="icon-warning-sign"></i> Flash</button>
+                        <button id="flash-button" class="btn btn-warning" type="submit" data-loading-text="{{ _('Flashing...') }}" ><i class="icon-warning-sign"></i> {{ _('Flash') }}</button>
                     </div>
                 </div>
             </form>

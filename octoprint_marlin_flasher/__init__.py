@@ -3,6 +3,7 @@ from __future__ import absolute_import
 import octoprint.plugin
 import flask
 import pyduinocli
+from gettext import gettext
 import shlex
 import zipfile
 import shutil
@@ -32,8 +33,7 @@ class MarlinFlasherPlugin(octoprint.plugin.SettingsPlugin,
 				"js/marlin_flasher.js"
 			],
 			css=[
-				"css/bootstrap-table.css",
-				"css/marlin_flasher.css"
+				"css/bootstrap-table.css"
 			]
 		)
 
@@ -41,7 +41,7 @@ class MarlinFlasherPlugin(octoprint.plugin.SettingsPlugin,
 	def upload_sketch(self):
 		upload_path = "sketch_file." + self._settings.global_get(["server", "uploads", "pathSuffix"])
 		if upload_path not in flask.request.values:
-			result = dict(error="Missing sketch_file.")
+			result = dict(error=gettext("Missing sketch_file."))
 			return flask.make_response(flask.jsonify(result), 400)
 		path = flask.request.values[upload_path]
 		try:
@@ -62,16 +62,16 @@ class MarlinFlasherPlugin(octoprint.plugin.SettingsPlugin,
 							)
 							return flask.make_response(flask.jsonify(result), 200)
 				shutil.rmtree(sketch_dir)
-				result = dict(error="No valid sketch found in the given file.")
+				result = dict(error=gettext("No valid sketch found in the given file."))
 				return flask.make_response(flask.jsonify(result), 400)
 		except zipfile.BadZipfile:
-			result = dict(error="The given file was not a valid zip file.")
+			result = dict(error=gettext("The given file was not a valid zip file."))
 			return flask.make_response(flask.jsonify(result), 400)
 
 	@octoprint.plugin.BlueprintPlugin.route("/cores/search", methods=["GET"])
 	def search_cores(self):
 		if "query" not in flask.request.values:
-			result = dict(error="Missing query.")
+			result = dict(error=gettext("Missing query."))
 			return flask.make_response(flask.jsonify(result), 400)
 		arduino = self.__get_arduino()
 		try:
@@ -85,7 +85,7 @@ class MarlinFlasherPlugin(octoprint.plugin.SettingsPlugin,
 	@octoprint.plugin.BlueprintPlugin.route("/libs/search", methods=["GET"])
 	def search_libs(self):
 		if "query" not in flask.request.values:
-			result = dict(error="Missing query.")
+			result = dict(error=gettext("Missing query."))
 			return flask.make_response(flask.jsonify(result), 400)
 		arduino = self.__get_arduino()
 		try:
@@ -99,7 +99,7 @@ class MarlinFlasherPlugin(octoprint.plugin.SettingsPlugin,
 	@octoprint.plugin.BlueprintPlugin.route("/cores/install", methods=["POST"])
 	def install_core(self):
 		if "core" not in flask.request.values:
-			result = dict(error="Missing core.")
+			result = dict(error=gettext("Missing core."))
 			return flask.make_response(flask.jsonify(result), 400)
 		arduino = self.__get_arduino()
 		try:
@@ -113,7 +113,7 @@ class MarlinFlasherPlugin(octoprint.plugin.SettingsPlugin,
 	@octoprint.plugin.BlueprintPlugin.route("/libs/install", methods=["POST"])
 	def install_lib(self):
 		if "lib" not in flask.request.values:
-			result = dict(error="Missing lib.")
+			result = dict(error=gettext("Missing lib."))
 			return flask.make_response(flask.jsonify(result), 400)
 		arduino = self.__get_arduino()
 		try:
@@ -127,7 +127,7 @@ class MarlinFlasherPlugin(octoprint.plugin.SettingsPlugin,
 	@octoprint.plugin.BlueprintPlugin.route("/cores/uninstall", methods=["POST"])
 	def uninstall_core(self):
 		if "core" not in flask.request.values:
-			result = dict(error="Missing core.")
+			result = dict(error=gettext("Missing core."))
 			return flask.make_response(flask.jsonify(result), 400)
 		arduino = self.__get_arduino()
 		try:
@@ -141,7 +141,7 @@ class MarlinFlasherPlugin(octoprint.plugin.SettingsPlugin,
 	@octoprint.plugin.BlueprintPlugin.route("/libs/uninstall", methods=["POST"])
 	def uninstall_lib(self):
 		if "lib" not in flask.request.values:
-			result = dict(error="Missing lib.")
+			result = dict(error=gettext("Missing lib."))
 			return flask.make_response(flask.jsonify(result), 400)
 		arduino = self.__get_arduino()
 		try:
@@ -149,7 +149,7 @@ class MarlinFlasherPlugin(octoprint.plugin.SettingsPlugin,
 		except pyduinocli.ArduinoError as e:
 			result = dict(error=e.message)
 			return flask.make_response(flask.jsonify(result), 400)
-		result = dict(core=flask.request.values["lib"])
+		result = dict(lib=flask.request.values["lib"])
 		return flask.make_response(flask.jsonify(result), 200)
 
 	@octoprint.plugin.BlueprintPlugin.route("/board/listall", methods=["GET"])
@@ -165,7 +165,7 @@ class MarlinFlasherPlugin(octoprint.plugin.SettingsPlugin,
 	@octoprint.plugin.BlueprintPlugin.route("/board/details", methods=["GET"])
 	def board_detail(self):
 		if "fqbn" not in flask.request.values or not flask.request.values["fqbn"]:
-			result = dict(error="Missing fqbn.")
+			result = dict(error=gettext("Missing fqbn."))
 			return flask.make_response(flask.jsonify(result), 400)
 		arduino = self.__get_arduino()
 		try:
@@ -178,13 +178,13 @@ class MarlinFlasherPlugin(octoprint.plugin.SettingsPlugin,
 	@octoprint.plugin.BlueprintPlugin.route("/flash", methods=["POST"])
 	def flash(self):
 		if "fqbn" not in flask.request.values or not flask.request.values["fqbn"]:
-			result = dict(error="Missing fqbn.")
+			result = dict(error=gettext("Missing fqbn."))
 			return flask.make_response(flask.jsonify(result), 400)
 		if self.__sketch is None:
-			result = dict(error="No sketch uploaded.")
+			result = dict(error=gettext("No sketch uploaded."))
 			return flask.make_response(flask.jsonify(result), 400)
 		if not self._printer.is_ready():
-			result = dict(error="The printer is currently not ready.")
+			result = dict(error=gettext("The printer is currently not ready."))
 			return flask.make_response(flask.jsonify(result), 409)
 		options = []
 		for param in flask.request.values:
@@ -201,7 +201,7 @@ class MarlinFlasherPlugin(octoprint.plugin.SettingsPlugin,
 			self._printer.disconnect()
 			arduino.upload(self.__sketch, fqbn=fqbn, port=port)
 			self._printer.connect(port, baudrate, profile)
-			result = dict(message="Board successfully flashed.")
+			result = dict(message=gettext("Board successfully flashed."))
 			return flask.make_response(flask.jsonify(result), 200)
 		except pyduinocli.ArduinoError as e:
 			result = dict(error=e.message)

@@ -7,14 +7,14 @@ $(function() {
             headers: OctoPrint.getRequestHeaders(),
             done: function(e, data) {
                 new PNotify({
-                    title: "Sketch upload successful",
+                    title: gettext("Sketch upload successful"),
                     text: data.result.ino,
                     type: "success"
                 });
             },
             error: function(jqXHR, status, error) {
                 new PNotify({
-                    title: "Sketch upload failed",
+                    title: gettext("Sketch upload failed"),
                     text: jqXHR.responseJSON.error,
                     type: "error"
                 });
@@ -24,15 +24,15 @@ $(function() {
             columns: [
                 {
                     field: "ID",
-                    title: "ID"
+                    title: gettext("ID")
                 },
                 {
                     field: "Version",
-                    title: "Version"
+                    title: gettext("Version")
                 },
                 {
                     field: "Name",
-                    title: "Name"
+                    title: gettext("Name")
                 },
                 {
                     field: "dl_btn",
@@ -85,7 +85,7 @@ $(function() {
                 }
             }).fail(function(jqXHR, status, error) {
                 new PNotify({
-                    title: "Core search failed",
+                    title: gettext("Core search failed"),
                     text: jqXHR.responseJSON.error,
                     type: "error"
                 });
@@ -94,6 +94,7 @@ $(function() {
             });
             event.preventDefault();
         });
+
         $(document).on("click", "button.core-install-btn", function() {
             $("#cores-table").bootstrapTable("showLoading");
             $.ajax({
@@ -105,13 +106,13 @@ $(function() {
             }).done(function(data) {
                 self.loadBoardSelectOptions();
                 new PNotify({
-                    title: "Core install successful",
-                    text: "Successfully installed " + data.core,
+                    title: gettext("Core install successful"),
+                    text: gettext("Successfully installed {core}").replace("{core}", data.core),
                     type: "success"
                 });
             }).fail(function(jqXHR, status, error) {
                 new PNotify({
-                    title: "Core install failed",
+                    title: gettext("Core install failed"),
                     text: jqXHR.responseJSON.error,
                     type: "error"
                 });
@@ -130,13 +131,13 @@ $(function() {
             }).done(function(data) {
                 self.loadBoardSelectOptions();
                 new PNotify({
-                    title: "Core uninstall successful",
-                    text: "Successfully uninstalled " + data.core,
+                    title: gettext("Core uninstall successful"),
+                    text: gettext("Successfully uninstalled {core}").replace("{core}", data.core),
                     type: "success"
                 });
             }).fail(function(jqXHR, status, error) {
                 new PNotify({
-                    title: "Core uninstall failed",
+                    title: gettext("Core uninstall failed"),
                     text: jqXHR.responseJSON.error,
                     type: "error"
                 });
@@ -148,7 +149,7 @@ $(function() {
             columns: [
                 {
                     field: "Name",
-                    title: "Name"
+                    title: gettext("Name")
                 },
                 {
                     field: "dl_btn",
@@ -201,7 +202,7 @@ $(function() {
                 }
             }).fail(function(jqXHR, status, error) {
                 new PNotify({
-                    title: "Lib search failed",
+                    title: gettext("Lib search failed"),
                     text: jqXHR.responseJSON.error,
                     type: "error"
                 });
@@ -220,13 +221,13 @@ $(function() {
                 }
             }).done(function(data) {
                 new PNotify({
-                    title: "Lib install successful",
-                    text: "Successfully installed " + data.lib,
+                    title: gettext("Lib install successful"),
+                    text: gettext("Successfully installed {lib}").replace("{lib}", data.lib),
                     type: "success"
                 });
             }).fail(function(jqXHR, status, error) {
                 new PNotify({
-                    title: "Lib install failed",
+                    title: gettext("Lib install failed"),
                     text: jqXHR.responseJSON.error,
                     type: "error"
                 });
@@ -244,13 +245,13 @@ $(function() {
                 }
             }).done(function(data) {
                 new PNotify({
-                    title: "Lib uninstall successful",
-                    text: "Successfully uninstalled " + data.lib,
+                    title: gettext("Lib uninstall successful"),
+                    text: gettext("Successfully uninstalled {lib}").replace("{lib}", data.lib),
                     type: "success"
                 });
             }).fail(function(jqXHR, status, error) {
                 new PNotify({
-                    title: "Lib uninstall failed",
+                    title: gettext("Lib uninstall failed"),
                     text: jqXHR.responseJSON.error,
                     type: "error"
                 });
@@ -264,7 +265,7 @@ $(function() {
                 disabled: true,
                 selected: true,
                 value: "",
-                text: "Please select one"
+                text: gettext("Please select one")
             }));
             $("#flash-options").empty();
             $.ajax({
@@ -281,7 +282,7 @@ $(function() {
                 }
             }).fail(function(jqXHR, status, error) {
                 new PNotify({
-                    title: "Board list fetch failed",
+                    title: gettext("Board list fetch failed"),
                     text: jqXHR.responseJSON.error,
                     type: "error"
                 });
@@ -296,13 +297,13 @@ $(function() {
                 data: $("#form-flash").serialize()
             }).done(function (data) {
                 new PNotify({
-                    title: "Flashing successful",
+                    title: gettext("Flashing successful"),
                     text: data.message,
                     type: "success"
                 });
             }).fail(function(jqXHR, status, error) {
                 new PNotify({
-                    title: "Flashing failed",
+                    title: gettext("Flashing failed"),
                     text: jqXHR.responseJSON.error,
                     type: "error"
                 });
@@ -355,7 +356,7 @@ $(function() {
                 }
             }).fail(function(jqXHR, status, error) {
                 new PNotify({
-                    title: "Board option fetch failed",
+                    title: gettext("Board option fetch failed"),
                     text: jqXHR.responseJSON.error,
                     type: "error"
                 });
