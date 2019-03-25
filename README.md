@@ -3,7 +3,13 @@
 This plugins makes the upgrade of your Marlin (or any Arduino based) firmware possible directly within OctoPrint.
 Simply connect to your printer, upload your firmware code, select your motherboard type, and click flash.**DONE**.
 
+![](/extras/assets/img/plugins/marlin_flasher/sketch.png)
 
+![](/extras/assets/img/plugins/marlin_flasher/cores.png)
+
+![](/extras/assets/img/plugins/marlin_flasher/libraries.png)
+
+![](/extras/assets/img/plugins/marlin_flasher/flash.png)
 
 ## Setup
 

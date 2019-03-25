@@ -15,7 +15,6 @@ archive: https://github.com/Renaud11232/OctoPrint-Marlin-Flasher/archive/master.
 
 follow_dependency_links: false
 
-# TODO
 tags:
 - firmware
 - updater
@@ -36,8 +35,7 @@ screenshots:
   alt: flash
   caption: The flash menu where you start the flashing process
 
-# TODO
-featuredimage: url of a featured image for your plugin, /assets/img/...
+featuredimage: /assets/img/plugins/marlin_flasher/flash.png
 
 compatibility:
   octoprint:
