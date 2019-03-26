@@ -9,15 +9,15 @@
             <form class="form-search" data-bind="submit: searchCore">
                 <div class="input-append">
                     <input name="query" type="text" class="span2 search-query">
-                    <button id="search-core-btn" type="submit" class="btn" data-loading-text="Searching">{{ _('Search') }}</button>
+                    <button id="search-core-btn" type="submit" class="btn" data-loading-text="{{ _('Searching') }}">{{ _('Search') }}</button>
                 </div>
             </form>
             <table class="table table-bordered table-hover">
                 <thead>
                     <tr>
-                        <th>ID</th>
-                        <th>Version</th>
-                        <th>Name</th>
+                        <th>{{ _('ID') }}</th>
+                        <th>{{ _('Version') }}</th>
+                        <th>{{ _('Name') }}</th>
                         <th class="btn-col"><i class="icon-download-alt"></i></th>
                         <th class="btn-col"><i class="icon-trash"></i></th>
                     </tr>
@@ -43,7 +43,7 @@
                 <!-- ko if: coreSearchResult().length == 0 -->
                     <tbody>
                         <tr>
-                            <td colspan="5">No result found</td>
+                            <td colspan="5">{{ _('No result found') }}</td>
                         </tr>
                     </tbody>
                 <!-- /ko -->
