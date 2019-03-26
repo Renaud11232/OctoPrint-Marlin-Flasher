@@ -6,14 +6,13 @@
     </div>
     <div id="libraries" class="accordion-body collapse">
         <div class="accordion-inner">
-            <form id="libs-search-form" class="form-search" data-bind="submit: searchLib">
+            <form class="form-search" data-bind="submit: searchLib">
                 <div class="input-append">
                     <input name="query" type="text" class="span2 search-query">
                     <button type="submit" class="btn">{{ _('Search') }}</button>
                 </div>
             </form>
-            <table id="libs-table"></table>
-            <table id="libs-table" class="table table-bordered table-hover">
+            <table class="table table-bordered table-hover">
                 <thead>
                     <tr>
                         <th>Name</th>

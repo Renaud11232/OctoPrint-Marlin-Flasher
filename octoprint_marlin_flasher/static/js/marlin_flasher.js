@@ -3,15 +3,13 @@ $(function() {
         var self = this;
         self.settingsViewModel = parameters[0];
         self.sketchFileButton = $("#sketch_file");
-        self.coreSearchTextField = $("#cores-search-text");
-        self.libSearchTextField = $("#libs-search-text");
-        self.flashOptionContainer = $("#flash-options");
-        self.fqbn = $("#fqbn");
-        self.flashForm = $("#form-flash");
         self.flashButton = $("#flash-button");
 
         self.coreSearchResult = ko.observableArray();
         self.libSearchResult = ko.observableArray();
+        self.boardList = ko.observableArray();
+        self.selectedBoard = ko.observable();
+        self.boardOptions = ko.observableArray();
 
         self.sketchFileButton.fileupload({
             maxNumberOfFiles: 1,
@@ -62,7 +60,7 @@ $(function() {
                     core: this.ID
                 }
             }).done(function(data) {
-                self.loadBoardSelectOptions();
+                self.loadBoardList();
                 new PNotify({
                     title: gettext("Core install successful"),
                     text: gettext("Successfully installed {core}").replace("{core}", data.core),
@@ -87,7 +85,7 @@ $(function() {
                     core: this.ID
                 }
             }).done(function(data) {
-                self.loadBoardSelectOptions();
+                self.loadBoardList();
                 new PNotify({
                     title: gettext("Core uninstall successful"),
                     text: gettext("Successfully uninstalled {core}").replace("{core}", data.core),
@@ -173,26 +171,15 @@ $(function() {
                 //self.libsTable.bootstrapTable("hideLoading");
             });
         };
-        self.loadBoardSelectOptions = function() {
-            self.fqbn.empty();
-            self.fqbn.append($("<option>", {
-                disabled: true,
-                selected: true,
-                value: "",
-                text: gettext("Please select one")
-            }));
-            self.flashOptionContainer.empty();
+        self.loadBoardList = function() {
             $.ajax({
                 type: "GET",
                 url: "/plugin/marlin_flasher/board/listall",
             }).done(function (data) {
                 if(data.boards) {
-                    data.boards.forEach(function(board) {
-                        self.fqbn.append($("<option>", {
-                            text: board.name,
-                            value: board.fqbn
-                        }));
-                    });
+                    self.boardList(data.boards);
+                } else {
+                    self.boardList([]);
                 }
             }).fail(function(jqXHR, status, error) {
                 new PNotify({
@@ -202,13 +189,12 @@ $(function() {
                 });
             });
         };
-        self.loadBoardSelectOptions();
-        self.flashForm.submit(function(event) {
+        self.flash = function(form) {
             self.flashButton.button("loading");
             $.ajax({
                 type: "POST",
                 url: "/plugin/marlin_flasher/flash",
-                data: self.flashForm.serialize()
+                data: $(form).serialize()
             }).done(function (data) {
                 new PNotify({
                     title: gettext("Flashing successful"),
@@ -224,58 +210,32 @@ $(function() {
             }).always(function() {
                 self.flashButton.button("reset");
             });
-            event.preventDefault();
-        });
-        self.fqbn.change(function() {
-            self.flashOptionContainer.empty();
-            $.ajax({
-                type: "GET",
-                url: "/plugin/marlin_flasher/board/details",
-                data: {
-                    fqbn: self.fqbn.val()
-                }
-            }).done(function (data) {
-                if(data) {
-                    data.ConfigOptions.forEach(function(o) {
-                        var controlGroup = $("<div>", {
-                            class: "control-group"
-                        });
-                        controlGroup.append($("<label>", {
-                            class: "control-label",
-                            for: "flash-option-" + o.Option,
-                            text: o.OptionLabel
-                        }));
-                        var controls = $("<div>", {
-                            class: "controls"
-                        });
-                        var select = $("<select>", {
-                            id: "flash-option-" + o.Option,
-                            name: o.Option,
-                            required: true
-                        });
-                        o.Values.forEach(function(v) {
-                            var option = $("<option>", {
-                                value: v.Value,
-                                text: v.ValueLabel
-                            });
-                            if(v.hasOwnProperty("Selected") && v.Selected) {
-                                option.prop("selected", true)
-                            }
-                            select.append(option);
-                        });
-                        controls.append(select);
-                        controlGroup.append(controls);
-                        self.flashOptionContainer.append(controlGroup);
+        };
+        self.selectedBoard.subscribe(function(newValue) {
+            self.boardOptions([]);
+            if (newValue) {
+                $.ajax({
+                    type: "GET",
+                    url: "/plugin/marlin_flasher/board/details",
+                    data: {
+                        fqbn: newValue
+                    }
+                }).done(function (data) {
+                    if(data) {
+                        self.boardOptions(data.ConfigOptions);
+                    } else {
+                        self.boardOptions([]);
+                    }
+                }).fail(function(jqXHR, status, error) {
+                    new PNotify({
+                        title: gettext("Board option fetch failed"),
+                        text: jqXHR.responseJSON.error,
+                        type: "error"
                     });
-                }
-            }).fail(function(jqXHR, status, error) {
-                new PNotify({
-                    title: gettext("Board option fetch failed"),
-                    text: jqXHR.responseJSON.error,
-                    type: "error"
                 });
-            });
+            }
         });
+        self.loadBoardList();
     }
 
     OCTOPRINT_VIEWMODELS.push({

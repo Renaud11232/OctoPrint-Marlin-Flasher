@@ -29,11 +29,9 @@ class MarlinFlasherPlugin(octoprint.plugin.SettingsPlugin,
 	def get_assets(self):
 		return dict(
 			js=[
-				"js/bootstrap-table.js",
 				"js/marlin_flasher.js"
 			],
 			css=[
-				"css/bootstrap-table.css",
 				"css/marlin_flasher.css"
 			]
 		)
