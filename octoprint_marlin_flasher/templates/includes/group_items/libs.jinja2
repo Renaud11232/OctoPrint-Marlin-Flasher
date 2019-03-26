@@ -6,13 +6,45 @@
     </div>
     <div id="libraries" class="accordion-body collapse">
         <div class="accordion-inner">
-            <form id="libs-search-form" class="form-search">
+            <form id="libs-search-form" class="form-search" data-bind="submit: searchLib">
                 <div class="input-append">
-                    <input id="libs-search-text" type="text" class="span2 search-query">
+                    <input name="query" type="text" class="span2 search-query">
                     <button type="submit" class="btn">{{ _('Search') }}</button>
                 </div>
             </form>
             <table id="libs-table"></table>
+            <table id="libs-table" class="table table-bordered table-hover">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th class="btn-col"><i class="icon-download-alt"></i></th>
+                        <th class="btn-col"><i class="icon-trash"></i></th>
+                    </tr>
+                </thead>
+                <!-- ko if: libSearchResult().length > 0 -->
+                    <tbody data-bind="foreach: libSearchResult">
+                        <tr>
+                            <td data-bind="text: Name"></td>
+                            <td>
+                                <button type="button" class="btn btn-primary" data-bind="click: $parent.installLib">
+                                    <i class="icon-download-alt"></i>
+                                </button></td>
+                            <td>
+                                <button type="button" class="btn btn-danger" data-bind="click: $parent.uninstallLib">
+                                    <i class="icon-trash"></i>
+                                </button>
+                            </td>
+                        </tr>
+                    </tbody>
+                <!-- /ko -->
+                <!-- ko if: libSearchResult().length == 0 -->
+                    <tbody>
+                        <tr>
+                            <td colspan="3">No result found</td>
+                        </tr>
+                    </tbody>
+                <!-- /ko -->
+            </table>
         </div>
     </div>
 </div>

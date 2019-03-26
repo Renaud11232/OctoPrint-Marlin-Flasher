@@ -6,13 +6,48 @@
     </div>
     <div id="cores" class="accordion-body collapse">
         <div class="accordion-inner">
-            <form id="cores-search-form" class="form-search">
+            <form id="cores-search-form" class="form-search" data-bind="submit: searchCore">
                 <div class="input-append">
-                    <input id="cores-search-text" type="text" class="span2 search-query">
+                    <input name="query" type="text" class="span2 search-query">
                     <button type="submit" class="btn">{{ _('Search') }}</button>
                 </div>
             </form>
-            <table id="cores-table"></table>
+            <table id="cores-table" class="table table-bordered table-hover">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Version</th>
+                        <th>Name</th>
+                        <th class="btn-col"><i class="icon-download-alt"></i></th>
+                        <th class="btn-col"><i class="icon-trash"></i></th>
+                    </tr>
+                </thead>
+                <!-- ko if: coreSearchResult().length > 0 -->
+                    <tbody data-bind="foreach: coreSearchResult">
+                        <tr>
+                            <td data-bind="text: ID"></td>
+                            <td data-bind="text: Version"></td>
+                            <td data-bind="text: Name"></td>
+                            <td>
+                                <button type="button" class="btn btn-primary" data-bind="click: $parent.installCore">
+                                    <i class="icon-download-alt"></i>
+                                </button></td>
+                            <td>
+                                <button type="button" class="btn btn-danger" data-bind="click: $parent.uninstallCore">
+                                    <i class="icon-trash"></i>
+                                </button>
+                            </td>
+                        </tr>
+                    </tbody>
+                <!-- /ko -->
+                <!-- ko if: coreSearchResult().length == 0 -->
+                    <tbody>
+                        <tr>
+                            <td colspan="5">No result found</td>
+                        </tr>
+                    </tbody>
+                <!-- /ko -->
+            </table>
         </div>
     </div>
 </div>

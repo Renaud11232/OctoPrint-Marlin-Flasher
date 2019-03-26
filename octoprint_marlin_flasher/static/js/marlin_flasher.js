@@ -2,7 +2,18 @@ $(function() {
     function MarlinFlasherViewModel(parameters) {
         var self = this;
         self.settingsViewModel = parameters[0];
-        $("#sketch_file").fileupload({
+        self.sketchFileButton = $("#sketch_file");
+        self.coreSearchTextField = $("#cores-search-text");
+        self.libSearchTextField = $("#libs-search-text");
+        self.flashOptionContainer = $("#flash-options");
+        self.fqbn = $("#fqbn");
+        self.flashForm = $("#form-flash");
+        self.flashButton = $("#flash-button");
+
+        self.coreSearchResult = ko.observableArray();
+        self.libSearchResult = ko.observableArray();
+
+        self.sketchFileButton.fileupload({
             maxNumberOfFiles: 1,
             headers: OctoPrint.getRequestHeaders(),
             done: function(e, data) {
@@ -20,68 +31,17 @@ $(function() {
                 });
             }
         });
-        $("#cores-table").bootstrapTable({
-            columns: [
-                {
-                    field: "ID",
-                    title: gettext("ID")
-                },
-                {
-                    field: "Version",
-                    title: gettext("Version")
-                },
-                {
-                    field: "Name",
-                    title: gettext("Name")
-                },
-                {
-                    field: "dl_btn",
-                    title: $("<i>", {
-                        class: "icon-download-alt"
-                    }).prop("outerHTML"),
-                    width: "54px",
-                    halign: "center"
-                },
-                {
-                    field: "rm_btn",
-                    title: $("<i>", {
-                        class: "icon-trash"
-                    }).prop("outerHTML"),
-                    width: "54px",
-                    halign: "center"
-                }
-            ]
-        });
-        $("#cores-search-form").submit(function(event) {
-            $("#cores-table").bootstrapTable("showLoading");
+        self.searchCore = function(form) {
+            //show loading
             $.ajax({
                 type: "GET",
                 url: "/plugin/marlin_flasher/cores/search",
-                data: {
-                    query: $("#cores-search-text").val()
-                }
+                data: $(form).serialize()
             }).done(function (data) {
                 if(data.hasOwnProperty("Platforms")) {
-                    var tableData = data.Platforms;
-                    tableData.forEach(function(element) {
-                        element.dl_btn = $("<button>", {
-                            class: "btn btn-primary core-install-btn",
-                            type: "button",
-                            value: element.ID + "@" + element.Version,
-                            html: $("<i>", {
-                                class: "icon-download-alt"
-                            }).prop("outerHTML")
-                        }).prop("outerHTML");
-                        element.rm_btn = $("<button>", {
-                            class: "btn btn-danger core-uninstall-btn",
-                            type: "button",
-                            value: element.ID,
-                            html: $("<i>", {
-                                class: "icon-trash"
-                            }).prop("outerHTML")
-                        }).prop("outerHTML");
-                    });
-                    $("#cores-table").bootstrapTable("load", tableData);
+                    self.coreSearchResult(data.Platforms);
+                } else {
+                    self.coreSearchResult([]);
                 }
             }).fail(function(jqXHR, status, error) {
                 new PNotify({
@@ -90,18 +50,16 @@ $(function() {
                     type: "error"
                 });
             }).always(function() {
-                $("#cores-table").bootstrapTable("hideLoading");
+                //hide loading
             });
-            event.preventDefault();
-        });
-
-        $(document).on("click", "button.core-install-btn", function() {
-            $("#cores-table").bootstrapTable("showLoading");
+        };
+        self.installCore = function() {
+            //show loading
             $.ajax({
                 type: "POST",
                 url: "/plugin/marlin_flasher/cores/install",
                 data: {
-                    core: $(this).val()
+                    core: this.ID
                 }
             }).done(function(data) {
                 self.loadBoardSelectOptions();
@@ -117,16 +75,16 @@ $(function() {
                     type: "error"
                 });
             }).always(function() {
-                $("#cores-table").bootstrapTable("hideLoading");
+                //hide loading
             });
-        });
-        $(document).on("click", "button.core-uninstall-btn", function() {
-            $("#cores-table").bootstrapTable("showLoading");
+        };
+        self.uninstallCore = function() {
+            //show loading
             $.ajax({
                 type: "POST",
                 url: "/plugin/marlin_flasher/cores/uninstall",
                 data: {
-                    core: $(this).val()
+                    core: this.ID
                 }
             }).done(function(data) {
                 self.loadBoardSelectOptions();
@@ -142,63 +100,20 @@ $(function() {
                     type: "error"
                 });
             }).always(function() {
-                $("#cores-table").bootstrapTable("hideLoading");
+                //hide loading
             });
-        });
-        $("#libs-table").bootstrapTable({
-            columns: [
-                {
-                    field: "Name",
-                    title: gettext("Name")
-                },
-                {
-                    field: "dl_btn",
-                    title: $("<i>", {
-                        class: "icon-download-alt"
-                    }).prop("outerHTML"),
-                    width: "54px",
-                    halign: "center"
-                },
-                {
-                    field: "rm_btn",
-                    title: $("<i>", {
-                        class: "icon-trash"
-                    }).prop("outerHTML"),
-                    width: "54px",
-                    halign: "center"
-                }
-            ]
-        });
-        $("#libs-search-form").submit(function(event) {
-            $("#libs-table").bootstrapTable("showLoading");
+        };
+        self.searchLib = function(form) {
+            //self.libsTable.bootstrapTable("showLoading");
             $.ajax({
                 type: "GET",
                 url: "/plugin/marlin_flasher/libs/search",
-                data: {
-                    query: $("#libs-search-text").val()
-                }
+                data: $(form).serialize()
             }).done(function (data) {
                 if(data.hasOwnProperty("libraries")) {
-                    var tableData = data.libraries;
-                    tableData.forEach(function(element) {
-                        element.dl_btn = $("<button>", {
-                            class: "btn btn-primary lib-install-btn",
-                            type: "button",
-                            value: element.Name,
-                            html: $("<i>", {
-                                class: "icon-download-alt"
-                            }).prop("outerHTML")
-                        }).prop("outerHTML");
-                        element.rm_btn = $("<button>", {
-                            class: "btn btn-danger lib-uninstall-btn",
-                            type: "button",
-                            value: element.Name,
-                            html: $("<i>", {
-                                class: "icon-trash"
-                            }).prop("outerHTML")
-                        }).prop("outerHTML");
-                    });
-                    $("#libs-table").bootstrapTable("load", tableData);
+                    self.libSearchResult(data.libraries);
+                } else {
+                    self.libSearchResult([]);
                 }
             }).fail(function(jqXHR, status, error) {
                 new PNotify({
@@ -207,17 +122,16 @@ $(function() {
                     type: "error"
                 });
             }).always(function() {
-                $("#libs-table").bootstrapTable("hideLoading");
+                //self.libsTable.bootstrapTable("hideLoading");
             });
-            event.preventDefault();
-        });
-        $(document).on("click", "button.lib-install-btn", function() {
-            $("#libs-table").bootstrapTable("showLoading");
+        };
+        self.installLib = function() {
+            //self.libsTable.bootstrapTable("showLoading");
             $.ajax({
                 type: "POST",
                 url: "/plugin/marlin_flasher/libs/install",
                 data: {
-                    lib: $(this).val()
+                    lib: this.Name
                 }
             }).done(function(data) {
                 new PNotify({
@@ -232,16 +146,16 @@ $(function() {
                     type: "error"
                 });
             }).always(function() {
-                $("#libs-table").bootstrapTable("hideLoading");
+                //self.libsTable.bootstrapTable("hideLoading");
             });
-        });
-        $(document).on("click", "button.lib-uninstall-btn", function() {
-            $("#libs-table").bootstrapTable("showLoading");
+        };
+        self.uninstallLib =  function() {
+            //self.libsTable.bootstrapTable("showLoading");
             $.ajax({
                 type: "POST",
                 url: "/plugin/marlin_flasher/libs/uninstall",
                 data: {
-                    lib: $(this).val()
+                    lib: this.Name
                 }
             }).done(function(data) {
                 new PNotify({
@@ -256,25 +170,25 @@ $(function() {
                     type: "error"
                 });
             }).always(function() {
-                $("#libs-table").bootstrapTable("hideLoading");
+                //self.libsTable.bootstrapTable("hideLoading");
             });
-        });
+        };
         self.loadBoardSelectOptions = function() {
-            $("#fqbn").empty();
-            $("#fqbn").append($("<option>", {
+            self.fqbn.empty();
+            self.fqbn.append($("<option>", {
                 disabled: true,
                 selected: true,
                 value: "",
                 text: gettext("Please select one")
             }));
-            $("#flash-options").empty();
+            self.flashOptionContainer.empty();
             $.ajax({
                 type: "GET",
                 url: "/plugin/marlin_flasher/board/listall",
             }).done(function (data) {
                 if(data.boards) {
                     data.boards.forEach(function(board) {
-                        $("#fqbn").append($("<option>", {
+                        self.fqbn.append($("<option>", {
                             text: board.name,
                             value: board.fqbn
                         }));
@@ -289,12 +203,12 @@ $(function() {
             });
         };
         self.loadBoardSelectOptions();
-        $("#form-flash").submit(function(event) {
-            $("#flash-button").button("loading");
+        self.flashForm.submit(function(event) {
+            self.flashButton.button("loading");
             $.ajax({
                 type: "POST",
                 url: "/plugin/marlin_flasher/flash",
-                data: $("#form-flash").serialize()
+                data: self.flashForm.serialize()
             }).done(function (data) {
                 new PNotify({
                     title: gettext("Flashing successful"),
@@ -308,17 +222,17 @@ $(function() {
                     type: "error"
                 });
             }).always(function() {
-                $("#flash-button").button("reset");
+                self.flashButton.button("reset");
             });
             event.preventDefault();
         });
-        $("#fqbn").change(function() {
-            $("#flash-options").empty();
+        self.fqbn.change(function() {
+            self.flashOptionContainer.empty();
             $.ajax({
                 type: "GET",
                 url: "/plugin/marlin_flasher/board/details",
                 data: {
-                    fqbn: $("#fqbn").val()
+                    fqbn: self.fqbn.val()
                 }
             }).done(function (data) {
                 if(data) {
@@ -351,7 +265,7 @@ $(function() {
                         });
                         controls.append(select);
                         controlGroup.append(controls);
-                        $("#flash-options").append(controlGroup);
+                        self.flashOptionContainer.append(controlGroup);
                     });
                 }
             }).fail(function(jqXHR, status, error) {
