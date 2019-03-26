@@ -4,6 +4,8 @@ $(function() {
         self.settingsViewModel = parameters[0];
         self.sketchFileButton = $("#sketch_file");
         self.flashButton = $("#flash-button");
+        self.searchCoreButton = $("#search-core-btn");
+        self.searchLibButton = $("#search-lib-btn");
 
         self.coreSearchResult = ko.observableArray();
         self.libSearchResult = ko.observableArray();
@@ -30,7 +32,7 @@ $(function() {
             }
         });
         self.searchCore = function(form) {
-            //show loading
+            self.searchCoreButton.button("loading");
             $.ajax({
                 type: "GET",
                 url: "/plugin/marlin_flasher/cores/search",
@@ -48,16 +50,16 @@ $(function() {
                     type: "error"
                 });
             }).always(function() {
-                //hide loading
+                self.searchCoreButton.button("reset");
             });
         };
-        self.installCore = function() {
-            //show loading
+        self.installCore = function(data, event) {
+            $(event.currentTarget).button("loading");
             $.ajax({
                 type: "POST",
                 url: "/plugin/marlin_flasher/cores/install",
                 data: {
-                    core: this.ID
+                    core: data.ID
                 }
             }).done(function(data) {
                 self.loadBoardList();
@@ -73,16 +75,16 @@ $(function() {
                     type: "error"
                 });
             }).always(function() {
-                //hide loading
+                $(event.currentTarget).button("reset");
             });
         };
-        self.uninstallCore = function() {
-            //show loading
+        self.uninstallCore = function(data, event) {
+            $(event.currentTarget).button("loading");
             $.ajax({
                 type: "POST",
                 url: "/plugin/marlin_flasher/cores/uninstall",
                 data: {
-                    core: this.ID
+                    core: data.ID
                 }
             }).done(function(data) {
                 self.loadBoardList();
@@ -98,11 +100,11 @@ $(function() {
                     type: "error"
                 });
             }).always(function() {
-                //hide loading
+                $(event.currentTarget).button("reset");
             });
         };
         self.searchLib = function(form) {
-            //self.libsTable.bootstrapTable("showLoading");
+            self.searchLibButton.button("loading");
             $.ajax({
                 type: "GET",
                 url: "/plugin/marlin_flasher/libs/search",
@@ -120,16 +122,16 @@ $(function() {
                     type: "error"
                 });
             }).always(function() {
-                //self.libsTable.bootstrapTable("hideLoading");
+                self.searchLibButton.button("reset");
             });
         };
-        self.installLib = function() {
-            //self.libsTable.bootstrapTable("showLoading");
+        self.installLib = function(data, event) {
+            $(event.currentTarget).button("loading");
             $.ajax({
                 type: "POST",
                 url: "/plugin/marlin_flasher/libs/install",
                 data: {
-                    lib: this.Name
+                    lib: data.Name
                 }
             }).done(function(data) {
                 new PNotify({
@@ -144,16 +146,16 @@ $(function() {
                     type: "error"
                 });
             }).always(function() {
-                //self.libsTable.bootstrapTable("hideLoading");
+                $(event.currentTarget).button("reset");
             });
         };
-        self.uninstallLib =  function() {
-            //self.libsTable.bootstrapTable("showLoading");
+        self.uninstallLib =  function(data, event) {
+            $(event.currentTarget).button("loading");
             $.ajax({
                 type: "POST",
                 url: "/plugin/marlin_flasher/libs/uninstall",
                 data: {
-                    lib: this.Name
+                    lib: data.Name
                 }
             }).done(function(data) {
                 new PNotify({
@@ -168,7 +170,7 @@ $(function() {
                     type: "error"
                 });
             }).always(function() {
-                //self.libsTable.bootstrapTable("hideLoading");
+                $(event.currentTarget).button("reset");
             });
         };
         self.loadBoardList = function() {
@@ -223,8 +225,6 @@ $(function() {
                 }).done(function (data) {
                     if(data) {
                         self.boardOptions(data.ConfigOptions);
-                    } else {
-                        self.boardOptions([]);
                     }
                 }).fail(function(jqXHR, status, error) {
                     new PNotify({

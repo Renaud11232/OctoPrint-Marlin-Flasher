@@ -9,7 +9,7 @@
             <form class="form-search" data-bind="submit: searchLib">
                 <div class="input-append">
                     <input name="query" type="text" class="span2 search-query">
-                    <button type="submit" class="btn">{{ _('Search') }}</button>
+                    <button id="search-lib-btn" type="submit" class="btn" data-loading-text="Searching">{{ _('Search') }}</button>
                 </div>
             </form>
             <table class="table table-bordered table-hover">
@@ -25,11 +25,11 @@
                         <tr>
                             <td data-bind="text: Name"></td>
                             <td>
-                                <button type="button" class="btn btn-primary" data-bind="click: $parent.installLib">
+                                <button type="button" class="btn btn-primary" data-loading-text="<i class='icon-download-alt'></i>" data-bind="click: $parent.installLib">
                                     <i class="icon-download-alt"></i>
                                 </button></td>
                             <td>
-                                <button type="button" class="btn btn-danger" data-bind="click: $parent.uninstallLib">
+                                <button type="button" class="btn btn-danger" data-loading-text="<i class='icon-trash'></i>" data-bind="click: $parent.uninstallLib">
                                     <i class="icon-trash"></i>
                                 </button>
                             </td>

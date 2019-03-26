@@ -13,12 +13,10 @@
                 <div class="control-group">
                     <label class="control-label" for="sketch_file">{{ _('Arduino sketch') }} :</label>
                     <div class="controls">
-                        <div class="input-prepend">
-                            <span class="btn fileinput-button">
-                                <span>{{ _('Browse') }}</span>
-                                <input id="sketch_file" type="file" name="sketch_file" data-url="{{ url_for("plugin.marlin_flasher.upload_sketch") }}" accept=".zip">
-                            </span>
-                        </div>
+                        <span class="btn fileinput-button">
+                            <span>{{ _('Browse') }}</span>
+                            <input id="sketch_file" type="file" name="sketch_file" data-url="{{ url_for("plugin.marlin_flasher.upload_sketch") }}" accept=".zip">
+                        </span>
                     </div>
                 </div>
             </form>
