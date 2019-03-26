@@ -35,6 +35,7 @@ $(function() {
             self.searchCoreButton.button("loading");
             $.ajax({
                 type: "GET",
+                headers: OctoPrint.getRequestHeaders(),
                 url: "/plugin/marlin_flasher/cores/search",
                 data: $(form).serialize()
             }).done(function (data) {
@@ -57,6 +58,7 @@ $(function() {
             $(event.currentTarget).button("loading");
             $.ajax({
                 type: "POST",
+                headers: OctoPrint.getRequestHeaders(),
                 url: "/plugin/marlin_flasher/cores/install",
                 data: {
                     core: data.ID
@@ -82,6 +84,7 @@ $(function() {
             $(event.currentTarget).button("loading");
             $.ajax({
                 type: "POST",
+                headers: OctoPrint.getRequestHeaders(),
                 url: "/plugin/marlin_flasher/cores/uninstall",
                 data: {
                     core: data.ID
@@ -107,6 +110,7 @@ $(function() {
             self.searchLibButton.button("loading");
             $.ajax({
                 type: "GET",
+                headers: OctoPrint.getRequestHeaders(),
                 url: "/plugin/marlin_flasher/libs/search",
                 data: $(form).serialize()
             }).done(function (data) {
@@ -129,6 +133,7 @@ $(function() {
             $(event.currentTarget).button("loading");
             $.ajax({
                 type: "POST",
+                headers: OctoPrint.getRequestHeaders(),
                 url: "/plugin/marlin_flasher/libs/install",
                 data: {
                     lib: data.Name
@@ -153,6 +158,7 @@ $(function() {
             $(event.currentTarget).button("loading");
             $.ajax({
                 type: "POST",
+                headers: OctoPrint.getRequestHeaders(),
                 url: "/plugin/marlin_flasher/libs/uninstall",
                 data: {
                     lib: data.Name
@@ -176,6 +182,7 @@ $(function() {
         self.loadBoardList = function() {
             $.ajax({
                 type: "GET",
+                headers: OctoPrint.getRequestHeaders(),
                 url: "/plugin/marlin_flasher/board/listall",
             }).done(function (data) {
                 if(data.boards) {
@@ -195,6 +202,7 @@ $(function() {
             self.flashButton.button("loading");
             $.ajax({
                 type: "POST",
+                headers: OctoPrint.getRequestHeaders(),
                 url: "/plugin/marlin_flasher/flash",
                 data: $(form).serialize()
             }).done(function (data) {
@@ -218,6 +226,7 @@ $(function() {
             if (newValue) {
                 $.ajax({
                     type: "GET",
+                    headers: OctoPrint.getRequestHeaders(),
                     url: "/plugin/marlin_flasher/board/details",
                     data: {
                         fqbn: newValue
