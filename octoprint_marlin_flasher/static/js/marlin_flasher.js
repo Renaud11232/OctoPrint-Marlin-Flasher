@@ -6,7 +6,7 @@ $(function() {
         self.flashButton = $("#flash-button");
         self.searchCoreButton = $("#search-core-btn");
         self.searchLibButton = $("#search-lib-btn");
-        self.stderrModal = $("#stderr-modal");
+        self.stderrModal = $("#marlin_flasher_modal");
 
         self.coreSearchResult = ko.observableArray();
         self.libSearchResult = ko.observableArray();
@@ -271,7 +271,8 @@ $(function() {
         elements: [
             "#settings_plugin_marlin_flasher",
             "#wizard_plugin_marlin_flasher",
-            "#tab_plugin_marlin_flasher"
+            "#tab_plugin_marlin_flasher",
+            "#marlin_flasher_modal"
         ]
     });
 });
