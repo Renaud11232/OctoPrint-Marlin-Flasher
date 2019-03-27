@@ -26,7 +26,7 @@ $(function() {
             error: function(jqXHR, status, error) {
                 new PNotify({
                     title: gettext("Sketch upload failed"),
-                    text: jqXHR.responseJSON.error,
+                    text: jqXHR.responseJSON.message,
                     type: "error"
                 });
             }
@@ -47,7 +47,7 @@ $(function() {
             }).fail(function(jqXHR, status, error) {
                 new PNotify({
                     title: gettext("Core search failed"),
-                    text: jqXHR.responseJSON.error,
+                    text: jqXHR.responseJSON.message,
                     type: "error"
                 });
             }).always(function() {
@@ -73,7 +73,7 @@ $(function() {
             }).fail(function(jqXHR, status, error) {
                 new PNotify({
                     title: gettext("Core install failed"),
-                    text: jqXHR.responseJSON.error,
+                    text: jqXHR.responseJSON.message,
                     type: "error"
                 });
             }).always(function() {
@@ -99,7 +99,7 @@ $(function() {
             }).fail(function(jqXHR, status, error) {
                 new PNotify({
                     title: gettext("Core uninstall failed"),
-                    text: jqXHR.responseJSON.error,
+                    text: jqXHR.responseJSON.message,
                     type: "error"
                 });
             }).always(function() {
@@ -122,7 +122,7 @@ $(function() {
             }).fail(function(jqXHR, status, error) {
                 new PNotify({
                     title: gettext("Lib search failed"),
-                    text: jqXHR.responseJSON.error,
+                    text: jqXHR.responseJSON.message,
                     type: "error"
                 });
             }).always(function() {
@@ -147,7 +147,7 @@ $(function() {
             }).fail(function(jqXHR, status, error) {
                 new PNotify({
                     title: gettext("Lib install failed"),
-                    text: jqXHR.responseJSON.error,
+                    text: jqXHR.responseJSON.message,
                     type: "error"
                 });
             }).always(function() {
@@ -172,7 +172,7 @@ $(function() {
             }).fail(function(jqXHR, status, error) {
                 new PNotify({
                     title: gettext("Lib uninstall failed"),
-                    text: jqXHR.responseJSON.error,
+                    text: jqXHR.responseJSON.message,
                     type: "error"
                 });
             }).always(function() {
@@ -193,7 +193,7 @@ $(function() {
             }).fail(function(jqXHR, status, error) {
                 new PNotify({
                     title: gettext("Board list fetch failed"),
-                    text: jqXHR.responseJSON.error,
+                    text: jqXHR.responseJSON.message,
                     type: "error"
                 });
             });
@@ -214,7 +214,7 @@ $(function() {
             }).fail(function(jqXHR, status, error) {
                 new PNotify({
                     title: gettext("Flashing failed"),
-                    text: jqXHR.responseJSON.error,
+                    text: jqXHR.responseJSON.message,
                     type: "error"
                 });
             }).always(function() {
@@ -238,7 +238,7 @@ $(function() {
                 }).fail(function(jqXHR, status, error) {
                     new PNotify({
                         title: gettext("Board option fetch failed"),
-                        text: jqXHR.responseJSON.error,
+                        text: jqXHR.responseJSON.message,
                         type: "error"
                     });
                 });

@@ -40,7 +40,7 @@ class MarlinFlasherPlugin(octoprint.plugin.SettingsPlugin,
 	def upload_sketch(self):
 		upload_path = "sketch_file." + self._settings.global_get(["server", "uploads", "pathSuffix"])
 		if upload_path not in flask.request.values:
-			result = dict(error=gettext("Missing sketch_file."))
+			result = dict(message=gettext("Missing sketch_file."))
 			return flask.make_response(flask.jsonify(result), 400)
 		path = flask.request.values[upload_path]
 		try:
@@ -61,93 +61,87 @@ class MarlinFlasherPlugin(octoprint.plugin.SettingsPlugin,
 							)
 							return flask.make_response(flask.jsonify(result), 200)
 				shutil.rmtree(sketch_dir)
-				result = dict(error=gettext("No valid sketch found in the given file."))
+				result = dict(message=gettext("No valid sketch found in the given file."))
 				return flask.make_response(flask.jsonify(result), 400)
 		except zipfile.BadZipfile:
-			result = dict(error=gettext("The given file was not a valid zip file."))
+			result = dict(message=gettext("The given file was not a valid zip file."))
 			return flask.make_response(flask.jsonify(result), 400)
 
 	@octoprint.plugin.BlueprintPlugin.route("/cores/search", methods=["GET"])
 	def search_cores(self):
 		if "query" not in flask.request.values:
-			result = dict(error=gettext("Missing query."))
+			result = dict(message=gettext("Missing query."))
 			return flask.make_response(flask.jsonify(result), 400)
 		arduino = self.__get_arduino()
 		try:
 			arduino.core_update_index()
 			result = arduino.core_search(*self.__split(flask.request.values["query"]))
 		except pyduinocli.ArduinoError as e:
-			result = dict(error=e.message)
-			return flask.make_response(flask.jsonify(result), 400)
+			return flask.make_response(self.__get_error_json(e), 400)
 		return flask.make_response(flask.jsonify(result), 200)
 
 	@octoprint.plugin.BlueprintPlugin.route("/libs/search", methods=["GET"])
 	def search_libs(self):
 		if "query" not in flask.request.values:
-			result = dict(error=gettext("Missing query."))
+			result = dict(message=gettext("Missing query."))
 			return flask.make_response(flask.jsonify(result), 400)
 		arduino = self.__get_arduino()
 		try:
 			arduino.lib_update_index()
 			result = arduino.lib_search(*self.__split(flask.request.values["query"]))
 		except pyduinocli.ArduinoError as e:
-			result = dict(error=e.message)
-			return flask.make_response(flask.jsonify(result), 400)
+			return flask.make_response(self.__get_error_json(e), 400)
 		return flask.make_response(flask.jsonify(result), 200)
 
 	@octoprint.plugin.BlueprintPlugin.route("/cores/install", methods=["POST"])
 	def install_core(self):
 		if "core" not in flask.request.values:
-			result = dict(error=gettext("Missing core."))
+			result = dict(message=gettext("Missing core."))
 			return flask.make_response(flask.jsonify(result), 400)
 		arduino = self.__get_arduino()
 		try:
 			arduino.core_install(flask.request.values["core"])
 		except pyduinocli.ArduinoError as e:
-			result = dict(error=e.message)
-			return flask.make_response(flask.jsonify(result), 400)
+			return flask.make_response(self.__get_error_json(e), 400)
 		result = dict(core=flask.request.values["core"])
 		return flask.make_response(flask.jsonify(result), 200)
 
 	@octoprint.plugin.BlueprintPlugin.route("/libs/install", methods=["POST"])
 	def install_lib(self):
 		if "lib" not in flask.request.values:
-			result = dict(error=gettext("Missing lib."))
+			result = dict(message=gettext("Missing lib."))
 			return flask.make_response(flask.jsonify(result), 400)
 		arduino = self.__get_arduino()
 		try:
 			arduino.lib_install(flask.request.values["lib"])
 		except pyduinocli.ArduinoError as e:
-			result = dict(error=e.message)
-			return flask.make_response(flask.jsonify(result), 400)
+			return flask.make_response(self.__get_error_json(e), 400)
 		result = dict(lib=flask.request.values["lib"])
 		return flask.make_response(flask.jsonify(result), 200)
 
 	@octoprint.plugin.BlueprintPlugin.route("/cores/uninstall", methods=["POST"])
 	def uninstall_core(self):
 		if "core" not in flask.request.values:
-			result = dict(error=gettext("Missing core."))
+			result = dict(message=gettext("Missing core."))
 			return flask.make_response(flask.jsonify(result), 400)
 		arduino = self.__get_arduino()
 		try:
 			arduino.core_uninstall(flask.request.values["core"])
 		except pyduinocli.ArduinoError as e:
-			result = dict(error=e.message)
-			return flask.make_response(flask.jsonify(result), 400)
+			return flask.make_response(self.__get_error_json(e), 400)
 		result = dict(core=flask.request.values["core"])
 		return flask.make_response(flask.jsonify(result), 200)
 
 	@octoprint.plugin.BlueprintPlugin.route("/libs/uninstall", methods=["POST"])
 	def uninstall_lib(self):
 		if "lib" not in flask.request.values:
-			result = dict(error=gettext("Missing lib."))
+			result = dict(message=gettext("Missing lib."))
 			return flask.make_response(flask.jsonify(result), 400)
 		arduino = self.__get_arduino()
 		try:
 			arduino.lib_uninstall(flask.request.values["lib"])
 		except pyduinocli.ArduinoError as e:
-			result = dict(error=e.message)
-			return flask.make_response(flask.jsonify(result), 400)
+			return flask.make_response(self.__get_error_json(e), 400)
 		result = dict(lib=flask.request.values["lib"])
 		return flask.make_response(flask.jsonify(result), 200)
 
@@ -158,32 +152,30 @@ class MarlinFlasherPlugin(octoprint.plugin.SettingsPlugin,
 			result = arduino.board_listall()
 			return flask.make_response(flask.jsonify(result), 200)
 		except pyduinocli.ArduinoError as e:
-			result = dict(error=e.message)
-			return flask.make_response(flask.jsonify(result), 400)
+			return flask.make_response(self.__get_error_json(e), 400)
 
 	@octoprint.plugin.BlueprintPlugin.route("/board/details", methods=["GET"])
 	def board_detail(self):
 		if "fqbn" not in flask.request.values or not flask.request.values["fqbn"]:
-			result = dict(error=gettext("Missing fqbn."))
+			result = dict(message=gettext("Missing fqbn."))
 			return flask.make_response(flask.jsonify(result), 400)
 		arduino = self.__get_arduino()
 		try:
 			result = arduino.board_details(flask.request.values["fqbn"])
 			return flask.make_response(flask.jsonify(result), 200)
 		except pyduinocli.ArduinoError as e:
-			result = dict(error=e.message)
-			return flask.make_response(flask.jsonify(result), 400)
+			return flask.make_response(self.__get_error_json(e), 400)
 
 	@octoprint.plugin.BlueprintPlugin.route("/flash", methods=["POST"])
 	def flash(self):
 		if "fqbn" not in flask.request.values or not flask.request.values["fqbn"]:
-			result = dict(error=gettext("Missing fqbn."))
+			result = dict(message=gettext("Missing fqbn."))
 			return flask.make_response(flask.jsonify(result), 400)
 		if self.__sketch is None:
-			result = dict(error=gettext("No sketch uploaded."))
+			result = dict(message=gettext("No sketch uploaded."))
 			return flask.make_response(flask.jsonify(result), 400)
 		if not self._printer.is_ready():
-			result = dict(error=gettext("The printer is currently not ready."))
+			result = dict(message=gettext("The printer is currently not ready."))
 			return flask.make_response(flask.jsonify(result), 409)
 		options = []
 		for param in flask.request.values:
@@ -203,10 +195,10 @@ class MarlinFlasherPlugin(octoprint.plugin.SettingsPlugin,
 			result = dict(message=gettext("Board successfully flashed."))
 			return flask.make_response(flask.jsonify(result), 200)
 		except pyduinocli.ArduinoError as e:
-			result = dict(error=e.message)
-			return flask.make_response(flask.jsonify(result), 400)
+			return flask.make_response(self.__get_error_json(e), 400)
 
-	def __split(self, string):
+	@staticmethod
+	def __split(string):
 		s = shlex.split(string)
 		if len(s) == 0:
 			return [""]
@@ -215,6 +207,14 @@ class MarlinFlasherPlugin(octoprint.plugin.SettingsPlugin,
 	def __get_arduino(self):
 		arduino_path = self._settings.get(["arduino_path"])
 		return pyduinocli.Arduino(arduino_path)
+
+	@staticmethod
+	def __get_error_json(error):
+		return flask.jsonify(dict(
+			message=error.message,
+			cause=error.cause,
+			stderr=error.stderr
+		))
 
 	def is_wizard_required(self):
 		return self._settings.get(["arduino_path"]) is None
