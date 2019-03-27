@@ -24,11 +24,19 @@ $(function() {
                 });
             },
             error: function(jqXHR, status, error) {
-                new PNotify({
-                    title: gettext("Sketch upload failed"),
-                    text: jqXHR.responseJSON.message,
-                    type: "error"
-                });
+                if(error === "") {
+                    new PNotify({
+                        title: gettext("Sketch upload failed"),
+                        text: gettext("Check your request size limit"),
+                        type: "error"
+                    });
+                } else {
+                    new PNotify({
+                        title: gettext("Sketch upload failed"),
+                        text: jqXHR.responseJSON.message,
+                        type: "error"
+                    });
+                }
             }
         });
         self.searchCore = function(form) {
