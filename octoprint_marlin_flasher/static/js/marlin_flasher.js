@@ -6,12 +6,14 @@ $(function() {
         self.flashButton = $("#flash-button");
         self.searchCoreButton = $("#search-core-btn");
         self.searchLibButton = $("#search-lib-btn");
+        self.stderrModal = $("#stderr-modal");
 
         self.coreSearchResult = ko.observableArray();
         self.libSearchResult = ko.observableArray();
         self.boardList = ko.observableArray();
         self.selectedBoard = ko.observable();
         self.boardOptions = ko.observableArray();
+        self.stderr = ko.observable();
 
         self.sketchFileButton.fileupload({
             maxNumberOfFiles: 1,
@@ -225,6 +227,12 @@ $(function() {
                     text: jqXHR.responseJSON.message,
                     type: "error"
                 });
+                if(jqXHR.responseJSON.stderr) {
+                    self.stderr(jqXHR.responseJSON.stderr);
+                    self.stderrModal.modal("show");
+                } else {
+                    self.stderr(null);
+                }
             }).always(function() {
                 self.flashButton.button("reset");
             });

@@ -2,3 +2,14 @@ th.btn-col {
     width: 39px;
     text-align: center;
 }
+
+pre.scrollable-pre {
+    overflow: auto;
+    word-wrap: normal;
+    white-space: pre;
+}
+
+.modal.modal-lg {
+    width: 800px;
+    margin-left: -400px;
+}
