@@ -15,6 +15,7 @@ $(function() {
         self.selectedBoard = ko.observable();
         self.boardOptions = ko.observableArray();
         self.stderr = ko.observable();
+        self.uploadProgress = ko.observable(0);
 
         self.sketchFileButton.fileupload({
             maxNumberOfFiles: 1,
@@ -25,6 +26,7 @@ $(function() {
                     text: data.result.ino,
                     type: "success"
                 });
+                self.uploadProgress(0);
             },
             error: function(jqXHR, status, error) {
                 if(error === "") {
@@ -40,6 +42,9 @@ $(function() {
                         type: "error"
                     });
                 }
+            },
+            progress: function(e, data) {
+                self.uploadProgress((data.loaded / data.total) * 100);
             }
         });
         self.searchCore = function(form) {
@@ -261,9 +266,11 @@ $(function() {
                 });
             }
         });
-        if(self.loginStateViewModel.isAdmin()) {
-            self.loadBoardList();
-        }
+        self.onAllBound = function(viewModels) {
+            if(self.loginStateViewModel.isAdmin()) {
+                self.loadBoardList();
+            }
+        };
     }
 
     OCTOPRINT_VIEWMODELS.push({
