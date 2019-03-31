@@ -3,7 +3,7 @@ from __future__ import absolute_import
 import octoprint.plugin
 import flask
 import pyduinocli
-from gettext import gettext
+from flask_babel import gettext
 import shlex
 import zipfile
 import shutil
@@ -23,7 +23,8 @@ class MarlinFlasherPlugin(octoprint.plugin.SettingsPlugin,
 	def get_settings_defaults(self):
 		return dict(
 			arduino_path=None,
-			sketch_ino="Marlin.ino"
+			sketch_ino="Marlin.ino",
+			max_sketch_size=10 * 1024
 		)
 
 	def get_assets(self):
@@ -234,6 +235,10 @@ class MarlinFlasherPlugin(octoprint.plugin.SettingsPlugin,
 			)
 		)
 
+	def body_size_hook(self, current_max_body_sizes, *args, **kwargs):
+		print(self._settings.get_int(["max_sketch_size"]))
+		return [("POST", r"/upload_sketch", self._settings.get_int(["max_sketch_size"]) * 1024)]
+
 
 __plugin_name__ = "Marlin Flasher"
 
@@ -244,5 +249,6 @@ def __plugin_load__():
 
 	global __plugin_hooks__
 	__plugin_hooks__ = {
-		"octoprint.plugin.softwareupdate.check_config": __plugin_implementation__.get_update_information
+		"octoprint.plugin.softwareupdate.check_config": __plugin_implementation__.get_update_information,
+		"octoprint.server.http.bodysize": __plugin_implementation__.body_size_hook
 	}

@@ -29,7 +29,7 @@ $(function() {
                 if(error === "") {
                     new PNotify({
                         title: gettext("Sketch upload failed"),
-                        text: gettext("Check your request size limit"),
+                        text: gettext("Check the maximum sketch size"),
                         type: "error"
                     });
                 } else {
