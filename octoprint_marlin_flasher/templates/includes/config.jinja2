@@ -15,8 +15,8 @@
         <label class="control-label" for="sketch_size">{{ _('Maximum sketch size') }}</label>
         <div class="controls">
             <div class="input-append">
-                <input type="number" min="1" max="1048576" data-bind="value: settingsViewModel.settings.plugins.marlin_flasher.max_sketch_size" id="sketch_size">
-                <span class="add-on">{{ _('kB') }}</span>
+                <input type="number" min="1" max="1024" data-bind="value: settingsViewModel.settings.plugins.marlin_flasher.max_sketch_size" id="sketch_size">
+                <span class="add-on">{{ _('MB') }}</span>
             </div>
             <span>{{ _('*requires restart') }}</span>
         </div>

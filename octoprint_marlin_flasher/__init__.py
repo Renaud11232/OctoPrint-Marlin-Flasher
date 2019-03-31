@@ -26,7 +26,7 @@ class MarlinFlasherPlugin(octoprint.plugin.SettingsPlugin,
 		return dict(
 			arduino_path=None,
 			sketch_ino="Marlin.ino",
-			max_sketch_size=10 * 1024
+			max_sketch_size=20
 		)
 
 	def get_assets(self):
@@ -259,7 +259,7 @@ class MarlinFlasherPlugin(octoprint.plugin.SettingsPlugin,
 
 	def body_size_hook(self, current_max_body_sizes, *args, **kwargs):
 		print(self._settings.get_int(["max_sketch_size"]))
-		return [("POST", r"/upload_sketch", self._settings.get_int(["max_sketch_size"]) * 1024)]
+		return [("POST", r"/upload_sketch", self._settings.get_int(["max_sketch_size"]) * 1024 * 1024)]
 
 
 __plugin_name__ = "Marlin Flasher"

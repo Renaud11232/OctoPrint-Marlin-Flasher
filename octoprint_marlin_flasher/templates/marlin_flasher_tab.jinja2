@@ -1,15 +1,11 @@
-<!-- ko if: loginStateViewModel.isAdmin() -->
-    <div class="accordion" id="marlin_flasher_accordion">
-        {% include "includes/group_items/sketch.jinja2" %}
-        {% include "includes/group_items/cores.jinja2" %}
-        {% include "includes/group_items/libs.jinja2" %}
-        {% include "includes/group_items/flash.jinja2" %}
-    </div>
-<!-- /ko -->
+<div data-bind="visible: loginStateViewModel.isAdmin" class="accordion" id="marlin_flasher_accordion">
+    {% include "includes/group_items/sketch.jinja2" %}
+    {% include "includes/group_items/cores.jinja2" %}
+    {% include "includes/group_items/libs.jinja2" %}
+    {% include "includes/group_items/flash.jinja2" %}
+</div>
 
-<!-- ko ifnot: loginStateViewModel.isAdmin() -->
+<div data-bind="visible: !loginStateViewModel.isAdmin()">
     <h3>{{ _("Sorry") }}</h3>
-    <p>
-        {{ _("Only administrators are authorized to view and use this panel. If you are an administrator, make sure you logged in with the right account") }}
-    </p>
-<!-- /ko -->
+    <p>{{ _("Only administrators are authorized to view and use this panel. Please login using an administrator account and try again.") }}</p>
+</div>
