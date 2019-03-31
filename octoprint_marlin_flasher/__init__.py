@@ -1,6 +1,8 @@
 # coding=utf-8
 from __future__ import absolute_import
 import octoprint.plugin
+from octoprint.server.util.flask import restricted_access
+from octoprint.server import admin_permission
 import flask
 import pyduinocli
 from flask_babel import gettext
@@ -38,6 +40,8 @@ class MarlinFlasherPlugin(octoprint.plugin.SettingsPlugin,
 		)
 
 	@octoprint.plugin.BlueprintPlugin.route("/upload_sketch", methods=["POST"])
+	@restricted_access
+	@admin_permission.require(403)
 	def upload_sketch(self):
 		upload_path = "sketch_file." + self._settings.global_get(["server", "uploads", "pathSuffix"])
 		if upload_path not in flask.request.values:
@@ -69,6 +73,8 @@ class MarlinFlasherPlugin(octoprint.plugin.SettingsPlugin,
 			return flask.make_response(flask.jsonify(result), 400)
 
 	@octoprint.plugin.BlueprintPlugin.route("/cores/search", methods=["GET"])
+	@restricted_access
+	@admin_permission.require(403)
 	def search_cores(self):
 		if "query" not in flask.request.values:
 			result = dict(message=gettext("Missing query."))
@@ -82,6 +88,8 @@ class MarlinFlasherPlugin(octoprint.plugin.SettingsPlugin,
 		return flask.make_response(flask.jsonify(result), 200)
 
 	@octoprint.plugin.BlueprintPlugin.route("/libs/search", methods=["GET"])
+	@restricted_access
+	@admin_permission.require(403)
 	def search_libs(self):
 		if "query" not in flask.request.values:
 			result = dict(message=gettext("Missing query."))
@@ -95,6 +103,8 @@ class MarlinFlasherPlugin(octoprint.plugin.SettingsPlugin,
 		return flask.make_response(flask.jsonify(result), 200)
 
 	@octoprint.plugin.BlueprintPlugin.route("/cores/install", methods=["POST"])
+	@restricted_access
+	@admin_permission.require(403)
 	def install_core(self):
 		if "core" not in flask.request.values:
 			result = dict(message=gettext("Missing core."))
@@ -108,6 +118,8 @@ class MarlinFlasherPlugin(octoprint.plugin.SettingsPlugin,
 		return flask.make_response(flask.jsonify(result), 200)
 
 	@octoprint.plugin.BlueprintPlugin.route("/libs/install", methods=["POST"])
+	@restricted_access
+	@admin_permission.require(403)
 	def install_lib(self):
 		if "lib" not in flask.request.values:
 			result = dict(message=gettext("Missing lib."))
@@ -121,6 +133,8 @@ class MarlinFlasherPlugin(octoprint.plugin.SettingsPlugin,
 		return flask.make_response(flask.jsonify(result), 200)
 
 	@octoprint.plugin.BlueprintPlugin.route("/cores/uninstall", methods=["POST"])
+	@restricted_access
+	@admin_permission.require(403)
 	def uninstall_core(self):
 		if "core" not in flask.request.values:
 			result = dict(message=gettext("Missing core."))
@@ -134,6 +148,8 @@ class MarlinFlasherPlugin(octoprint.plugin.SettingsPlugin,
 		return flask.make_response(flask.jsonify(result), 200)
 
 	@octoprint.plugin.BlueprintPlugin.route("/libs/uninstall", methods=["POST"])
+	@restricted_access
+	@admin_permission.require(403)
 	def uninstall_lib(self):
 		if "lib" not in flask.request.values:
 			result = dict(message=gettext("Missing lib."))
@@ -147,6 +163,8 @@ class MarlinFlasherPlugin(octoprint.plugin.SettingsPlugin,
 		return flask.make_response(flask.jsonify(result), 200)
 
 	@octoprint.plugin.BlueprintPlugin.route("/board/listall", methods=["GET"])
+	@restricted_access
+	@admin_permission.require(403)
 	def board_listall(self):
 		arduino = self.__get_arduino()
 		try:
@@ -156,6 +174,8 @@ class MarlinFlasherPlugin(octoprint.plugin.SettingsPlugin,
 			return flask.make_response(self.__get_error_json(e), 400)
 
 	@octoprint.plugin.BlueprintPlugin.route("/board/details", methods=["GET"])
+	@restricted_access
+	@admin_permission.require(403)
 	def board_detail(self):
 		if "fqbn" not in flask.request.values or not flask.request.values["fqbn"]:
 			result = dict(message=gettext("Missing fqbn."))
@@ -168,6 +188,8 @@ class MarlinFlasherPlugin(octoprint.plugin.SettingsPlugin,
 			return flask.make_response(self.__get_error_json(e), 400)
 
 	@octoprint.plugin.BlueprintPlugin.route("/flash", methods=["POST"])
+	@restricted_access
+	@admin_permission.require(403)
 	def flash(self):
 		if "fqbn" not in flask.request.values or not flask.request.values["fqbn"]:
 			result = dict(message=gettext("Missing fqbn."))

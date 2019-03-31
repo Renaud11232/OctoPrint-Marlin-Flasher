@@ -2,6 +2,7 @@ $(function() {
     function MarlinFlasherViewModel(parameters) {
         var self = this;
         self.settingsViewModel = parameters[0];
+        self.loginStateViewModel = parameters[1];
         self.sketchFileButton = $("#sketch_file");
         self.flashButton = $("#flash-button");
         self.searchCoreButton = $("#search-core-btn");
@@ -260,13 +261,16 @@ $(function() {
                 });
             }
         });
-        self.loadBoardList();
+        if(self.loginStateViewModel.isAdmin()) {
+            self.loadBoardList();
+        }
     }
 
     OCTOPRINT_VIEWMODELS.push({
         construct: MarlinFlasherViewModel,
         dependencies: [
-            "settingsViewModel"
+            "settingsViewModel",
+            "loginStateViewModel"
         ],
         elements: [
             "#settings_plugin_marlin_flasher",
