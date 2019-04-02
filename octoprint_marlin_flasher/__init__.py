@@ -3,6 +3,7 @@ from __future__ import absolute_import
 import octoprint.plugin
 from octoprint.server.util.flask import restricted_access
 from octoprint.server import admin_permission
+import serial
 import flask
 import pyduinocli
 from flask_babel import gettext
@@ -211,9 +212,14 @@ class MarlinFlasherPlugin(octoprint.plugin.SettingsPlugin,
 		arduino = self.__get_arduino()
 		try:
 			arduino.compile(self.__sketch, fqbn=fqbn)
-			connection_string, port, baudrate, profile = self._printer.get_current_connection()
+			transport = self._printer.get_transport()
+			if not isinstance(transport, serial.Serial):
+				result = dict(message=gettext("The printer is not connected through Serial."))
+				return flask.make_response(result, 400)
+			flash_port = transport.port
+			_, port, baudrate, profile = self._printer.get_current_connection()
 			self._printer.disconnect()
-			arduino.upload(self.__sketch, fqbn=fqbn, port=port)
+			arduino.upload(self.__sketch, fqbn=fqbn, port=flash_port)
 			self._printer.connect(port, baudrate, profile)
 			result = dict(message=gettext("Board successfully flashed."))
 			return flask.make_response(flask.jsonify(result), 200)
