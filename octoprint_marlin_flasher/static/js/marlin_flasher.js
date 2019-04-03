@@ -23,7 +23,7 @@ $(function() {
             done: function(e, data) {
                 new PNotify({
                     title: gettext("Sketch upload successful"),
-                    text: data.result.ino,
+                    text: data.result.file,
                     type: "success"
                 });
                 self.uploadProgress(0);
@@ -41,7 +41,8 @@ $(function() {
                         text: jqXHR.responseJSON.message,
                         type: "error"
                     });
-                }
+                };
+                self.uploadProgress(0);
             },
             progress: function(e, data) {
                 self.uploadProgress((data.loaded / data.total) * 100);

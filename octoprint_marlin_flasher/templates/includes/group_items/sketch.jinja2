@@ -7,7 +7,7 @@
     <div id="sketch" class="accordion-body collapse">
         <div class="accordion-inner">
             <p>
-                {{ _("Here you can upload whatever firmware you want to be running on your printer. Make sure it's a zip file containing a valid Arduino sketch.") }}
+                {{ _("Here you can upload whatever firmware you want to be running on your printer. Make sure it's a zip, or hex file containing a valid Arduino sketch for your board.") }}
             </p>
             <form class="form-horizontal">
                 <div class="control-group">
@@ -15,7 +15,7 @@
                     <div class="controls">
                         <span class="btn fileinput-button">
                             <span>{{ _('Browse') }}</span>
-                            <input id="sketch_file" type="file" name="sketch_file" data-url="{{ url_for("plugin.marlin_flasher.upload_sketch") }}" accept=".zip">
+                            <input id="sketch_file" type="file" name="sketch_file" data-url="{{ url_for("plugin.marlin_flasher.upload_sketch") }}" accept=".zip, .hex">
                         </span>
                     </div>
                 </div>

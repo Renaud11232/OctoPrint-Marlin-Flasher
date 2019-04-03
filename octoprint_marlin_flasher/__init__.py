@@ -6,6 +6,7 @@ from octoprint.server import admin_permission
 import serial
 import flask
 import pyduinocli
+import intelhex
 from flask_babel import gettext
 import shlex
 import zipfile
@@ -22,6 +23,7 @@ class MarlinFlasherPlugin(octoprint.plugin.SettingsPlugin,
 
 	def on_after_startup(self):
 		self.__sketch = None
+		self.__sketch_ino = False
 
 	def get_settings_defaults(self):
 		return dict(
@@ -40,10 +42,46 @@ class MarlinFlasherPlugin(octoprint.plugin.SettingsPlugin,
 			]
 		)
 
+	def __handle_zip(self, zip_file):
+		self.__sketch_ino = True
+		sketch_dir = os.path.join(self.get_plugin_data_folder(), "extracted_sketch")
+		if os.path.exists(sketch_dir):
+			shutil.rmtree(sketch_dir)
+		os.makedirs(sketch_dir)
+		zip_file.extractall(sketch_dir)
+		for root, dirs, files in os.walk(sketch_dir):
+			for f in files:
+				if f == self._settings.get(["sketch_ino"]):
+					self.__sketch = root
+					result = dict(
+						path=root,
+						file=f
+					)
+					return flask.make_response(flask.jsonify(result), 200)
+		result = dict(message=gettext("No valid sketch found in the given file."))
+		return flask.make_response(flask.jsonify(result), 400)
+
+	def __handle_hex(self, path):
+		self.__sketch_ino = False
+		try:
+			ih = intelhex.IntelHex()
+			ih.loadhex(path)
+		except intelhex.IntelHexError:
+			result = dict(message=gettext("The given file is not a zip file nor a hex file"))
+			return flask.make_response(flask.jsonify(result), 400)
+		self.__sketch = os.path.join(self.get_plugin_data_folder(), "sketch.hex")
+		shutil.copyfile(path, self.__sketch)
+		result = dict(
+			path=self.get_plugin_data_folder(),
+			file="sketch.hex"
+		)
+		return flask.make_response(flask.jsonify(result), 200)
+
 	@octoprint.plugin.BlueprintPlugin.route("/upload_sketch", methods=["POST"])
 	@restricted_access
 	@admin_permission.require(403)
 	def upload_sketch(self):
+		self.__sketch = None
 		upload_path = "sketch_file." + self._settings.global_get(["server", "uploads", "pathSuffix"])
 		if upload_path not in flask.request.values:
 			result = dict(message=gettext("Missing sketch_file."))
@@ -51,27 +89,9 @@ class MarlinFlasherPlugin(octoprint.plugin.SettingsPlugin,
 		path = flask.request.values[upload_path]
 		try:
 			with zipfile.ZipFile(path, "r") as zip_file:
-				self.__sketch = None
-				sketch_dir = os.path.join(self.get_plugin_data_folder(), "extracted_sketch")
-				if os.path.exists(sketch_dir):
-					shutil.rmtree(sketch_dir)
-				os.makedirs(sketch_dir)
-				zip_file.extractall(sketch_dir)
-				for root, dirs, files in os.walk(sketch_dir):
-					for f in files:
-						if f == self._settings.get(["sketch_ino"]):
-							self.__sketch = root
-							result = dict(
-								path=root,
-								ino=f
-							)
-							return flask.make_response(flask.jsonify(result), 200)
-				shutil.rmtree(sketch_dir)
-				result = dict(message=gettext("No valid sketch found in the given file."))
-				return flask.make_response(flask.jsonify(result), 400)
+				return self.__handle_zip(zip_file)
 		except zipfile.BadZipfile:
-			result = dict(message=gettext("The given file was not a valid zip file."))
-			return flask.make_response(flask.jsonify(result), 400)
+			return self.__handle_hex(path)
 
 	@octoprint.plugin.BlueprintPlugin.route("/cores/search", methods=["GET"])
 	@restricted_access
@@ -83,7 +103,7 @@ class MarlinFlasherPlugin(octoprint.plugin.SettingsPlugin,
 		arduino = self.__get_arduino()
 		try:
 			arduino.core_update_index()
-			result = arduino.core_search(*self.__split(flask.request.values["query"]))
+			result = arduino.core_search(self.__split(flask.request.values["query"]))
 		except pyduinocli.ArduinoError as e:
 			return flask.make_response(self.__get_error_json(e), 400)
 		return flask.make_response(flask.jsonify(result), 200)
@@ -98,7 +118,7 @@ class MarlinFlasherPlugin(octoprint.plugin.SettingsPlugin,
 		arduino = self.__get_arduino()
 		try:
 			arduino.lib_update_index()
-			result = arduino.lib_search(*self.__split(flask.request.values["query"]))
+			result = arduino.lib_search(self.__split(flask.request.values["query"]))
 		except pyduinocli.ArduinoError as e:
 			return flask.make_response(self.__get_error_json(e), 400)
 		return flask.make_response(flask.jsonify(result), 200)
@@ -112,7 +132,7 @@ class MarlinFlasherPlugin(octoprint.plugin.SettingsPlugin,
 			return flask.make_response(flask.jsonify(result), 400)
 		arduino = self.__get_arduino()
 		try:
-			arduino.core_install(flask.request.values["core"])
+			arduino.core_install([flask.request.values["core"]])
 		except pyduinocli.ArduinoError as e:
 			return flask.make_response(self.__get_error_json(e), 400)
 		result = dict(core=flask.request.values["core"])
@@ -127,7 +147,7 @@ class MarlinFlasherPlugin(octoprint.plugin.SettingsPlugin,
 			return flask.make_response(flask.jsonify(result), 400)
 		arduino = self.__get_arduino()
 		try:
-			arduino.lib_install(flask.request.values["lib"])
+			arduino.lib_install([flask.request.values["lib"]])
 		except pyduinocli.ArduinoError as e:
 			return flask.make_response(self.__get_error_json(e), 400)
 		result = dict(lib=flask.request.values["lib"])
@@ -142,7 +162,7 @@ class MarlinFlasherPlugin(octoprint.plugin.SettingsPlugin,
 			return flask.make_response(flask.jsonify(result), 400)
 		arduino = self.__get_arduino()
 		try:
-			arduino.core_uninstall(flask.request.values["core"])
+			arduino.core_uninstall([flask.request.values["core"]])
 		except pyduinocli.ArduinoError as e:
 			return flask.make_response(self.__get_error_json(e), 400)
 		result = dict(core=flask.request.values["core"])
@@ -157,7 +177,7 @@ class MarlinFlasherPlugin(octoprint.plugin.SettingsPlugin,
 			return flask.make_response(flask.jsonify(result), 400)
 		arduino = self.__get_arduino()
 		try:
-			arduino.lib_uninstall(flask.request.values["lib"])
+			arduino.lib_uninstall([flask.request.values["lib"]])
 		except pyduinocli.ArduinoError as e:
 			return flask.make_response(self.__get_error_json(e), 400)
 		result = dict(lib=flask.request.values["lib"])
@@ -211,7 +231,8 @@ class MarlinFlasherPlugin(octoprint.plugin.SettingsPlugin,
 			fqbn = "%s:%s" % (fqbn, options)
 		arduino = self.__get_arduino()
 		try:
-			arduino.compile(self.__sketch, fqbn=fqbn)
+			if self.__sketch_ino:
+				arduino.compile(self.__sketch, fqbn=fqbn)
 			transport = self._printer.get_transport()
 			if not isinstance(transport, serial.Serial):
 				result = dict(message=gettext("The printer is not connected through Serial."))
@@ -219,8 +240,12 @@ class MarlinFlasherPlugin(octoprint.plugin.SettingsPlugin,
 			flash_port = transport.port
 			_, port, baudrate, profile = self._printer.get_current_connection()
 			self._printer.disconnect()
-			arduino.upload(self.__sketch, fqbn=fqbn, port=flash_port)
+			if self.__sketch_ino:
+				arduino.upload(sketch=self.__sketch, fqbn=fqbn, port=flash_port)
+			else:
+				arduino.upload(fqbn=fqbn, port=flash_port, input=self.__sketch)
 			self._printer.connect(port, baudrate, profile)
+			self.__sketch = None
 			result = dict(message=gettext("Board successfully flashed."))
 			return flask.make_response(flask.jsonify(result), 200)
 		except pyduinocli.ArduinoError as e:
