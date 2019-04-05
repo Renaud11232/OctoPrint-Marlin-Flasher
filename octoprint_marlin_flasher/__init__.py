@@ -208,27 +208,7 @@ class MarlinFlasherPlugin(octoprint.plugin.SettingsPlugin,
 		except pyduinocli.ArduinoError as e:
 			return flask.make_response(self.__get_error_json(e), 400)
 
-	@octoprint.plugin.BlueprintPlugin.route("/flash", methods=["POST"])
-	@restricted_access
-	@admin_permission.require(403)
-	def flash(self):
-		if "fqbn" not in flask.request.values or not flask.request.values["fqbn"]:
-			result = dict(message=gettext("Missing fqbn."))
-			return flask.make_response(flask.jsonify(result), 400)
-		if self.__sketch is None:
-			result = dict(message=gettext("No sketch uploaded."))
-			return flask.make_response(flask.jsonify(result), 400)
-		if not self._printer.is_ready():
-			result = dict(message=gettext("The printer is currently not ready."))
-			return flask.make_response(flask.jsonify(result), 409)
-		options = []
-		for param in flask.request.values:
-			if param != "fqbn":
-				options.append("%s=%s" % (param, flask.request.values[param]))
-		options = ",".join(options)
-		fqbn = flask.request.values["fqbn"]
-		if options:
-			fqbn = "%s:%s" % (fqbn, options)
+	def __flash(self, fqbn):
 		arduino = self.__get_arduino()
 		try:
 			if self.__sketch_ino:
@@ -250,6 +230,29 @@ class MarlinFlasherPlugin(octoprint.plugin.SettingsPlugin,
 			return flask.make_response(flask.jsonify(result), 200)
 		except pyduinocli.ArduinoError as e:
 			return flask.make_response(self.__get_error_json(e), 400)
+
+	@octoprint.plugin.BlueprintPlugin.route("/flash", methods=["POST"])
+	@restricted_access
+	@admin_permission.require(403)
+	def flash(self):
+		if "fqbn" not in flask.request.values or not flask.request.values["fqbn"]:
+			result = dict(message=gettext("Missing fqbn."))
+			return flask.make_response(flask.jsonify(result), 400)
+		if self.__sketch is None:
+			result = dict(message=gettext("No sketch uploaded."))
+			return flask.make_response(flask.jsonify(result), 400)
+		if not self._printer.is_ready():
+			result = dict(message=gettext("The printer is currently not ready."))
+			return flask.make_response(flask.jsonify(result), 409)
+		options = []
+		for param in flask.request.values:
+			if param != "fqbn":
+				options.append("%s=%s" % (param, flask.request.values[param]))
+		options = ",".join(options)
+		fqbn = flask.request.values["fqbn"]
+		if options:
+			fqbn = "%s:%s" % (fqbn, options)
+		return self.__flash(fqbn)
 
 	@staticmethod
 	def __split(string):
