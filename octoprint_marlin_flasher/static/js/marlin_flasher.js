@@ -16,6 +16,8 @@ $(function() {
         self.boardOptions = ko.observableArray();
         self.stderr = ko.observable();
         self.uploadProgress = ko.observable(0);
+        self.flashingProgress = ko.observable(0);
+        self.progressStep = ko.observable();
 
         self.sketchFileButton.fileupload({
             maxNumberOfFiles: 1,
@@ -234,6 +236,8 @@ $(function() {
                     text: jqXHR.responseJSON.message,
                     type: "error"
                 });
+                self.progressStep(null);
+                self.flashingProgress(0);
                 if(jqXHR.responseJSON.stderr) {
                     self.stderr(jqXHR.responseJSON.stderr);
                     self.stderrModal.modal("show");
@@ -270,6 +274,12 @@ $(function() {
         self.onAllBound = function(viewModels) {
             if(self.loginStateViewModel.isAdmin()) {
                 self.loadBoardList();
+            }
+        };
+        self.onDataUpdaterPluginMessage = function(plugin, message) {
+            if(plugin == "marlin_flasher") {
+                self.progressStep(message.step);
+                self.flashingProgress(message.progress);
             }
         };
     }

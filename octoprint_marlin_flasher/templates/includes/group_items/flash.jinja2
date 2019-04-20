@@ -34,6 +34,11 @@
                         <button id="flash-button" class="btn btn-warning" type="submit" data-loading-text="{{ _('Flashing...') }}" ><i class="icon-warning-sign"></i> {{ _('Flash') }}</button>
                     </div>
                 </div>
+                <span data-bind="text: progressStep"></span>
+                <div class="progress progress-text-centered">
+                    <div class="bar" data-bind="style: {width: flashingProgress() + '%'},
+                                                css: {'bar-success': flashingProgress() >= 100}"></div>
+                </div>
             </form>
         </div>
     </div>
