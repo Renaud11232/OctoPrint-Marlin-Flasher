@@ -3,13 +3,13 @@
 This plugins makes the upgrade of your Marlin (or any Arduino based) firmware possible directly within OctoPrint.
 Simply connect to your printer, upload your firmware code, select your motherboard type, and click flash.**DONE**.
 
-![](/extras/assets/img/plugins/marlin_flasher/sketch.png)
+![sketch](extras/assets/img/plugins/marlin_flasher/sketch.png)
 
-![](/extras/assets/img/plugins/marlin_flasher/cores.png)
+![cores](extras/assets/img/plugins/marlin_flasher/cores.png)
 
-![](/extras/assets/img/plugins/marlin_flasher/libraries.png)
+![libraries](extras/assets/img/plugins/marlin_flasher/libraries.png)
 
-![](/extras/assets/img/plugins/marlin_flasher/flash.png)
+![flash](extras/assets/img/plugins/marlin_flasher/flash.png)
 
 ## Setup
 
@@ -22,26 +22,23 @@ or manually using this URL:
 
 ## Configuration
 
-In order to be able to use Marlin Flasher properly you will need to increase the maximum request size. This is necessary
-to successfully upload your firmware if the files weights more than 100kB. You will need to edit
-[config.yaml](https://docs.octoprint.org/en/master/configuration/config_yaml.html)
-
-```yaml
-server:
-  maxSize: 102400000
-```
-
-There are two configurable options:
+There are three configurable options:
 * The path to your `arduino-cli` executable
 * The name of the Arduino sketch (defaults to `Marlin.ino`)
+* The maximum file upload size (defaults to `20MB`)
 
-Both can be configured directly though the *Settings* menu. or via the [config.yaml](https://docs.octoprint.org/en/master/configuration/config_yaml.html)
+All can be configured directly though the *Settings* menu. or via the [config.yaml](https://docs.octoprint.org/en/master/configuration/config_yaml.html)
 
 ```yaml
 plugins:
   marlin_flasher:
     arduino_path: /path/to/arduino-cli
     sketch_ino: Marlin.ino
+    max_sketch_size: 20
 ```
 
 You may also want to add custom boards ie: `Sanguino`. To do that edit the arduino-cli configuration file manually (cf: `arduino-cli` official documentation)
+
+## Step by step
+
+If you need more help on how to setup and use the plugin feel free to check the [wiki](https://github.com/Renaud11232/OctoPrint-Marlin-Flasher/wiki)

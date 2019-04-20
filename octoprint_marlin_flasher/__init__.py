@@ -212,7 +212,11 @@ class MarlinFlasherPlugin(octoprint.plugin.SettingsPlugin,
 		arduino = self.__get_arduino()
 		try:
 			if self.__sketch_ino:
+				self._plugin_manager.send_plugin_message(self._identifier, dict(step=gettext("Compiling"), progress=0))
 				arduino.compile(self.__sketch, fqbn=fqbn)
+				self._plugin_manager.send_plugin_message(self._identifier, dict(step=gettext("Uploading"), progress=50))
+			else:
+				self._plugin_manager.send_plugin_message(self._identifier, dict(step=gettext("Uploading"), progress=0))
 			transport = self._printer.get_transport()
 			if not isinstance(transport, serial.Serial):
 				result = dict(message=gettext("The printer is not connected through Serial."))
@@ -226,6 +230,7 @@ class MarlinFlasherPlugin(octoprint.plugin.SettingsPlugin,
 				arduino.upload(fqbn=fqbn, port=flash_port, input=self.__sketch)
 			self._printer.connect(port, baudrate, profile)
 			self.__sketch = None
+			self._plugin_manager.send_plugin_message(self._identifier, dict(step=gettext("Done"), progress=100))
 			result = dict(message=gettext("Board successfully flashed."))
 			return flask.make_response(flask.jsonify(result), 200)
 		except pyduinocli.ArduinoError as e:
