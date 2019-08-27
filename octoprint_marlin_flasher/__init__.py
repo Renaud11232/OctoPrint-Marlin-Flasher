@@ -249,7 +249,7 @@ class MarlinFlasherPlugin(octoprint.plugin.SettingsPlugin,
 			result = dict(message=gettext("No sketch uploaded."))
 			return flask.make_response(flask.jsonify(result), 400)
 		if not self._printer.is_ready():
-			result = dict(message=gettext("The printer is currently not ready."))
+			result = dict(message=gettext("The printer is currently not ready. Is it connected/idle ?"))
 			return flask.make_response(flask.jsonify(result), 409)
 		options = []
 		for param in flask.request.values:
