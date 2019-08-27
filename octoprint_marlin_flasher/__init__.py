@@ -25,9 +25,6 @@ class MarlinFlasherPlugin(octoprint.plugin.SettingsPlugin,
 		self.__sketch = None
 		self.__sketch_ino = False
 
-	def get_settings_version(self):
-		return 1
-
 	def get_settings_defaults(self):
 		return dict(
 			arduino_path=None,
@@ -273,7 +270,11 @@ class MarlinFlasherPlugin(octoprint.plugin.SettingsPlugin,
 
 	def __get_arduino(self):
 		arduino_path = self._settings.get(["arduino_path"])
-		additional_urls = self._settings.get(["additional_urls"]).splitlines()
+		additional_urls = self._settings.get(["additional_urls"])
+		if additional_urls:
+			additional_urls = additional_urls.splitlines()
+		else:
+			additional_urls = None
 		return pyduinocli.Arduino(arduino_path, additional_urls=additional_urls)
 
 	@staticmethod
@@ -286,9 +287,6 @@ class MarlinFlasherPlugin(octoprint.plugin.SettingsPlugin,
 
 	def is_wizard_required(self):
 		return self._settings.get(["arduino_path"]) is None
-
-	def get_wizard_version(self):
-		return 1
 
 	def get_update_information(self):
 		return dict(
