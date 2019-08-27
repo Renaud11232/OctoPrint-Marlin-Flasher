@@ -189,6 +189,7 @@ class MarlinFlasherPlugin(octoprint.plugin.SettingsPlugin,
 	def board_listall(self):
 		arduino = self.__get_arduino()
 		try:
+			arduino.core_update_index()
 			result = arduino.board_listall()
 			return flask.make_response(flask.jsonify(result), 200)
 		except pyduinocli.ArduinoError as e:
