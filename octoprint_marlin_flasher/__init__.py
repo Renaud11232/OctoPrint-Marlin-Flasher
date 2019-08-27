@@ -178,7 +178,7 @@ class MarlinFlasherPlugin(octoprint.plugin.SettingsPlugin,
 			return flask.make_response(flask.jsonify(result), 400)
 		try:
 			arduino = self.__get_arduino()
-			arduino.lib_uninstall([flask.request.values["lib"]])
+			arduino.lib_uninstall([flask.request.values["lib"].replace(" ", "_")])
 		except pyduinocli.ArduinoError as e:
 			return flask.make_response(self.__get_error_json(e), 400)
 		result = dict(lib=flask.request.values["lib"])
