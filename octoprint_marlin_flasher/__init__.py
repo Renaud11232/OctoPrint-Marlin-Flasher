@@ -285,6 +285,9 @@ class MarlinFlasherPlugin(octoprint.plugin.SettingsPlugin,
 			stderr=error.stderr
 		))
 
+	def get_wizard_version(self):
+		return 1
+
 	def is_wizard_required(self):
 		return self._settings.get(["arduino_path"]) is None
 
