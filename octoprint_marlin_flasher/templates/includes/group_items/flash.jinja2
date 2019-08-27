@@ -13,19 +13,19 @@
                         <select id="fqbn" name="fqbn" required="required" data-bind="options:boardList,
                                                                                      optionsCaption: 'Please select one',
                                                                                      optionsText: 'name',
-                                                                                     optionsValue: 'fqbn',
+                                                                                     optionsValue: 'FQBN',
                                                                                      value: selectedBoard"></select>
                     </div>
                 </div>
                 <div data-bind="foreach: boardOptions">
                     <div class="control-group">
-                        <label class="control-label" data-bind="text: OptionLabel,
-                                                                attr: {for: Option}"></label>
+                        <label class="control-label" data-bind="text: option_label,
+                                                                attr: {for: option}"></label>
                         <div class="controls">
-                            <select data-bind="attr: {name: Option, id: Option},
-                                               options: $data.Values,
-                                               optionsText: 'ValueLabel',
-                                               optionsValue: 'Value'"></select>
+                            <select data-bind="attr: {name: option, id: option},
+                                               options: $data.values,
+                                               optionsText: 'value_label',
+                                               optionsValue: 'value'"></select>
                         </div>
                     </div>
                 </div>

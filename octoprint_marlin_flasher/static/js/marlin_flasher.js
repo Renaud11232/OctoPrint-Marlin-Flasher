@@ -260,7 +260,7 @@ $(function() {
                     }
                 }).done(function (data) {
                     if(data) {
-                        self.boardOptions(data.ConfigOptions);
+                        self.boardOptions(data.config_options);
                     }
                 }).fail(function(jqXHR, status, error) {
                     new PNotify({
