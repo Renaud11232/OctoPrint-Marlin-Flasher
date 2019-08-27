@@ -155,7 +155,7 @@ $(function() {
                 headers: OctoPrint.getRequestHeaders(),
                 url: "/plugin/marlin_flasher/libs/install",
                 data: {
-                    lib: data.Name
+                    lib: data.name
                 }
             }).done(function(data) {
                 new PNotify({
@@ -180,7 +180,7 @@ $(function() {
                 headers: OctoPrint.getRequestHeaders(),
                 url: "/plugin/marlin_flasher/libs/uninstall",
                 data: {
-                    lib: data.Name
+                    lib: data.name
                 }
             }).done(function(data) {
                 new PNotify({
