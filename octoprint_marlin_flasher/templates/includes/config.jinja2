@@ -24,7 +24,8 @@
     <div class="control-group">
         <label class="control-label" for="additional_urls">{{ _('Additional Board URLs') }}</label>
         <div class="controls">
-            <textarea id="additional_urls" rows="5" data-bind="value: settingsViewModel.settings.plugins.marlin_flasher.additional_urls"></textarea>
+            <textarea class="input-block-level" id="additional_urls" rows="10" cols="100" data-bind="value: settingsViewModel.settings.plugins.marlin_flasher.additional_urls"></textarea>
+            <span>{{ _('*one per line') }}</span>
         </div>
     </div>
 </form>
