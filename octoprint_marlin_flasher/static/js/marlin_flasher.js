@@ -58,11 +58,7 @@ $(function() {
                 url: "/plugin/marlin_flasher/cores/search",
                 data: $(form).serialize()
             }).done(function (data) {
-                if(data.hasOwnProperty("Platforms")) {
-                    self.coreSearchResult(data.Platforms);
-                } else {
-                    self.coreSearchResult([]);
-                }
+                self.coreSearchResult(data);
             }).fail(function(jqXHR, status, error) {
                 new PNotify({
                     title: gettext("Core search failed"),
