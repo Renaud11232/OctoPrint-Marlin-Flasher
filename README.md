@@ -22,10 +22,11 @@ or manually using this URL:
 
 ## Configuration
 
-There are three configurable options:
+There are four configurable options:
 * The path to your `arduino-cli` executable
 * The name of the Arduino sketch (defaults to `Marlin.ino`)
 * The maximum file upload size (defaults to `20MB`)
+* The additional boards urls (ie: Sanguino)
 
 All can be configured directly though the *Settings* menu. or via the [config.yaml](https://docs.octoprint.org/en/master/configuration/config_yaml.html)
 
@@ -35,6 +36,7 @@ plugins:
     arduino_path: /path/to/arduino-cli
     sketch_ino: Marlin.ino
     max_sketch_size: 20
+    additional_urls: 'https://what.ever/boards.json'
 ```
 
 You may also want to add custom boards ie: `Sanguino`. To do that edit the arduino-cli configuration file manually (cf: `arduino-cli` official documentation)
