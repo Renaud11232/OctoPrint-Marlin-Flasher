@@ -1,3 +1,6 @@
+<div class="alert alert-info">
+    <strong>{{ _('Warning !') }}</strong> {{ _('You must have arduino-cli version <strong>0.4.0</strong>. Other versions may not work.') }}
+</div>
 <form class="form-horizontal">
     <div class="control-group">
         <label class="control-label" for="arduino_path">{{ _('Path to arduino-cli') }}</label>
@@ -19,6 +22,13 @@
                 <span class="add-on">{{ _('MB') }}</span>
             </div>
             <span>{{ _('*requires restart') }}</span>
+        </div>
+    </div>
+    <div class="control-group">
+        <label class="control-label" for="additional_urls">{{ _('Additional Board URLs') }}</label>
+        <div class="controls">
+            <textarea class="input-block-level" id="additional_urls" rows="10" cols="100" data-bind="value: settingsViewModel.settings.plugins.marlin_flasher.additional_urls"></textarea>
+            <span>{{ _('*one per line') }}</span>
         </div>
     </div>
 </form>

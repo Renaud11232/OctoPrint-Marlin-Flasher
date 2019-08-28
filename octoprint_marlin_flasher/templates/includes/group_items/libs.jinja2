@@ -23,7 +23,7 @@
                 <!-- ko if: libSearchResult().length > 0 -->
                     <tbody data-bind="foreach: libSearchResult">
                         <tr>
-                            <td data-bind="text: Name"></td>
+                            <td data-bind="text: name"></td>
                             <td>
                                 <button type="button" class="btn btn-primary" data-loading-text="<i class='icon-download-alt'></i>" data-bind="click: $parent.installLib">
                                     <i class="icon-download-alt"></i>

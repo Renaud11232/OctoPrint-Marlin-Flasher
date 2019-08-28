@@ -58,11 +58,7 @@ $(function() {
                 url: "/plugin/marlin_flasher/cores/search",
                 data: $(form).serialize()
             }).done(function (data) {
-                if(data.hasOwnProperty("Platforms")) {
-                    self.coreSearchResult(data.Platforms);
-                } else {
-                    self.coreSearchResult([]);
-                }
+                self.coreSearchResult(data);
             }).fail(function(jqXHR, status, error) {
                 new PNotify({
                     title: gettext("Core search failed"),
@@ -155,7 +151,7 @@ $(function() {
                 headers: OctoPrint.getRequestHeaders(),
                 url: "/plugin/marlin_flasher/libs/install",
                 data: {
-                    lib: data.Name
+                    lib: data.name
                 }
             }).done(function(data) {
                 new PNotify({
@@ -180,7 +176,7 @@ $(function() {
                 headers: OctoPrint.getRequestHeaders(),
                 url: "/plugin/marlin_flasher/libs/uninstall",
                 data: {
-                    lib: data.Name
+                    lib: data.name
                 }
             }).done(function(data) {
                 new PNotify({
@@ -260,7 +256,7 @@ $(function() {
                     }
                 }).done(function (data) {
                     if(data) {
-                        self.boardOptions(data.ConfigOptions);
+                        self.boardOptions(data.config_options);
                     }
                 }).fail(function(jqXHR, status, error) {
                     new PNotify({

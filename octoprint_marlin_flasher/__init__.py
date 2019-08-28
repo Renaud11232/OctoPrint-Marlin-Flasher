@@ -29,7 +29,8 @@ class MarlinFlasherPlugin(octoprint.plugin.SettingsPlugin,
 		return dict(
 			arduino_path=None,
 			sketch_ino="Marlin.ino",
-			max_sketch_size=20
+			max_sketch_size=20,
+			additiona_urls=""
 		)
 
 	def get_assets(self):
@@ -100,8 +101,8 @@ class MarlinFlasherPlugin(octoprint.plugin.SettingsPlugin,
 		if "query" not in flask.request.values:
 			result = dict(message=gettext("Missing query."))
 			return flask.make_response(flask.jsonify(result), 400)
-		arduino = self.__get_arduino()
 		try:
+			arduino = self.__get_arduino()
 			arduino.core_update_index()
 			result = arduino.core_search(self.__split(flask.request.values["query"]))
 		except pyduinocli.ArduinoError as e:
@@ -115,8 +116,8 @@ class MarlinFlasherPlugin(octoprint.plugin.SettingsPlugin,
 		if "query" not in flask.request.values:
 			result = dict(message=gettext("Missing query."))
 			return flask.make_response(flask.jsonify(result), 400)
-		arduino = self.__get_arduino()
 		try:
+			arduino = self.__get_arduino()
 			arduino.lib_update_index()
 			result = arduino.lib_search(self.__split(flask.request.values["query"]))
 		except pyduinocli.ArduinoError as e:
@@ -130,8 +131,8 @@ class MarlinFlasherPlugin(octoprint.plugin.SettingsPlugin,
 		if "core" not in flask.request.values:
 			result = dict(message=gettext("Missing core."))
 			return flask.make_response(flask.jsonify(result), 400)
-		arduino = self.__get_arduino()
 		try:
+			arduino = self.__get_arduino()
 			arduino.core_install([flask.request.values["core"]])
 		except pyduinocli.ArduinoError as e:
 			return flask.make_response(self.__get_error_json(e), 400)
@@ -145,8 +146,8 @@ class MarlinFlasherPlugin(octoprint.plugin.SettingsPlugin,
 		if "lib" not in flask.request.values:
 			result = dict(message=gettext("Missing lib."))
 			return flask.make_response(flask.jsonify(result), 400)
-		arduino = self.__get_arduino()
 		try:
+			arduino = self.__get_arduino()
 			arduino.lib_install([flask.request.values["lib"]])
 		except pyduinocli.ArduinoError as e:
 			return flask.make_response(self.__get_error_json(e), 400)
@@ -160,8 +161,8 @@ class MarlinFlasherPlugin(octoprint.plugin.SettingsPlugin,
 		if "core" not in flask.request.values:
 			result = dict(message=gettext("Missing core."))
 			return flask.make_response(flask.jsonify(result), 400)
-		arduino = self.__get_arduino()
 		try:
+			arduino = self.__get_arduino()
 			arduino.core_uninstall([flask.request.values["core"]])
 		except pyduinocli.ArduinoError as e:
 			return flask.make_response(self.__get_error_json(e), 400)
@@ -175,9 +176,9 @@ class MarlinFlasherPlugin(octoprint.plugin.SettingsPlugin,
 		if "lib" not in flask.request.values:
 			result = dict(message=gettext("Missing lib."))
 			return flask.make_response(flask.jsonify(result), 400)
-		arduino = self.__get_arduino()
 		try:
-			arduino.lib_uninstall([flask.request.values["lib"]])
+			arduino = self.__get_arduino()
+			arduino.lib_uninstall([flask.request.values["lib"].replace(" ", "_")])
 		except pyduinocli.ArduinoError as e:
 			return flask.make_response(self.__get_error_json(e), 400)
 		result = dict(lib=flask.request.values["lib"])
@@ -187,8 +188,9 @@ class MarlinFlasherPlugin(octoprint.plugin.SettingsPlugin,
 	@restricted_access
 	@admin_permission.require(403)
 	def board_listall(self):
-		arduino = self.__get_arduino()
 		try:
+			arduino = self.__get_arduino()
+			arduino.core_update_index()
 			result = arduino.board_listall()
 			return flask.make_response(flask.jsonify(result), 200)
 		except pyduinocli.ArduinoError as e:
@@ -201,16 +203,16 @@ class MarlinFlasherPlugin(octoprint.plugin.SettingsPlugin,
 		if "fqbn" not in flask.request.values or not flask.request.values["fqbn"]:
 			result = dict(message=gettext("Missing fqbn."))
 			return flask.make_response(flask.jsonify(result), 400)
-		arduino = self.__get_arduino()
 		try:
+			arduino = self.__get_arduino()
 			result = arduino.board_details(flask.request.values["fqbn"])
 			return flask.make_response(flask.jsonify(result), 200)
 		except pyduinocli.ArduinoError as e:
 			return flask.make_response(self.__get_error_json(e), 400)
 
 	def __flash(self, fqbn):
-		arduino = self.__get_arduino()
 		try:
+			arduino = self.__get_arduino()
 			if self.__sketch_ino:
 				self._plugin_manager.send_plugin_message(self._identifier, dict(step=gettext("Compiling"), progress=0))
 				arduino.compile(self.__sketch, fqbn=fqbn)
@@ -247,7 +249,7 @@ class MarlinFlasherPlugin(octoprint.plugin.SettingsPlugin,
 			result = dict(message=gettext("No sketch uploaded."))
 			return flask.make_response(flask.jsonify(result), 400)
 		if not self._printer.is_ready():
-			result = dict(message=gettext("The printer is currently not ready."))
+			result = dict(message=gettext("The printer is currently not ready. Is it connected/idle ?"))
 			return flask.make_response(flask.jsonify(result), 409)
 		options = []
 		for param in flask.request.values:
@@ -268,7 +270,12 @@ class MarlinFlasherPlugin(octoprint.plugin.SettingsPlugin,
 
 	def __get_arduino(self):
 		arduino_path = self._settings.get(["arduino_path"])
-		return pyduinocli.Arduino(arduino_path)
+		additional_urls = self._settings.get(["additional_urls"])
+		if additional_urls:
+			additional_urls = additional_urls.splitlines()
+		else:
+			additional_urls = None
+		return pyduinocli.Arduino(arduino_path, additional_urls=additional_urls)
 
 	@staticmethod
 	def __get_error_json(error):
@@ -277,6 +284,9 @@ class MarlinFlasherPlugin(octoprint.plugin.SettingsPlugin,
 			cause=error.cause,
 			stderr=error.stderr
 		))
+
+	def get_wizard_version(self):
+		return 1
 
 	def is_wizard_required(self):
 		return self._settings.get(["arduino_path"]) is None
