@@ -287,17 +287,17 @@ class MarlinFlasherPlugin(octoprint.plugin.SettingsPlugin,
 		))
 
 	def get_wizard_version(self):
-		return 1
+		return 2
 
 	def is_wizard_required(self):
 		no_arduino_path = self._settings.get(["arduino_path"]) is None
-		old_arduino = False
+		bad_arduino = False
 		if not no_arduino_path and not self._settings.get(["additional_urls"]):
 			try:
-				old_arduino = re.match(r"(?:0\.4\..+?)\Z", self.__get_arduino().version()["VersionString"]) is None
-			except KeyError:
-				old_arduino = True
-		return no_arduino_path or old_arduino
+				bad_arduino = re.match(r"(?:0\.5\..+?)\Z", self.__get_arduino().version()["VersionString"]) is None
+			except (pyduinocli.ArduinoError, KeyError):
+				bad_arduino = True
+		return no_arduino_path or bad_arduino
 
 	def get_update_information(self):
 		return dict(
