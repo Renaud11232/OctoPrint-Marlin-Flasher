@@ -25,18 +25,33 @@
                 <!-- ko if: coreSearchResult().length > 0 -->
                     <tbody data-bind="foreach: coreSearchResult">
                         <tr>
-                            <td data-bind="text: ID"></td>
-                            <td data-bind="text: Latest"></td>
-                            <td data-bind="text: Name"></td>
-                            <td>
-                                <button type="button" class="btn btn-primary" data-loading-text="<i class='icon-download-alt'></i>" data-bind="click: $parent.installCore">
-                                    <i class="icon-download-alt"></i>
-                                </button></td>
-                            <td>
-                                <button type="button" class="btn btn-danger" data-loading-text="<i class='icon-trash'></i>" data-bind="click: $parent.uninstallCore">
-                                    <i class="icon-trash"></i>
-                                </button>
-                            </td>
+                            <!-- ko if: $data.Name && $data.Latest -->
+                                <td data-bind="text: ID"></td>
+                                <td data-bind="text: Latest"></td>
+                                <td data-bind="text: Name"></td>
+                                <td>
+                                    <button type="button" class="btn btn-primary" data-loading-text="<i class='icon-download-alt'></i>" data-bind="click: $parent.installCore">
+                                        <i class="icon-download-alt"></i>
+                                    </button></td>
+                                <td>
+                                    <button type="button" class="btn btn-danger" data-loading-text="<i class='icon-trash'></i>" data-bind="click: $parent.uninstallCore">
+                                        <i class="icon-trash"></i>
+                                    </button>
+                                </td>
+                            <!-- /ko -->
+                            <!-- ko ifnot: $data.Name && $data.Latest -->
+                                <td data-bind="text: ID"></td>
+                                <td colspan="2">{{ _('Manually installed') }}</td>
+                                <td>
+                                    <button type="button" class="btn btn-primary" disabled>
+                                        <i class="icon-download-alt"></i>
+                                    </button></td>
+                                <td>
+                                    <button type="button" class="btn btn-danger" disabled>
+                                        <i class="icon-trash"></i>
+                                    </button>
+                                </td>
+                            <!-- /ko -->
                         </tr>
                     </tbody>
                 <!-- /ko -->
