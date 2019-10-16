@@ -54,7 +54,7 @@ class MarlinFlasherPlugin(octoprint.plugin.SettingsPlugin,
 		for root, dirs, files in os.walk(sketch_dir):
 			for f in files:
 				if f == self._settings.get(["sketch_ino"]):
-					self.__sketch = root
+					self.__sketch = os.path.join(root, f)
 					result = dict(
 						path=root,
 						file=f
