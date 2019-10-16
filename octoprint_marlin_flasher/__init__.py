@@ -46,15 +46,16 @@ class MarlinFlasherPlugin(octoprint.plugin.SettingsPlugin,
 
 	def __handle_zip(self, zip_file):
 		self.__sketch_ino = True
-		sketch_dir = os.path.join(self.get_plugin_data_folder(), "extracted_sketch")
-		if os.path.exists(sketch_dir):
-			shutil.rmtree(sketch_dir)
+		extracted_dir = os.path.join(self.get_plugin_data_folder(), "extracted_sketch")
+		sketch_dir = os.path.join(extracted_dir, os.path.splitext(self._settings.get(["sketch_ino"]))[0])
+		if os.path.exists(extracted_dir):
+			shutil.rmtree(extracted_dir)
 		os.makedirs(sketch_dir)
 		zip_file.extractall(sketch_dir)
 		for root, dirs, files in os.walk(sketch_dir):
 			for f in files:
 				if f == self._settings.get(["sketch_ino"]):
-					self.__sketch = os.path.join(root, f)
+					self.__sketch = root
 					result = dict(
 						path=root,
 						file=f
