@@ -1,0 +1,2 @@
+class FlasherError(Exception):
+	pass
