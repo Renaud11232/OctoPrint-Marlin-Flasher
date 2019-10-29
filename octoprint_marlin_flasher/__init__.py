@@ -8,7 +8,7 @@ import flask
 import pyduinocli
 import intelhex
 from flask_babel import gettext
-from . import flasher
+from .flasher import MarlinFlasher
 import shlex
 import zipfile
 import shutil
@@ -26,7 +26,7 @@ class MarlinFlasherPlugin(octoprint.plugin.SettingsPlugin,
 	def on_after_startup(self):
 		self.__sketch = None
 		self.__sketch_ino = False
-		self.__flasher = flasher.MarlinFlasher(self._settings, self._printer)
+		self.__flasher = MarlinFlasher(self._settings, self._printer)
 
 	def get_settings_defaults(self):
 		return dict(

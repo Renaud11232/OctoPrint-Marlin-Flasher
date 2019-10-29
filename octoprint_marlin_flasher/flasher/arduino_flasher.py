@@ -1,4 +1,4 @@
-from .flasher import BaseFlasher
+from .base_flasher import BaseFlasher
 
 
 class ArduinoFlasher(BaseFlasher):
