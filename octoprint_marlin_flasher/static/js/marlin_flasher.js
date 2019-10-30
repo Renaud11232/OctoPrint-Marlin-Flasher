@@ -3,7 +3,7 @@ $(function() {
         var self = this;
         self.settingsViewModel = parameters[0];
         self.loginStateViewModel = parameters[1];
-        self.sketchFileButton = $("#sketch_file");
+        self.firmwareFileButton = $("#firmware_file");
         self.flashButton = $("#flash-button");
         self.searchCoreButton = $("#search-core-btn");
         self.searchLibButton = $("#search-lib-btn");
@@ -19,7 +19,7 @@ $(function() {
         self.flashingProgress = ko.observable(0);
         self.progressStep = ko.observable();
 
-        self.sketchFileButton.fileupload({
+        self.firmwareFileButton.fileupload({
             maxNumberOfFiles: 1,
             headers: OctoPrint.getRequestHeaders(),
             done: function(e, data) {

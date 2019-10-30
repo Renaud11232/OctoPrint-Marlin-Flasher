@@ -10,6 +10,7 @@ import intelhex
 from flask_babel import gettext
 from .flasher import MarlinFlasher
 from .validation import RequestValidator
+from .flasher.platform_type import PlatformType
 import shlex
 import zipfile
 import shutil
@@ -41,6 +42,7 @@ class MarlinFlasherPlugin(octoprint.plugin.StartupPlugin,
 
 			),
 			max_upload_size=20,
+			platform_type=PlatformType.ARDUINO
 		)
 
 	def get_settings_version(self):
@@ -111,8 +113,11 @@ class MarlinFlasherPlugin(octoprint.plugin.StartupPlugin,
 	@restricted_access
 	@admin_permission.require(403)
 	def upload_sketch(self):
+		errors = self.__validator.validate_upload()
+		if errors:
+			return flask.make_response(flask.jsonify(errors), 400)
 		self.__sketch = None
-		upload_path = "sketch_file." + self._settings.global_get(["server", "uploads", "pathSuffix"])
+		upload_path = "firmware_file." + self._settings.global_get(["server", "uploads", "pathSuffix"])
 		if upload_path not in flask.request.values:
 			result = dict(message=gettext("Missing sketch_file."))
 			return flask.make_response(flask.jsonify(result), 400)

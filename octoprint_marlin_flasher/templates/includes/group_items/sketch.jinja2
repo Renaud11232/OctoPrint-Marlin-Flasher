@@ -11,11 +11,11 @@
             </p>
             <form class="form-horizontal">
                 <div class="control-group">
-                    <label class="control-label" for="sketch_file">{{ _('Arduino sketch') }} :</label>
+                    <label class="control-label" for="firmware_file">{{ _('Arduino sketch') }} :</label>
                     <div class="controls">
                         <span class="btn fileinput-button">
                             <span>{{ _('Browse') }}</span>
-                            <input id="sketch_file" type="file" name="sketch_file" data-url="{{ url_for("plugin.marlin_flasher.upload_sketch") }}" accept=".zip, .hex">
+                            <input id="firmware_file" type="file" name="firmware_file" data-url="{{ url_for("plugin.marlin_flasher.upload_sketch") }}" accept=".zip, .hex">
                         </span>
                     </div>
                 </div>
