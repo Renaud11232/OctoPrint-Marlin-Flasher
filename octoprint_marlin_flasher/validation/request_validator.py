@@ -1,7 +1,7 @@
 from ..flasher.platform_type import PlatformType
 from .platformio_validator import PlatformIOValidator
 from .arduino_validator import ArduinoValidator
-from .validator_error import ValidatorError
+from .unsupported_validator import UnsupportedPlatformValidator
 
 
 class RequestValidator:
@@ -11,6 +11,7 @@ class RequestValidator:
 		self.__printer = printer
 		self.__arduino_validator = ArduinoValidator(settings, printer)
 		self.__platformio_validator = PlatformIOValidator(settings, printer)
+		self.__unsupported_validator = UnsupportedPlatformValidator(settings, printer)
 
 	def __get_implementation(self):
 		platform = self.__settings.get_platform_type()
@@ -18,7 +19,8 @@ class RequestValidator:
 			return self.__arduino_validator
 		elif platform == PlatformType.PLATFORM_IO:
 			return self.__platformio_validator
-		raise ValidatorError("Unknown firmware platform")
+		else:
+			return self.__unsupported_validator
 
 	def validate_upload(self):
 		return self.__get_implementation().validate_upload()
