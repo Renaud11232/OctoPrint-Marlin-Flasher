@@ -5,20 +5,20 @@
     <div class="control-group">
         <label class="control-label" for="arduino_path">{{ _('Path to arduino-cli') }}</label>
         <div class="controls">
-            <input type="text" data-bind="value: settingsViewModel.settings.plugins.marlin_flasher.arduino_path" id="arduino_path">
+            <input type="text" data-bind="value: settingsViewModel.settings.plugins.marlin_flasher.arduino.cli_path" id="cli_path">
         </div>
     </div>
     <div class="control-group">
         <label class="control-label" for="sketch_ino">{{ _('Sketch .ino') }}</label>
         <div class="controls">
-            <input type="text" data-bind="value: settingsViewModel.settings.plugins.marlin_flasher.sketch_ino" id="sketch_ino">
+            <input type="text" data-bind="value: settingsViewModel.settings.plugins.marlin_flasher.arduino.sketch_ino" id="sketch_ino">
         </div>
     </div>
     <div class="control-group">
         <label class="control-label" for="sketch_size">{{ _('Maximum sketch size') }}</label>
         <div class="controls">
             <div class="input-append">
-                <input type="number" min="1" max="1024" data-bind="value: settingsViewModel.settings.plugins.marlin_flasher.max_sketch_size" id="sketch_size">
+                <input type="number" min="1" max="1024" data-bind="value: settingsViewModel.settings.plugins.marlin_flasher.max_upload_size" id="upload_size">
                 <span class="add-on">{{ _('MB') }}</span>
             </div>
             <span>{{ _('*requires restart') }}</span>
@@ -27,7 +27,7 @@
     <div class="control-group">
         <label class="control-label" for="additional_urls">{{ _('Additional Board URLs') }}</label>
         <div class="controls">
-            <textarea class="input-block-level" id="additional_urls" rows="10" cols="100" data-bind="value: settingsViewModel.settings.plugins.marlin_flasher.additional_urls"></textarea>
+            <textarea class="input-block-level" id="additional_urls" rows="10" cols="100" data-bind="value: settingsViewModel.settings.plugins.marlin_flasher.arduino.additional_urls"></textarea>
             <span>{{ _('*one per line') }}</span>
         </div>
     </div>

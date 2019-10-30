@@ -17,12 +17,12 @@ import os
 import re
 
 
-class MarlinFlasherPlugin(octoprint.plugin.SettingsPlugin,
-							octoprint.plugin.AssetPlugin,
-							octoprint.plugin.TemplatePlugin,
-							octoprint.plugin.WizardPlugin,
-							octoprint.plugin.BlueprintPlugin,
-							octoprint.plugin.StartupPlugin):
+class MarlinFlasherPlugin(octoprint.plugin.StartupPlugin,
+						  octoprint.plugin.SettingsPlugin,
+						  octoprint.plugin.AssetPlugin,
+						  octoprint.plugin.TemplatePlugin,
+						  octoprint.plugin.WizardPlugin,
+						  octoprint.plugin.BlueprintPlugin):
 
 	def on_after_startup(self):
 		self.__sketch = None
@@ -32,11 +32,34 @@ class MarlinFlasherPlugin(octoprint.plugin.SettingsPlugin,
 
 	def get_settings_defaults(self):
 		return dict(
-			arduino_path=None,
-			sketch_ino="Marlin.ino",
-			max_sketch_size=20,
-			additiona_urls=""
+			arduino=dict(
+				sketch_ino="Marlin.ino",
+				cli_path=None,
+				additional_urls=""
+			),
+			platformio=dict(
+
+			),
+			max_upload_size=20,
 		)
+
+	def get_settings_version(self):
+		return 1
+
+	def on_settings_migrate(self, target, current):
+		if current is None:
+			max_sketch_size = self._settings.get(["max_sketch_size"])
+			self._settings.set(["max_upload_size"], max_sketch_size)
+			self._settings.set(["max_sketch_size"], None)
+			arduino_path = self._settings.get(["arduino_path"])
+			self._settings.set(["arduino", "cli_path"], arduino_path)
+			self._settings.set(["arduino_path"], None)
+			sketch_ino = self._settings.get(["sketch_ino"])
+			self._settings.set(["arduino", "sketch_ino"], sketch_ino)
+			self._settings.set(["sketch_ino"], None)
+			additional_urls = self._settings.get(["additional_urls"])
+			self._settings.set(["additional_urls"], None)
+			self._settings.set(["arduino", "additional_urls"], additional_urls)
 
 	def get_assets(self):
 		return dict(
@@ -51,14 +74,14 @@ class MarlinFlasherPlugin(octoprint.plugin.SettingsPlugin,
 	def __handle_zip(self, zip_file):
 		self.__sketch_ino = True
 		extracted_dir = os.path.join(self.get_plugin_data_folder(), "extracted_sketch")
-		sketch_dir = os.path.join(extracted_dir, os.path.splitext(self._settings.get(["sketch_ino"]))[0])
+		sketch_dir = os.path.join(extracted_dir, os.path.splitext(self._settings.get(["arduino", "sketch_ino"]))[0])
 		if os.path.exists(extracted_dir):
 			shutil.rmtree(extracted_dir)
 		os.makedirs(sketch_dir)
 		zip_file.extractall(sketch_dir)
 		for root, dirs, files in os.walk(sketch_dir):
 			for f in files:
-				if f == self._settings.get(["sketch_ino"]):
+				if f == self._settings.get(["arduino", "sketch_ino"]):
 					self.__sketch = root
 					result = dict(
 						path=root,
@@ -275,8 +298,8 @@ class MarlinFlasherPlugin(octoprint.plugin.SettingsPlugin,
 		return s
 
 	def __get_arduino(self):
-		arduino_path = self._settings.get(["arduino_path"])
-		additional_urls = self._settings.get(["additional_urls"])
+		arduino_path = self._settings.get(["arduino", "cli_path"])
+		additional_urls = self._settings.get(["arduino", "additional_urls"])
 		if additional_urls:
 			additional_urls = additional_urls.splitlines()
 		else:
@@ -295,7 +318,7 @@ class MarlinFlasherPlugin(octoprint.plugin.SettingsPlugin,
 		return 2
 
 	def is_wizard_required(self):
-		no_arduino_path = self._settings.get(["arduino_path"]) is None
+		no_arduino_path = self._settings.get(["arduino", "cli_path"]) is None
 		bad_arduino = False
 		if not no_arduino_path:
 			try:
@@ -320,7 +343,7 @@ class MarlinFlasherPlugin(octoprint.plugin.SettingsPlugin,
 		)
 
 	def body_size_hook(self, current_max_body_sizes, *args, **kwargs):
-		return [("POST", r"/upload_sketch", self._settings.get_int(["max_sketch_size"]) * 1024 * 1024)]
+		return [("POST", r"/upload_sketch", self._settings.get_int(["max_upload_size"]) * 1024 * 1024)]
 
 
 __plugin_name__ = "Marlin Flasher"
