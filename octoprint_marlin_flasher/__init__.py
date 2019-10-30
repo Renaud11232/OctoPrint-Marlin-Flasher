@@ -9,7 +9,7 @@ import pyduinocli
 import intelhex
 from flask_babel import gettext
 from .flasher import MarlinFlasher
-from .validator import RequestValidator
+from .validation import RequestValidator
 import shlex
 import zipfile
 import shutil
