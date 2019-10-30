@@ -6,7 +6,7 @@ import zipfile
 
 def is_correct_file_type(filename):
 	try:
-		with zipfile.ZipFile(filename, "r") as z:
+		with zipfile.ZipFile(filename, "r") as _:
 			pass
 	except zipfile.BadZipfile:
 		try:
