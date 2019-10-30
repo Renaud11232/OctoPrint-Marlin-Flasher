@@ -6,5 +6,6 @@ class UnsupportedSchema(Schema):
 
 	def validate(self, _):
 		return dict(
-			error=gettext("The configured platform type is not recognized. Check the settings page.")
+			error=gettext("Unknown platform type."),
+			cause=gettext("Your configuration might be wrong, check the settings page")
 		)

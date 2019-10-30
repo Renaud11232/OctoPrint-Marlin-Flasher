@@ -13,4 +13,4 @@ def is_correct_file_type(filename):
 			ih = intelhex.IntelHex()
 			ih.loadhex(filename)
 		except intelhex.IntelHexError:
-			raise ValidationError(gettext("Invalid file type"))
+			raise ValidationError(gettext("Invalid file type."))
