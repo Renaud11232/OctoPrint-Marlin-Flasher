@@ -1,7 +1,7 @@
 import flask
 from marshmallow import Schema, fields
 from .base_validator import BaseValidator
-from .schema import arduino
+from .validators import arduino
 
 
 class ArduinoValidator(BaseValidator):

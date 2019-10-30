@@ -132,9 +132,9 @@ class MarlinFlasherPlugin(octoprint.plugin.StartupPlugin,
 	@restricted_access
 	@admin_permission.require(403)
 	def search_cores(self):
-		if "query" not in flask.request.values:
-			result = dict(message=gettext("Missing query."))
-			return flask.make_response(flask.jsonify(result), 400)
+		errors = self.__validator.validate_core_search()
+		if errors:
+			return flask.make_response(flask.jsonify(errors), 400)
 		try:
 			arduino = self.__get_arduino()
 			arduino.core_update_index()
@@ -147,9 +147,9 @@ class MarlinFlasherPlugin(octoprint.plugin.StartupPlugin,
 	@restricted_access
 	@admin_permission.require(403)
 	def search_libs(self):
-		if "query" not in flask.request.values:
-			result = dict(message=gettext("Missing query."))
-			return flask.make_response(flask.jsonify(result), 400)
+		errors = self.__validator.validate_lib_search()
+		if errors:
+			return flask.make_response(flask.jsonify(errors), 400)
 		try:
 			arduino = self.__get_arduino()
 			arduino.lib_update_index()
@@ -162,9 +162,9 @@ class MarlinFlasherPlugin(octoprint.plugin.StartupPlugin,
 	@restricted_access
 	@admin_permission.require(403)
 	def install_core(self):
-		if "core" not in flask.request.values:
-			result = dict(message=gettext("Missing core."))
-			return flask.make_response(flask.jsonify(result), 400)
+		errors = self.__validator.validate_core_install()
+		if errors:
+			return flask.make_response(flask.jsonify(errors), 400)
 		try:
 			arduino = self.__get_arduino()
 			arduino.core_install([flask.request.values["core"]])
@@ -177,9 +177,9 @@ class MarlinFlasherPlugin(octoprint.plugin.StartupPlugin,
 	@restricted_access
 	@admin_permission.require(403)
 	def install_lib(self):
-		if "lib" not in flask.request.values:
-			result = dict(message=gettext("Missing lib."))
-			return flask.make_response(flask.jsonify(result), 400)
+		errors = self.__validator.validate_lib_install()
+		if errors:
+			return flask.make_response(flask.jsonify(errors), 400)
 		try:
 			arduino = self.__get_arduino()
 			arduino.lib_install([flask.request.values["lib"]])
@@ -192,9 +192,9 @@ class MarlinFlasherPlugin(octoprint.plugin.StartupPlugin,
 	@restricted_access
 	@admin_permission.require(403)
 	def uninstall_core(self):
-		if "core" not in flask.request.values:
-			result = dict(message=gettext("Missing core."))
-			return flask.make_response(flask.jsonify(result), 400)
+		errors = self.__validator.validate_core_uninstall()
+		if errors:
+			return flask.make_response(flask.jsonify(errors), 400)
 		try:
 			arduino = self.__get_arduino()
 			arduino.core_uninstall([flask.request.values["core"]])
@@ -207,9 +207,9 @@ class MarlinFlasherPlugin(octoprint.plugin.StartupPlugin,
 	@restricted_access
 	@admin_permission.require(403)
 	def uninstall_lib(self):
-		if "lib" not in flask.request.values:
-			result = dict(message=gettext("Missing lib."))
-			return flask.make_response(flask.jsonify(result), 400)
+		errors = self.__validator.validate_lib_uninstall()
+		if errors:
+			return flask.make_response(flask.jsonify(errors), 400)
 		try:
 			arduino = self.__get_arduino()
 			arduino.lib_uninstall([flask.request.values["lib"].replace(" ", "_")])
@@ -222,6 +222,9 @@ class MarlinFlasherPlugin(octoprint.plugin.StartupPlugin,
 	@restricted_access
 	@admin_permission.require(403)
 	def board_listall(self):
+		errors = self.__validator.validate_board_listall()
+		if errors:
+			return flask.make_response(flask.jsonify(errors), 400)
 		try:
 			arduino = self.__get_arduino()
 			arduino.core_update_index()
@@ -234,9 +237,9 @@ class MarlinFlasherPlugin(octoprint.plugin.StartupPlugin,
 	@restricted_access
 	@admin_permission.require(403)
 	def board_detail(self):
-		if "fqbn" not in flask.request.values or not flask.request.values["fqbn"]:
-			result = dict(message=gettext("Missing fqbn."))
-			return flask.make_response(flask.jsonify(result), 400)
+		errors = self.__validator.validate_board_details()
+		if errors:
+			return flask.make_response(flask.jsonify(errors), 400)
 		try:
 			arduino = self.__get_arduino()
 			result = arduino.board_details(flask.request.values["fqbn"])
@@ -276,6 +279,9 @@ class MarlinFlasherPlugin(octoprint.plugin.StartupPlugin,
 	@restricted_access
 	@admin_permission.require(403)
 	def flash(self):
+		errors = self.__validator.validate_flash()
+		if errors:
+			return flask.make_response(flask.jsonify(errors), 400)
 		if "fqbn" not in flask.request.values or not flask.request.values["fqbn"]:
 			result = dict(message=gettext("Missing fqbn."))
 			return flask.make_response(flask.jsonify(result), 400)
