@@ -9,6 +9,7 @@ import pyduinocli
 import intelhex
 from flask_babel import gettext
 from .flasher import MarlinFlasher
+from .validator import RequestValidator
 import shlex
 import zipfile
 import shutil
@@ -27,6 +28,7 @@ class MarlinFlasherPlugin(octoprint.plugin.SettingsPlugin,
 		self.__sketch = None
 		self.__sketch_ino = False
 		self.__flasher = MarlinFlasher(self._settings, self._printer)
+		self.__validator = RequestValidator(self._settings, self._printer)
 
 	def get_settings_defaults(self):
 		return dict(

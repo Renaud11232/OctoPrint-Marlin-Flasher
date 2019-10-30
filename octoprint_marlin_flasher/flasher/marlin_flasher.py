@@ -19,12 +19,3 @@ class MarlinFlasher:
 		elif platform == PlatformType.PLATFORM_IO:
 			return self.__platformio_flasher
 		raise FlasherError("Unknown firmware platform")
-
-	def handle_upload(self):
-		self.__firmware = self.__get_implementation().handle_upload()
-
-	def flash(self):
-		self.__get_implementation().flash(self.__firmware)
-
-	def compile(self):
-		self.__get_implementation().compile(self.__firmware)
