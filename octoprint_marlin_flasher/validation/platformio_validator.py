@@ -8,7 +8,7 @@ class PlatformIOValidator(BaseValidator):
 
 	def validate_upload(self):
 		request_fields = {
-			"firmware_file." + self._settings.global_get(["server", "uploads", "pathSuffix"]): fields.Str(required=True, validate=platformio.is_correct_file_type)
+			"firmware_file." + self._settings.get_upload_path_suffix(): fields.Str(required=True, validate=platformio.is_correct_file_type)
 		}
 		return type("_PlatformIOUploadSchema", (Schema,), request_fields)().validate(flask.request.values)
 

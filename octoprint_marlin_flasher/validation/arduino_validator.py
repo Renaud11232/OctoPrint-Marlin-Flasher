@@ -8,7 +8,7 @@ class ArduinoValidator(BaseValidator):
 
 	def validate_upload(self):
 		request_fields = {
-			"firmware_file." + self._settings.global_get(["server", "uploads", "pathSuffix"]): fields.Str(required=True, validate=arduino.is_correct_file_type)
+			"firmware_file." + self._settings.get_upload_path_suffix(): fields.Str(required=True, validate=arduino.is_correct_file_type)
 		}
 		return type("_ArduinoUploadSchema", (Schema,), request_fields)().validate(flask.request.values)
 

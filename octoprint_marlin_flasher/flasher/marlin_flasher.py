@@ -13,7 +13,7 @@ class MarlinFlasher:
 		self.__platformio_flasher = PlatformIOFlasher(settings, printer)
 
 	def __get_implementation(self):
-		platform = self.__settings.get(["platform_type"])
+		platform = self.__settings.get_platform_type()
 		if platform == PlatformType.ARDUINO:
 			return self.__arduino_flasher
 		elif platform == PlatformType.PLATFORM_IO:

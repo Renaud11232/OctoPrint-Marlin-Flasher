@@ -10,6 +10,7 @@ import intelhex
 from flask_babel import gettext
 from .flasher import MarlinFlasher
 from .validation import RequestValidator
+from .settings import SettingsWrapper
 from .flasher.platform_type import PlatformType
 import shlex
 import zipfile
@@ -28,8 +29,8 @@ class MarlinFlasherPlugin(octoprint.plugin.StartupPlugin,
 	def on_after_startup(self):
 		self.__sketch = None
 		self.__sketch_ino = False
-		self.__flasher = MarlinFlasher(self._settings, self._printer)
-		self.__validator = RequestValidator(self._settings, self._printer)
+		self.__flasher = MarlinFlasher(self.__settings_wrapper, self._printer)
+		self.__validator = RequestValidator(self.__settings_wrapper, self._printer)
 
 	def get_settings_defaults(self):
 		return dict(
@@ -47,6 +48,9 @@ class MarlinFlasherPlugin(octoprint.plugin.StartupPlugin,
 
 	def get_settings_version(self):
 		return 1
+
+	def on_settings_initialized(self):
+		self.__settings_wrapper = SettingsWrapper(self._settings)
 
 	def on_settings_migrate(self, target, current):
 		if current is None:
@@ -351,7 +355,8 @@ class MarlinFlasherPlugin(octoprint.plugin.StartupPlugin,
 		)
 
 	def body_size_hook(self, current_max_body_sizes, *args, **kwargs):
-		return [("POST", r"/upload_sketch", self._settings.get_int(["max_upload_size"]) * 1024 * 1024)]
+		# return [("POST", r"/upload_sketch", self._settings.get_int(["max_upload_size"]) * 1024 * 1024)]
+		return [("POST", r"/upload_sketch", self.__settings_wrapper.get_max_upload_size() * 1024 * 1024)]
 
 
 __plugin_name__ = "Marlin Flasher"
