@@ -21,3 +21,55 @@ class MarlinFlasher:
 			return self.__platformio_flasher
 		else:
 			return self.__unsupported_flasher
+
+	@staticmethod
+	def __run_after_checks(impl, func):
+		errors = impl.do_checks()
+		if errors:
+			return errors
+		return func()
+
+	def upload_file(self):
+		impl = self.__get_implementation()
+		self.__run_after_checks(impl, impl.upload_file)
+
+	def core_search(self):
+		impl = self.__get_implementation()
+		self.__run_after_checks(impl, impl.core_search)
+
+	def lib_search(self):
+		impl = self.__get_implementation()
+		self.__run_after_checks(impl, impl.lib_search)
+
+	def core_install(self):
+		impl = self.__get_implementation()
+		self.__run_after_checks(impl, impl.core_install)
+
+	def lib_install(self):
+		impl = self.__get_implementation()
+		self.__run_after_checks(impl, impl.lib_install)
+
+	def core_uninstall(self):
+		impl = self.__get_implementation()
+		self.__run_after_checks(impl, impl.core_uninstall)
+
+	def lib_uninstall(self):
+		impl = self.__get_implementation()
+		self.__run_after_checks(impl, impl.lib_uninstall)
+
+	def board_listall(self):
+		impl = self.__get_implementation()
+		self.__run_after_checks(impl, impl.board_listall)
+
+	def board_details(self):
+		impl = self.__get_implementation()
+		self.__run_after_checks(impl, impl.board_details)
+
+	def compile(self):
+		impl = self.__get_implementation()
+		self.__run_after_checks(impl, impl.compile)
+
+	def upload(self):
+		impl = self.__get_implementation()
+		self.__run_after_checks(impl, impl.upload)
+

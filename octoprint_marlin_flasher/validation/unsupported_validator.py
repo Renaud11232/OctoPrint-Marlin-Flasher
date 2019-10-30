@@ -5,8 +5,8 @@ from .validators import unsupported
 
 class UnsupportedPlatformValidator(BaseValidator):
 
-	def __init__(self, settings, printer):
-		BaseValidator.__init__(self, settings, printer)
+	def __init__(self, settings):
+		BaseValidator.__init__(self, settings)
 		self.__schema = unsupported.UnsupportedSchema()
 
 	def validate_upload(self):

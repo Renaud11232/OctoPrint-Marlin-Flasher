@@ -6,12 +6,11 @@ from .unsupported_validator import UnsupportedPlatformValidator
 
 class RequestValidator:
 
-	def __init__(self, settings, printer):
+	def __init__(self, settings):
 		self.__settings = settings
-		self.__printer = printer
-		self.__arduino_validator = ArduinoValidator(settings, printer)
-		self.__platformio_validator = PlatformIOValidator(settings, printer)
-		self.__unsupported_validator = UnsupportedPlatformValidator(settings, printer)
+		self.__arduino_validator = ArduinoValidator(settings)
+		self.__platformio_validator = PlatformIOValidator(settings)
+		self.__unsupported_validator = UnsupportedPlatformValidator(settings)
 
 	def __get_implementation(self):
 		platform = self.__settings.get_platform_type()

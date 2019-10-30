@@ -3,9 +3,8 @@ from .validator_error import ValidatorError
 
 class BaseValidator:
 
-	def __init__(self, settings, printer):
+	def __init__(self, settings):
 		self._settings = settings
-		self._printer = printer
 
 	def validate_upload(self):
 		raise ValidatorError("Unsupported function call.")

@@ -30,7 +30,7 @@ class MarlinFlasherPlugin(octoprint.plugin.StartupPlugin,
 		self.__sketch = None
 		self.__sketch_ino = False
 		self.__flasher = MarlinFlasher(self.__settings_wrapper, self._printer)
-		self.__validator = RequestValidator(self.__settings_wrapper, self._printer)
+		self.__validator = RequestValidator(self.__settings_wrapper)
 
 	def get_settings_defaults(self):
 		return dict(
