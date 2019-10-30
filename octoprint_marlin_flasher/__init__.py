@@ -118,9 +118,6 @@ class MarlinFlasherPlugin(octoprint.plugin.StartupPlugin,
 			return flask.make_response(flask.jsonify(errors), 400)
 		self.__sketch = None
 		upload_path = "firmware_file." + self._settings.global_get(["server", "uploads", "pathSuffix"])
-		if upload_path not in flask.request.values:
-			result = dict(message=gettext("Missing sketch_file."))
-			return flask.make_response(flask.jsonify(result), 400)
 		path = flask.request.values[upload_path]
 		try:
 			with zipfile.ZipFile(path, "r") as zip_file:
