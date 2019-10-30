@@ -19,3 +19,33 @@ class RequestValidator:
 		elif platform == PlatformType.PLATFORM_IO:
 			return self.__platformio_validator
 		raise ValidatorError("Unknown firmware platform")
+
+	def validate_upload(self):
+		return self.__get_implementation().validate_upload()
+
+	def validate_core_search(self):
+		return self.__get_implementation().validate_core_search()
+
+	def validate_lib_search(self):
+		return self.__get_implementation().validate_lib_search()
+
+	def validate_core_install(self):
+		return self.__get_implementation().validate_core_install()
+
+	def validate_lib_install(self):
+		return self.__get_implementation().validate_lib_install()
+
+	def validate_core_uninstall(self):
+		return self.__get_implementation().validate_core_uninstall()
+
+	def validate_lib_uninstall(self):
+		return self.__get_implementation().validate_lib_uninstall()
+
+	def validate_board_listall(self):
+		return self.__get_implementation().validate_board_listall()
+
+	def validate_board_details(self):
+		return self.__get_implementation().validate_board_details()
+
+	def validate_flash(self):
+		return self.__get_implementation().validate_flash()

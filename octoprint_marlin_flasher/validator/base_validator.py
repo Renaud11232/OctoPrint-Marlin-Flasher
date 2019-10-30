@@ -34,5 +34,5 @@ class BaseValidator:
 	def validate_board_details(self):
 		raise ValidatorError("Unsupported function call.")
 
-	def validate_flash(self, firmware):
+	def validate_flash(self):
 		raise ValidatorError("Unsupported function call.")
