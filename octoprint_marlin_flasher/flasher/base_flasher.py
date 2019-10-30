@@ -8,7 +8,7 @@ class BaseFlasher:
 		self._printer = printer
 		self._firmware = None
 
-	def do_checks(self):
+	def check_setup_errors(self):
 		raise FlasherError("Unsupported function call.")
 
 	def upload_file(self):
@@ -43,4 +43,3 @@ class BaseFlasher:
 
 	def upload(self):
 		raise FlasherError("Unsupported function call.")
-

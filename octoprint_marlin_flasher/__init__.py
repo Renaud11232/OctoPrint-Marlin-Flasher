@@ -120,6 +120,10 @@ class MarlinFlasherPlugin(octoprint.plugin.StartupPlugin,
 		errors = self.__validator.validate_upload()
 		if errors:
 			return flask.make_response(flask.jsonify(errors), 400)
+		result, errors = self.__flasher.upload_file()
+		if errors:
+			return flask.make_response(flask.jsonify(errors), 400)
+		return flask.make_response(flask.jsonify(result), 200)
 		self.__sketch = None
 		upload_path = "firmware_file." + self._settings.global_get(["server", "uploads", "pathSuffix"])
 		path = flask.request.values[upload_path]
