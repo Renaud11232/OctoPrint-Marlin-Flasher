@@ -222,9 +222,6 @@ class MarlinFlasherPlugin(octoprint.plugin.StartupPlugin,
 	@restricted_access
 	@admin_permission.require(403)
 	def board_listall(self):
-		errors = self.__validator.validate_board_listall()
-		if errors:
-			return flask.make_response(flask.jsonify(errors), 400)
 		try:
 			arduino = self.__get_arduino()
 			arduino.core_update_index()
