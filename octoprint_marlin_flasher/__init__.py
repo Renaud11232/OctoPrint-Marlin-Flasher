@@ -72,6 +72,15 @@ class MarlinFlasherPlugin(octoprint.plugin.StartupPlugin,
 			]
 		)
 
+	def get_wizard_version(self):
+		return 2
+
+	def is_wizard_required(self):
+		if self.__flasher.check_setup_errors():
+			return True
+		else:
+			return False
+
 	@octoprint.plugin.BlueprintPlugin.route("/upload_sketch", methods=["POST"])
 	@restricted_access
 	@admin_permission.require(403)
@@ -274,15 +283,6 @@ class MarlinFlasherPlugin(octoprint.plugin.StartupPlugin,
 			cause=error.cause,
 			stderr=error.stderr
 		))
-
-	def get_wizard_version(self):
-		return 2
-
-	def is_wizard_required(self):
-		if self.__flasher.check_setup_errors():
-			return True
-		else:
-			return False
 
 	def get_update_information(self):
 		return dict(
