@@ -6,17 +6,12 @@ from octoprint.server import admin_permission
 import serial
 import flask
 import pyduinocli
-import intelhex
 from flask_babel import gettext
 from .flasher import MarlinFlasher
 from .validation import RequestValidator
 from .settings import SettingsWrapper
 from .flasher.platform_type import PlatformType
 import shlex
-import zipfile
-import shutil
-import os
-import re
 
 
 class MarlinFlasherPlugin(octoprint.plugin.StartupPlugin,
@@ -29,7 +24,7 @@ class MarlinFlasherPlugin(octoprint.plugin.StartupPlugin,
 	def on_after_startup(self):
 		self.__sketch = None
 		self.__sketch_ino = False
-		self.__flasher = MarlinFlasher(self.__settings_wrapper, self._printer)
+		self.__flasher = MarlinFlasher(self.__settings_wrapper, self._printer, self.get_plugin_data_folder())
 		self.__validator = RequestValidator(self.__settings_wrapper)
 
 	def get_settings_defaults(self):
@@ -37,7 +32,7 @@ class MarlinFlasherPlugin(octoprint.plugin.StartupPlugin,
 			arduino=dict(
 				sketch_ino="Marlin.ino",
 				cli_path=None,
-				additional_urls=""
+				additional_urls=None
 			),
 			platformio=dict(
 
@@ -77,42 +72,6 @@ class MarlinFlasherPlugin(octoprint.plugin.StartupPlugin,
 			]
 		)
 
-	def __handle_zip(self, zip_file):
-		self.__sketch_ino = True
-		extracted_dir = os.path.join(self.get_plugin_data_folder(), "extracted_sketch")
-		sketch_dir = os.path.join(extracted_dir, os.path.splitext(self._settings.get(["arduino", "sketch_ino"]))[0])
-		if os.path.exists(extracted_dir):
-			shutil.rmtree(extracted_dir)
-		os.makedirs(sketch_dir)
-		zip_file.extractall(sketch_dir)
-		for root, dirs, files in os.walk(sketch_dir):
-			for f in files:
-				if f == self._settings.get(["arduino", "sketch_ino"]):
-					self.__sketch = root
-					result = dict(
-						path=root,
-						file=f
-					)
-					return flask.make_response(flask.jsonify(result), 200)
-		result = dict(message=gettext("No valid sketch found in the given file."))
-		return flask.make_response(flask.jsonify(result), 400)
-
-	def __handle_hex(self, path):
-		self.__sketch_ino = False
-		try:
-			ih = intelhex.IntelHex()
-			ih.loadhex(path)
-		except intelhex.IntelHexError:
-			result = dict(message=gettext("The given file is not a zip file nor a hex file"))
-			return flask.make_response(flask.jsonify(result), 400)
-		self.__sketch = os.path.join(self.get_plugin_data_folder(), "sketch.hex")
-		shutil.copyfile(path, self.__sketch)
-		result = dict(
-			path=self.get_plugin_data_folder(),
-			file="sketch.hex"
-		)
-		return flask.make_response(flask.jsonify(result), 200)
-
 	@octoprint.plugin.BlueprintPlugin.route("/upload_sketch", methods=["POST"])
 	@restricted_access
 	@admin_permission.require(403)
@@ -124,14 +83,6 @@ class MarlinFlasherPlugin(octoprint.plugin.StartupPlugin,
 		if errors:
 			return flask.make_response(flask.jsonify(errors), 400)
 		return flask.make_response(flask.jsonify(result), 200)
-		self.__sketch = None
-		upload_path = "firmware_file." + self._settings.global_get(["server", "uploads", "pathSuffix"])
-		path = flask.request.values[upload_path]
-		try:
-			with zipfile.ZipFile(path, "r") as zip_file:
-				return self.__handle_zip(zip_file)
-		except zipfile.BadZipfile:
-			return self.__handle_hex(path)
 
 	@octoprint.plugin.BlueprintPlugin.route("/cores/search", methods=["GET"])
 	@restricted_access
@@ -334,14 +285,10 @@ class MarlinFlasherPlugin(octoprint.plugin.StartupPlugin,
 		return 2
 
 	def is_wizard_required(self):
-		no_arduino_path = self._settings.get(["arduino", "cli_path"]) is None
-		bad_arduino = False
-		if not no_arduino_path:
-			try:
-				bad_arduino = re.match(r"(?:0\.5\..+?)\Z", self.__get_arduino().version()["VersionString"]) is None
-			except (pyduinocli.ArduinoError, KeyError):
-				bad_arduino = True
-		return no_arduino_path or bad_arduino
+		if self.__flasher.check_setup_errors():
+			return True
+		else:
+			return False
 
 	def get_update_information(self):
 		return dict(
@@ -359,7 +306,6 @@ class MarlinFlasherPlugin(octoprint.plugin.StartupPlugin,
 		)
 
 	def body_size_hook(self, current_max_body_sizes, *args, **kwargs):
-		# return [("POST", r"/upload_sketch", self._settings.get_int(["max_upload_size"]) * 1024 * 1024)]
 		return [("POST", r"/upload_sketch", self.__settings_wrapper.get_max_upload_size() * 1024 * 1024)]
 
 

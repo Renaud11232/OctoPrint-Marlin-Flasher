@@ -3,9 +3,10 @@ from .flasher_error import FlasherError
 
 class BaseFlasher:
 
-	def __init__(self, settings, printer):
+	def __init__(self, settings, printer, data_folder):
 		self._settings = settings
 		self._printer = printer
+		self._data_folder = data_folder
 		self._firmware = None
 
 	def check_setup_errors(self):
