@@ -24,7 +24,7 @@ $(function() {
             headers: OctoPrint.getRequestHeaders(),
             done: function(e, data) {
                 new PNotify({
-                    title: gettext("Sketch upload successful"),
+                    title: gettext("Firmware upload successful"),
                     text: data.result.file,
                     type: "success"
                 });
@@ -33,20 +33,20 @@ $(function() {
             error: function(jqXHR, status, error) {
                 if(error === "") {
                     new PNotify({
-                        title: gettext("Sketch upload failed"),
-                        text: gettext("Check the maximum sketch size"),
+                        title: gettext("Firmware upload failed"),
+                        text: gettext("Check the maximum firmware size"),
                         type: "error"
                     });
                 } else {
                     if(typeof jqXHR.responseJSON.error === "undefined") {
                         new PNotify({
-                            title: gettext("Sketch upload failed"),
+                            title: gettext("Firmware upload failed"),
                             text: gettext("The given file was not valid"),
                             type: "error"
                         });
                     } else {
                         new PNotify({
-                            title: gettext("Sketch upload failed"),
+                            title: gettext("Firmware upload failed"),
                             text: jqXHR.responseJSON.error,
                             type: "error"
                         });

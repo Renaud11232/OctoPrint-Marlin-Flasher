@@ -35,7 +35,7 @@ plugins:
   marlin_flasher:
     arduino_path: /path/to/arduino-cli
     sketch_ino: Marlin.ino
-    max_sketch_size: 20
+    max_upload_size: 20
     additional_urls: 'https://what.ever/boards.json'
 ```
 

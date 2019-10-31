@@ -18,8 +18,6 @@ class MarlinFlasherPlugin(octoprint.plugin.StartupPlugin,
 						  octoprint.plugin.BlueprintPlugin):
 
 	def on_after_startup(self):
-		self.__sketch = None
-		self.__sketch_ino = False
 		self.__flasher = MarlinFlasher(self.__settings_wrapper, self._printer, self, self._plugin_manager, self._identifier)
 		self.__validator = RequestValidator(self.__settings_wrapper)
 
@@ -77,10 +75,10 @@ class MarlinFlasherPlugin(octoprint.plugin.StartupPlugin,
 		else:
 			return False
 
-	@octoprint.plugin.BlueprintPlugin.route("/upload_sketch", methods=["POST"])
+	@octoprint.plugin.BlueprintPlugin.route("/upload_firmware", methods=["POST"])
 	@restricted_access
 	@admin_permission.require(403)
-	def upload_sketch(self):
+	def upload_firmware(self):
 		errors = self.__validator.validate_upload()
 		if errors:
 			return flask.make_response(flask.jsonify(errors), 400)
@@ -213,7 +211,7 @@ class MarlinFlasherPlugin(octoprint.plugin.StartupPlugin,
 		)
 
 	def body_size_hook(self, current_max_body_sizes, *args, **kwargs):
-		return [("POST", r"/upload_sketch", self.__settings_wrapper.get_max_upload_size() * 1024 * 1024)]
+		return [("POST", r"/upload_firmware", self.__settings_wrapper.get_max_upload_size() * 1024 * 1024)]
 
 
 __plugin_name__ = "Marlin Flasher"
