@@ -203,23 +203,25 @@ $(function() {
             });
         };
         self.loadBoardList = function() {
-            $.ajax({
-                type: "GET",
-                headers: OctoPrint.getRequestHeaders(),
-                url: "/plugin/marlin_flasher/board/listall",
-            }).done(function (data) {
-                if(data.boards) {
-                    self.boardList(data.boards);
-                } else {
-                    self.boardList([]);
-                }
-            }).fail(function(jqXHR, status, error) {
-                new PNotify({
-                    title: gettext("Board list fetch failed"),
-                    text: jqXHR.responseJSON.error,
-                    type: "error"
+            if(self.loginStateViewModel.isAdmin() && self.settingsViewModel.settings.plugins.marlin_flasher.platform_type() == 0) {
+                $.ajax({
+                    type: "GET",
+                    headers: OctoPrint.getRequestHeaders(),
+                    url: "/plugin/marlin_flasher/board/listall",
+                }).done(function (data) {
+                    if(data.boards) {
+                        self.boardList(data.boards);
+                    } else {
+                        self.boardList([]);
+                    }
+                }).fail(function(jqXHR, status, error) {
+                    new PNotify({
+                        title: gettext("Board list fetch failed"),
+                        text: jqXHR.responseJSON.error,
+                        type: "error"
+                    });
                 });
-            });
+            }
         };
         self.flash = function(form) {
             self.flashButton.button("loading");
@@ -276,9 +278,7 @@ $(function() {
             }
         });
         self.onAllBound = function(viewModels) {
-            if(self.loginStateViewModel.isAdmin()) {
-                self.loadBoardList();
-            }
+            self.loadBoardList();
         };
         self.onDataUpdaterPluginMessage = function(plugin, message) {
             if(plugin == "marlin_flasher") {

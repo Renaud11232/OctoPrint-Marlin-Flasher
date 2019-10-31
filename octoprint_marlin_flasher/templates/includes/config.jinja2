@@ -1,34 +1,6 @@
-<div class="alert alert-info">
-    <strong>{{ _('Warning !') }}</strong> {{ _('You must have arduino-cli version <strong>0.5.0</strong>. Other versions may not work.') }}
-</div>
 <form class="form-horizontal">
-    <div class="control-group">
-        <label class="control-label" for="arduino_path">{{ _('Path to arduino-cli') }}</label>
-        <div class="controls">
-            <input type="text" data-bind="value: settingsViewModel.settings.plugins.marlin_flasher.arduino.cli_path" id="cli_path">
-        </div>
-    </div>
-    <div class="control-group">
-        <label class="control-label" for="sketch_ino">{{ _('Sketch .ino') }}</label>
-        <div class="controls">
-            <input type="text" data-bind="value: settingsViewModel.settings.plugins.marlin_flasher.arduino.sketch_ino" id="sketch_ino">
-        </div>
-    </div>
-    <div class="control-group">
-        <label class="control-label" for="upload_size">{{ _('Maximum sketch size') }}</label>
-        <div class="controls">
-            <div class="input-append">
-                <input type="number" min="1" max="1024" data-bind="value: settingsViewModel.settings.plugins.marlin_flasher.max_upload_size" id="upload_size">
-                <span class="add-on">{{ _('MB') }}</span>
-            </div>
-            <span>{{ _('*requires restart') }}</span>
-        </div>
-    </div>
-    <div class="control-group">
-        <label class="control-label" for="additional_urls">{{ _('Additional Board URLs') }}</label>
-        <div class="controls">
-            <textarea class="input-block-level" id="additional_urls" rows="10" cols="100" data-bind="value: settingsViewModel.settings.plugins.marlin_flasher.arduino.additional_urls"></textarea>
-            <span>{{ _('*one per line') }}</span>
-        </div>
+    <div class="accordion" id="marlin_flasher_settings_accordion">
+        {% include "includes/config_items/global.jinja2" %}
+        {% include "includes/config_items/arduino.jinja2" %}
     </div>
 </form>

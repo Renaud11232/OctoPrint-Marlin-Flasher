@@ -1,0 +1,30 @@
+<div class="accordion-group">
+    <div class="accordion-heading">
+        <a class="accordion-toggle" data-toggle="collapse" data-parent="#marlin_flasher_settings_accordion" href="#marlin_flasher_settings_global">
+            {{ _('Global Settings') }}
+        </a>
+    </div>
+    <div id="marlin_flasher_settings_global" class="accordion-body collapse in">
+        <div class="accordion-inner">
+            <div class="control-group">
+                <label class="control-label" for="marlin_flasher_platform_type">{{ _('Platform') }}</label>
+                <div class="controls">
+                    <select id="marlin_flasher_platform_type" data-bind="value: settingsViewModel.settings.plugins.marlin_flasher.platform_type">
+                        <option value="0">Arduino</option>
+                        <option value="1">Platform.io</option>
+                    </select>
+                </div>
+            </div>
+            <div class="control-group">
+                <label class="control-label" for="upload_size">{{ _('Maximum upload') }}</label>
+                <div class="controls">
+                    <div class="input-append">
+                        <input type="number" min="1" max="1024" data-bind="value: settingsViewModel.settings.plugins.marlin_flasher.max_upload_size" id="upload_size">
+                        <span class="add-on">{{ _('MB') }}</span>
+                    </div>
+                    <span>{{ _('*requires restart') }}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
