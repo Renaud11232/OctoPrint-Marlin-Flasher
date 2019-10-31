@@ -32,8 +32,8 @@ class MarlinFlasher:
 	def check_setup_errors(self):
 		return self.__get_implementation().check_setup_errors()
 
-	def upload_file(self):
-		return self.__get_implementation().upload_file()
+	def upload(self):
+		return self.__get_implementation().upload()
 
 	def core_search(self):
 		impl = self.__get_implementation()

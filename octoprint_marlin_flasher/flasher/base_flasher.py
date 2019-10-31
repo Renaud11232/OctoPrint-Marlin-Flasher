@@ -14,7 +14,7 @@ class BaseFlasher:
 	def check_setup_errors(self):
 		raise FlasherError("Unsupported function call.")
 
-	def upload_file(self):
+	def upload(self):
 		raise FlasherError("Unsupported function call.")
 
 	def core_search(self):

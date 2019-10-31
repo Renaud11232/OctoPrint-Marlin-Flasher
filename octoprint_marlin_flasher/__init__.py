@@ -84,7 +84,7 @@ class MarlinFlasherPlugin(octoprint.plugin.StartupPlugin,
 		errors = self.__validator.validate_upload()
 		if errors:
 			return flask.make_response(flask.jsonify(errors), 400)
-		result, errors = self.__flasher.upload_file()
+		result, errors = self.__flasher.upload()
 		if errors:
 			return flask.make_response(flask.jsonify(errors), 400)
 		return flask.make_response(flask.jsonify(result), 200)
@@ -165,7 +165,7 @@ class MarlinFlasherPlugin(octoprint.plugin.StartupPlugin,
 	@restricted_access
 	@admin_permission.require(403)
 	def board_listall(self):
-		errors = self.__validator.validate_board_details()
+		errors = self.__validator.validate_board_listall()
 		if errors:
 			return flask.make_response(flask.jsonify(errors), 400)
 		result, errors = self.__flasher.board_listall()

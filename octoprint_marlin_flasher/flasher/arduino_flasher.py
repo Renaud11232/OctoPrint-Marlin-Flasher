@@ -50,7 +50,7 @@ class ArduinoFlasher(BaseFlasher):
 			)
 		return None
 
-	def upload_file(self):
+	def upload(self):
 		self._firmware = None
 		uploaded_file_path = flask.request.values["firmware_file." + self._settings.get_upload_path_suffix()]
 		try:
