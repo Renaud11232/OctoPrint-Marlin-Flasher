@@ -21,6 +21,14 @@ class ArduinoFlasher(BaseFlasher):
 			additional_urls = additional_urls.splitlines()
 		return pyduinocli.Arduino(path, additional_urls=additional_urls)
 
+	@staticmethod
+	def __error_to_dict(error):
+		return dict(
+			error=error.message,
+			cause=error.cause,
+			stderr=error.stderr
+		)
+
 	def check_setup_errors(self):
 		no_arduino_path = self._settings.get_arduino_cli_path() is None
 		if no_arduino_path:
@@ -82,3 +90,21 @@ class ArduinoFlasher(BaseFlasher):
 			path=self._data_folder,
 			file="firmware.hex"
 		), None
+
+	def core_search(self):
+		try:
+			arduino = self.__get_arduino()
+			arduino.core_update_index()
+			result = arduino.core_search(flask.request.values["query"].split(" "))
+			return result, None
+		except pyduinocli.ArduinoError as e:
+			return None, self.__error_to_dict(e)
+
+	def lib_search(self):
+		try:
+			arduino = self.__get_arduino()
+			arduino.core_update_index()
+			result = arduino.lib_search(flask.request.values["query"].split(" "))
+			return result, None
+		except pyduinocli.ArduinoError as e:
+			return None, self.__error_to_dict(e)

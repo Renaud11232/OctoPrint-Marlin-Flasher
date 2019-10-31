@@ -91,12 +91,9 @@ class MarlinFlasherPlugin(octoprint.plugin.StartupPlugin,
 		errors = self.__validator.validate_core_search()
 		if errors:
 			return flask.make_response(flask.jsonify(errors), 400)
-		try:
-			arduino = self.__get_arduino()
-			arduino.core_update_index()
-			result = arduino.core_search(self.__split(flask.request.values["query"]))
-		except pyduinocli.ArduinoError as e:
-			return flask.make_response(self.__get_error_json(e), 400)
+		result, errors = self.__flasher.core_search()
+		if errors:
+			return flask.make_response(flask.jsonify(errors), 400)
 		return flask.make_response(flask.jsonify(result), 200)
 
 	@octoprint.plugin.BlueprintPlugin.route("/libs/search", methods=["GET"])
@@ -106,12 +103,9 @@ class MarlinFlasherPlugin(octoprint.plugin.StartupPlugin,
 		errors = self.__validator.validate_lib_search()
 		if errors:
 			return flask.make_response(flask.jsonify(errors), 400)
-		try:
-			arduino = self.__get_arduino()
-			arduino.lib_update_index()
-			result = arduino.lib_search(self.__split(flask.request.values["query"]))
-		except pyduinocli.ArduinoError as e:
-			return flask.make_response(self.__get_error_json(e), 400)
+		result, errors = self.__flasher.lib_search()
+		if errors:
+			return flask.make_response(flask.jsonify(errors), 400)
 		return flask.make_response(flask.jsonify(result), 200)
 
 	@octoprint.plugin.BlueprintPlugin.route("/cores/install", methods=["POST"])
