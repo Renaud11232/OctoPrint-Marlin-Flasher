@@ -124,12 +124,9 @@ class MarlinFlasherPlugin(octoprint.plugin.StartupPlugin,
 		errors = self.__validator.validate_core_install()
 		if errors:
 			return flask.make_response(flask.jsonify(errors), 400)
-		try:
-			arduino = self.__get_arduino()
-			arduino.core_install([flask.request.values["core"]])
-		except pyduinocli.ArduinoError as e:
-			return flask.make_response(self.__get_error_json(e), 400)
-		result = dict(core=flask.request.values["core"])
+		result, errors = self.__flasher.core_install()
+		if errors:
+			return flask.make_response(flask.jsonify(errors), 400)
 		return flask.make_response(flask.jsonify(result), 200)
 
 	@octoprint.plugin.BlueprintPlugin.route("/libs/install", methods=["POST"])
@@ -139,12 +136,9 @@ class MarlinFlasherPlugin(octoprint.plugin.StartupPlugin,
 		errors = self.__validator.validate_lib_install()
 		if errors:
 			return flask.make_response(flask.jsonify(errors), 400)
-		try:
-			arduino = self.__get_arduino()
-			arduino.lib_install([flask.request.values["lib"]])
-		except pyduinocli.ArduinoError as e:
-			return flask.make_response(self.__get_error_json(e), 400)
-		result = dict(lib=flask.request.values["lib"])
+		result, errors = self.__flasher.lib_install()
+		if errors:
+			return flask.make_response(flask.jsonify(errors), 400)
 		return flask.make_response(flask.jsonify(result), 200)
 
 	@octoprint.plugin.BlueprintPlugin.route("/cores/uninstall", methods=["POST"])
@@ -154,12 +148,9 @@ class MarlinFlasherPlugin(octoprint.plugin.StartupPlugin,
 		errors = self.__validator.validate_core_uninstall()
 		if errors:
 			return flask.make_response(flask.jsonify(errors), 400)
-		try:
-			arduino = self.__get_arduino()
-			arduino.core_uninstall([flask.request.values["core"]])
-		except pyduinocli.ArduinoError as e:
-			return flask.make_response(self.__get_error_json(e), 400)
-		result = dict(core=flask.request.values["core"])
+		result, errors = self.__flasher.core_uninstall()
+		if errors:
+			return flask.make_response(flask.jsonify(errors), 400)
 		return flask.make_response(flask.jsonify(result), 200)
 
 	@octoprint.plugin.BlueprintPlugin.route("/libs/uninstall", methods=["POST"])
@@ -169,12 +160,9 @@ class MarlinFlasherPlugin(octoprint.plugin.StartupPlugin,
 		errors = self.__validator.validate_lib_uninstall()
 		if errors:
 			return flask.make_response(flask.jsonify(errors), 400)
-		try:
-			arduino = self.__get_arduino()
-			arduino.lib_uninstall([flask.request.values["lib"].replace(" ", "_")])
-		except pyduinocli.ArduinoError as e:
-			return flask.make_response(self.__get_error_json(e), 400)
-		result = dict(lib=flask.request.values["lib"])
+		result, errors = self.__flasher.lib_uninstall()
+		if errors:
+			return flask.make_response(flask.jsonify(errors), 400)
 		return flask.make_response(flask.jsonify(result), 200)
 
 	@octoprint.plugin.BlueprintPlugin.route("/board/listall", methods=["GET"])
@@ -184,13 +172,10 @@ class MarlinFlasherPlugin(octoprint.plugin.StartupPlugin,
 		errors = self.__validator.validate_board_details()
 		if errors:
 			return flask.make_response(flask.jsonify(errors), 400)
-		try:
-			arduino = self.__get_arduino()
-			arduino.core_update_index()
-			result = arduino.board_listall()
-			return flask.make_response(flask.jsonify(result), 200)
-		except pyduinocli.ArduinoError as e:
-			return flask.make_response(self.__get_error_json(e), 400)
+		result, errors = self.__flasher.board_listall()
+		if errors:
+			return flask.make_response(flask.jsonify(errors), 400)
+		return flask.make_response(flask.jsonify(result), 200)
 
 	@octoprint.plugin.BlueprintPlugin.route("/board/details", methods=["GET"])
 	@restricted_access
@@ -199,12 +184,10 @@ class MarlinFlasherPlugin(octoprint.plugin.StartupPlugin,
 		errors = self.__validator.validate_board_details()
 		if errors:
 			return flask.make_response(flask.jsonify(errors), 400)
-		try:
-			arduino = self.__get_arduino()
-			result = arduino.board_details(flask.request.values["fqbn"])
-			return flask.make_response(flask.jsonify(result), 200)
-		except pyduinocli.ArduinoError as e:
-			return flask.make_response(self.__get_error_json(e), 400)
+		result, errors = self.__flasher.board_details()
+		if errors:
+			return flask.make_response(flask.jsonify(errors), 400)
+		return flask.make_response(flask.jsonify(result), 200)
 
 	def __flash(self, fqbn):
 		try:

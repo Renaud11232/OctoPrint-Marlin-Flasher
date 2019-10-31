@@ -108,3 +108,66 @@ class ArduinoFlasher(BaseFlasher):
 			return result, None
 		except pyduinocli.ArduinoError as e:
 			return None, self.__error_to_dict(e)
+
+	def core_install(self):
+		try:
+			arduino = self.__get_arduino()
+			arduino.core_install([flask.request.values["core"]])
+			return dict(
+				core=flask.request.values["core"]
+			), None
+		except pyduinocli.ArduinoError as e:
+			return None, self.__error_to_dict(e)
+
+	def lib_install(self):
+		try:
+			arduino = self.__get_arduino()
+			arduino.lib_install([flask.request.values["lib"]])
+			return dict(
+				lib=flask.request.values["lib"]
+			), None
+		except pyduinocli.ArduinoError as e:
+			return None, self.__error_to_dict(e)
+
+	def core_uninstall(self):
+		try:
+			arduino = self.__get_arduino()
+			arduino.core_uninstall([flask.request.values["core"]])
+			return dict(
+				core=flask.request.values["core"]
+			), None
+		except pyduinocli.ArduinoError as e:
+			return None, self.__error_to_dict(e)
+
+	def lib_uninstall(self):
+		try:
+			arduino = self.__get_arduino()
+			arduino.lib_uninstall([flask.request.values["lib"].replace(" ", "_")])
+			return dict(
+				lib=flask.request.values["lib"]
+			), None
+		except pyduinocli.ArduinoError as e:
+			return None, self.__error_to_dict(e)
+
+	def board_listall(self):
+		try:
+			arduino = self.__get_arduino()
+			arduino.core_update_index()
+			result = arduino.board_listall()
+			return result, None
+		except pyduinocli.ArduinoError as e:
+			return self.__error_to_dict(e)
+
+	def board_details(self):
+		try:
+			arduino = self.__get_arduino()
+			result = arduino.board_details(flask.request.values["fqbn"])
+			return result, None
+		except pyduinocli.ArduinoError as e:
+			return self.__error_to_dict(e)
+
+	def compile(self):
+		return BaseFlasher.compile(self)
+
+	def upload(self):
+		return BaseFlasher.upload(self)
