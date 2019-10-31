@@ -38,11 +38,19 @@ $(function() {
                         type: "error"
                     });
                 } else {
-                    new PNotify({
-                        title: gettext("Sketch upload failed"),
-                        text: jqXHR.responseJSON.error,
-                        type: "error"
-                    });
+                    if(typeof jqXHR.responseJSON.error === "undefined") {
+                        new PNotify({
+                            title: gettext("Sketch upload failed"),
+                            text: gettext("The given file was not valid"),
+                            type: "error"
+                        });
+                    } else {
+                        new PNotify({
+                            title: gettext("Sketch upload failed"),
+                            text: jqXHR.responseJSON.error,
+                            type: "error"
+                        });
+                    }
                 };
                 self.uploadProgress(0);
             },
