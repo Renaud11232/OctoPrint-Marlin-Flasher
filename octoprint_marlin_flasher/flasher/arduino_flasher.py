@@ -178,16 +178,19 @@ class ArduinoFlasher(BaseFlasher):
 			arduino = self.__get_arduino()
 			if self.__is_ino:
 				self._plugin_manager.send_plugin_message(self._identifier, dict(
+					type="flash_progress",
 					step=gettext("Compiling"),
 					progress=0
 				))
 				arduino.compile(self._firmware, fqbn=fqbn)
 				self._plugin_manager.send_plugin_message(self._identifier, dict(
+					type="flash_progress",
 					step=gettext("Uploading"),
 					progress=50
 				))
 			else:
 				self._plugin_manager.send_plugin_message(self._identifier, dict(
+					type="flash_progress",
 					step=gettext("Uploading"),
 					progress=0
 				))
@@ -206,6 +209,7 @@ class ArduinoFlasher(BaseFlasher):
 			self._printer.connect(port, baudrate, profile)
 			self._firmware = None
 			self._plugin_manager.send_plugin_message(self._identifier, dict(
+				type="flash_progress",
 				step=gettext("Done"),
 				progress=100
 			))

@@ -282,8 +282,12 @@ $(function() {
         };
         self.onDataUpdaterPluginMessage = function(plugin, message) {
             if(plugin == "marlin_flasher") {
-                self.progressStep(message.step);
-                self.flashingProgress(message.progress);
+                if(message.type === "flash_progress") {
+                    self.progressStep(message.step);
+                    self.flashingProgress(message.progress);
+                } else if(message.type === "settings_saved") {
+                    self.loadBoardList();
+                }
             }
         };
     }
