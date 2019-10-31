@@ -26,25 +26,25 @@ class ArduinoValidator(BaseValidator):
 
 	def validate_core_install(self):
 		request_fields = {
-			"core": fields.Str(required=False)
+			"core": fields.Str(required=True)
 		}
 		return type("_ArduinoCoreInstallSchema", (Schema,), request_fields)().validate(flask.request.values)
 
 	def validate_lib_install(self):
 		request_fields = {
-			"lib": fields.Str(required=False)
+			"lib": fields.Str(required=True)
 		}
 		return type("_ArduinoLibInstallSchema", (Schema,), request_fields)().validate(flask.request.values)
 
 	def validate_core_uninstall(self):
 		request_fields = {
-			"core": fields.Str(required=False)
+			"core": fields.Str(required=True)
 		}
 		return type("_ArduinoCoreUninstallSchema", (Schema,), request_fields)().validate(flask.request.values)
 
 	def validate_lib_uninstall(self):
 		request_fields = {
-			"lib": fields.Str(required=False)
+			"lib": fields.Str(required=True)
 		}
 		return type("_ArduinoLibUninstallSchema", (Schema,), request_fields)().validate(flask.request.values)
 
@@ -53,12 +53,12 @@ class ArduinoValidator(BaseValidator):
 
 	def validate_board_details(self):
 		request_fields = {
-			"fqbn": fields.Str(required=False)
+			"fqbn": fields.Str(required=True)
 		}
 		return type("_ArduinoBoardDetailsSchema", (Schema,), request_fields)().validate(flask.request.values)
 
 	def validate_flash(self):
 		request_fields = {
-			"fqbn": fields.Str(required=False)
+			"fqbn": fields.Str(required=True)
 		}
 		return type("_ArduinoFlashSchema", (Schema,), request_fields)().validate(flask.request.values)

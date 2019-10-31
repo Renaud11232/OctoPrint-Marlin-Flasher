@@ -7,8 +7,7 @@ class PlatformIOUnsupportedSchema(Schema):
 
 	def validate(self, _):
 		return dict(
-			error=gettext("Unsupported endpoint."),
-			cause=gettext("You tried to run a command that is not supported by this platform.")
+			error=gettext("This endpoint is not supported by the current platform.")
 		)
 
 

@@ -34,22 +34,19 @@ class ArduinoFlasher(BaseFlasher):
 		no_arduino_path = self._settings.get_arduino_cli_path() is None
 		if no_arduino_path:
 			return dict(
-				error=gettext("No arduino-cli path"),
-				cause=gettext("No path has been configured, check the plugin settings.")
+				error=gettext("No path has been configured, check the plugin settings.")
 			)
 		try:
 			bad_version = re.match(r"(?:0\.5\..+?)\Z", self.__get_arduino().version()["VersionString"]) is None
 		except pyduinocli.ArduinoError:
 			return dict(
-				error=gettext("Invalid arduino-cli"),
-				cause=gettext("The configured path does not point to an arduino-cli executable.")
+				error=gettext("The configured path does not point to an arduino-cli executable.")
 			)
 		except KeyError:
 			bad_version = True
 		if bad_version:
 			return dict(
-				error=gettext("Wrong arduino-cli version"),
-				cause=gettext("The arduino-cli version you are using is not supported.")
+				error=gettext("The arduino-cli version you are using is not supported.")
 			)
 		return None
 
@@ -74,8 +71,7 @@ class ArduinoFlasher(BaseFlasher):
 								file=f
 							), None
 				return None, dict(
-					error=gettext("No sketch found"),
-					cause=gettext("No valid sketch were found in the given file.")
+					error=gettext("No valid sketch were found in the given file.")
 				)
 		except zipfile.BadZipfile:
 			self.__is_ino = False
@@ -164,13 +160,11 @@ class ArduinoFlasher(BaseFlasher):
 	def flash(self):
 		if self._firmware is None:
 			return None, dict(
-				error=gettext("No firmware"),
-				cause=gettext("You did not upload the firmware or it got reset by the previous flash process.")
+				error=gettext("You did not upload the firmware or it got reset by the previous flash process.")
 			)
 		if not self._printer.is_ready():
 			return None, dict(
-				error=gettext("Printer not ready"),
-				cause=gettext("The printer may not be connected or it may be busy.")
+				error=gettext("The printer may not be connected or it may be busy.")
 			)
 		options = []
 		for param in flask.request.values:
@@ -200,8 +194,7 @@ class ArduinoFlasher(BaseFlasher):
 			transport = self._printer.get_transport()
 			if not isinstance(transport, serial.Serial):
 				return None, dict(
-					error=gettext("Not Serial printer"),
-					cause=gettext("The printer is not connected through a Serial port and thus, cannot be flashed.")
+					error=gettext("The printer is not connected through a Serial port and thus, cannot be flashed.")
 				)
 			flash_port = transport.port
 			_, port, baudrate, profile = self._printer.get_current_connection()
