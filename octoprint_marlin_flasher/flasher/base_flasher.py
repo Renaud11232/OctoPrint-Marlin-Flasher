@@ -3,10 +3,12 @@ from .flasher_error import FlasherError
 
 class BaseFlasher:
 
-	def __init__(self, settings, printer, data_folder):
+	def __init__(self, settings, printer, plugin, plugin_manager, identifier):
 		self._settings = settings
 		self._printer = printer
-		self._data_folder = data_folder
+		self._plugin = plugin
+		self._plugin_manager = plugin_manager
+		self._identifier = identifier
 		self._firmware = None
 
 	def check_setup_errors(self):
@@ -39,8 +41,5 @@ class BaseFlasher:
 	def board_details(self):
 		raise FlasherError("Unsupported function call.")
 
-	def compile(self):
-		raise FlasherError("Unsupported function call.")
-
-	def upload(self):
+	def flash(self):
 		raise FlasherError("Unsupported function call.")
