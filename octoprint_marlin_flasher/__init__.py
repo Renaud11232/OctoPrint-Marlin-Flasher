@@ -42,19 +42,26 @@ class MarlinFlasherPlugin(octoprint.plugin.StartupPlugin,
 		self.__settings_wrapper = SettingsWrapper(self._settings)
 
 	def on_settings_migrate(self, target, current):
-		if current is None:
+		defaults = self.get_settings_defaults()
+		current_migration = current
+		if current_migration is None or current_migration < 0:
 			max_sketch_size = self._settings.get(["max_sketch_size"])
+			if max_sketch_size is None:
+				max_sketch_size = defaults["max_upload_size"]
 			self._settings.set(["max_upload_size"], max_sketch_size)
 			self._settings.set(["max_sketch_size"], None)
 			arduino_path = self._settings.get(["arduino_path"])
 			self._settings.set(["arduino", "cli_path"], arduino_path)
 			self._settings.set(["arduino_path"], None)
 			sketch_ino = self._settings.get(["sketch_ino"])
+			if sketch_ino is None:
+				sketch_ino = defaults["arduino"]["sketch_ino"]
 			self._settings.set(["arduino", "sketch_ino"], sketch_ino)
 			self._settings.set(["sketch_ino"], None)
 			additional_urls = self._settings.get(["additional_urls"])
 			self._settings.set(["additional_urls"], None)
 			self._settings.set(["arduino", "additional_urls"], additional_urls)
+			current_migration = 1
 
 	def on_settings_save(self, data):
 		result = super(MarlinFlasherPlugin, self).on_settings_save(data)
