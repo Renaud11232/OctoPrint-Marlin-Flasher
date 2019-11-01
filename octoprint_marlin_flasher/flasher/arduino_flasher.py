@@ -147,7 +147,7 @@ class ArduinoFlasher(BaseFlasher):
 			result = arduino.board_listall()
 			return result, None
 		except pyduinocli.ArduinoError as e:
-			return self.__error_to_dict(e)
+			return None, self.__error_to_dict(e)
 
 	def board_details(self):
 		try:
