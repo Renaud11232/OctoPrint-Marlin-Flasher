@@ -1,17 +1,11 @@
-<!-- ko if: loginStateViewModel.isAdmin -->
-    <!-- ko if: settingsViewModel.settings.plugins.marlin_flasher.platform_type() == "arduino" -->
-        <div class="accordion" id="marlin_flasher_arduino_accordion">
-            {% include "includes/group_items/arduino/sketch.jinja2" %}
-            {% include "includes/group_items/arduino/cores.jinja2" %}
-            {% include "includes/group_items/arduino/libs.jinja2" %}
-            {% include "includes/group_items/arduino/flash.jinja2" %}
-        </div>
-    <!-- /ko -->
-<!-- /ko -->
+<div class="accordion" id="marlin_flasher_arduino_accordion" data-bind="visible: loginStateViewModel.isAdmin() && settingsViewModel.settings.plugins.marlin_flasher.platform_type() == 'arduino'">
+    {% include "includes/group_items/arduino/sketch.jinja2" %}
+    {% include "includes/group_items/arduino/cores.jinja2" %}
+    {% include "includes/group_items/arduino/libs.jinja2" %}
+    {% include "includes/group_items/arduino/flash.jinja2" %}
+</div>
 
-<!-- ko ifnot: loginStateViewModel.isAdmin -->
-    <div>
-        <h3>{{ _("Sorry") }}</h3>
-        <p>{{ _("Only administrators are authorized to view and use this panel. Please login using an administrator account and try again.") }}</p>
-    </div>
-<!-- /ko -->
+<div data-bind="visible: !loginStateViewModel.isAdmin()">
+    <h3>{{ _("Sorry") }}</h3>
+    <p>{{ _("Only administrators are authorized to view and use this panel. Please login using an administrator account and try again.") }}</p>
+</div>
