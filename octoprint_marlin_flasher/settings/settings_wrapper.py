@@ -7,7 +7,7 @@ class SettingsWrapper:
 		return self.__settings.get_int(["max_upload_size"])
 
 	def get_platform_type(self):
-		return self.__settings.get_int(["platform_type"])
+		return self.__settings.get(["platform_type"])
 
 	def get_upload_path_suffix(self):
 		return self.__settings.global_get(["server", "uploads", "pathSuffix"])

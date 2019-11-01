@@ -18,7 +18,6 @@ $(function() {
         self.uploadProgress = ko.observable(0);
         self.flashingProgress = ko.observable(0);
         self.progressStep = ko.observable();
-        self.selectedPlatform = ko.observable();
 
         self.firmwareFileButton.fileupload({
             maxNumberOfFiles: 1,
@@ -204,7 +203,7 @@ $(function() {
             });
         };
         self.loadBoardList = function() {
-            if(self.loginStateViewModel.isAdmin() && self.settingsViewModel.settings.plugins.marlin_flasher.platform_type() == 0) {
+            if(self.loginStateViewModel.isAdmin() && self.settingsViewModel.settings.plugins.marlin_flasher.platform_type() == "arduino") {
                 $.ajax({
                     type: "GET",
                     headers: OctoPrint.getRequestHeaders(),
@@ -279,10 +278,6 @@ $(function() {
             }
         });
         self.onAllBound = function(viewModels) {
-            self.selectedPlatform(self.settingsViewModel.settings.plugins.marlin_flasher.platform_type() + "");
-            self.settingsViewModel.settings.plugins.marlin_flasher.platform_type.subscribe(function(value) {
-                self.selectedPlatform(value + "");
-            });
             self.loadBoardList();
         };
         self.onDataUpdaterPluginMessage = function(plugin, message) {
@@ -297,7 +292,6 @@ $(function() {
         };
         self.onSettingsBeforeSave = function() {
             self.settingsViewModel.settings.plugins.marlin_flasher.max_upload_size(parseInt(self.settingsViewModel.settings.plugins.marlin_flasher.max_upload_size()));
-            self.settingsViewModel.settings.plugins.marlin_flasher.platform_type(parseInt(self.selectedPlatform()));
             if(self.settingsViewModel.settings.plugins.marlin_flasher.arduino.additional_urls() === "") {
                 self.settingsViewModel.settings.plugins.marlin_flasher.arduino.additional_urls(null);
             }

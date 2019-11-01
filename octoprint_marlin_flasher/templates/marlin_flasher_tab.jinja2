@@ -1,5 +1,5 @@
 <!-- ko if: loginStateViewModel.isAdmin -->
-    <!-- ko if: settingsViewModel.settings.plugins.marlin_flasher.platform_type() == 0 -->
+    <!-- ko if: settingsViewModel.settings.plugins.marlin_flasher.platform_type() == "arduino" -->
         <div class="accordion" id="marlin_flasher_arduino_accordion">
             {% include "includes/group_items/arduino/sketch.jinja2" %}
             {% include "includes/group_items/arduino/cores.jinja2" %}
