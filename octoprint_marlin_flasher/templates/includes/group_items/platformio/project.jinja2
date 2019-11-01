@@ -1,0 +1,28 @@
+<div class="accordion-group">
+    <div class="accordion-heading">
+        <a class="accordion-toggle" data-toggle="collapse" data-parent="#marlin_flasher_platformio_accordion" href="#platformio_project">
+            {{ _('Platform.io Project') }}
+        </a>
+    </div>
+    <div id="platformio_project" class="accordion-body collapse in">
+        <div class="accordion-inner">
+            <p>
+                {{ _("Here you can upload whatever firmware you want to be running on your printer. Make sure it's a zip file containing a valid Platform.io project for your board.") }}
+            </p>
+            <form class="form-horizontal">
+                <div class="control-group">
+                    <label class="control-label" for="platformio_firmware_file">{{ _('Platform.io project') }} :</label>
+                    <div class="controls">
+                        <span class="btn fileinput-button">
+                            <span>{{ _('Browse') }}</span>
+                            <input id="platformio_firmware_file" type="file" name="firmware_file" data-url="{{ url_for("plugin.marlin_flasher.upload_firmware") }}" accept=".zip">
+                        </span>
+                    </div>
+                </div>
+                <div class="progress">
+                    <div class="bar" data-bind="style: {width: uploadProgress() + '%'}"></div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

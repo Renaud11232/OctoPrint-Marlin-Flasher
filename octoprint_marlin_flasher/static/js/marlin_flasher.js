@@ -3,8 +3,10 @@ $(function() {
         var self = this;
         self.settingsViewModel = parameters[0];
         self.loginStateViewModel = parameters[1];
-        self.firmwareFileButton = $("#firmware_file");
-        self.flashButton = $("#flash-button");
+        self.arduinoFirmwareFileButton = $("#arduino_firmware_file");
+        self.platformioFirmwareFileButton = $("#platformio_firmware_file");
+        self.arduinoFlashButton = $("#arduino_flash-button");
+        self.platformioFlashButton = $("#platformio_flash-button");
         self.searchCoreButton = $("#search-core-btn");
         self.searchLibButton = $("#search-lib-btn");
         self.stderrModal = $("#marlin_flasher_modal");
@@ -19,7 +21,7 @@ $(function() {
         self.flashingProgress = ko.observable(0);
         self.progressStep = ko.observable();
 
-        self.firmwareFileButton.fileupload({
+        self.fileUploadParams = {
             maxNumberOfFiles: 1,
             headers: OctoPrint.getRequestHeaders(),
             done: function(e, data) {
@@ -57,7 +59,10 @@ $(function() {
             progress: function(e, data) {
                 self.uploadProgress((data.loaded / data.total) * 100);
             }
-        });
+        }
+
+        self.arduinoFirmwareFileButton.fileupload(self.fileUploadParams);
+        self.platformioFirmwareFileButton.fileupload(self.fileUploadParams);
         self.searchCore = function(form) {
             self.searchCoreButton.button("loading");
             $.ajax({
@@ -224,7 +229,8 @@ $(function() {
             }
         };
         self.flash = function(form) {
-            self.flashButton.button("loading");
+            self.arduinoFlashButton.button("loading");
+            self.platformioFlashButton.button("loading");
             $.ajax({
                 type: "POST",
                 headers: OctoPrint.getRequestHeaders(),
@@ -251,7 +257,8 @@ $(function() {
                     self.stderr(null);
                 }
             }).always(function() {
-                self.flashButton.button("reset");
+                self.arduinoFlashButton.button("reset");
+                self.platformioFlashButton.button("reset");
             });
         };
         self.selectedBoard.subscribe(function(newValue) {

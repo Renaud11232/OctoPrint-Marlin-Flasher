@@ -5,6 +5,11 @@
     {% include "includes/group_items/arduino/flash.jinja2" %}
 </div>
 
+<div class="accordion" id="marlin_flasher_platformio_accordion" data-bind="visible: loginStateViewModel.isAdmin() && settingsViewModel.settings.plugins.marlin_flasher.platform_type() == 'platform_io'">
+    {% include "includes/group_items/platformio/project.jinja2" %}
+    {% include "includes/group_items/platformio/flash.jinja2" %}
+</div>
+
 <div data-bind="visible: !loginStateViewModel.isAdmin()">
     <h3>{{ _("Sorry") }}</h3>
     <p>{{ _("Only administrators are authorized to view and use this panel. Please login using an administrator account and try again.") }}</p>

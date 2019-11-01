@@ -1,0 +1,23 @@
+<div class="accordion-group">
+    <div class="accordion-heading">
+        <a class="accordion-toggle" data-toggle="collapse" data-parent="#marlin_flasher_platformio_accordion" href="#platformio_flash">
+            {{ _('Flash') }}
+        </a>
+    </div>
+    <div id="platformio_flash" class="accordion-body collapse">
+        <div class="accordion-inner">
+            <form class="form-horizontal" data-bind="submit: flash">
+                <div class="control-group">
+                    <div class="controls">
+                        <button id="platformio_flash-button" class="btn btn-warning" type="submit" data-loading-text="{{ _('Flashing...') }}" ><i class="icon-warning-sign"></i> {{ _('Flash') }}</button>
+                    </div>
+                </div>
+                <span data-bind="text: progressStep"></span>
+                <div class="progress progress-text-centered">
+                    <div class="bar" data-bind="style: {width: flashingProgress() + '%'},
+                                                css: {'bar-success': flashingProgress() >= 100}"></div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
