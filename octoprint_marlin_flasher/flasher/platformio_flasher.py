@@ -1,4 +1,6 @@
 from .base_flasher import BaseFlasher
+from .flasher_error import FlasherError
+from subprocess import Popen, PIPE
 import zipfile
 import os
 import shutil
@@ -8,11 +10,35 @@ from flask_babel import gettext
 
 class PlatformIOFlasher(BaseFlasher):
 
+	def __exec(self, args):
+		command = [self._settings.get_platformio_cli_path()]
+		command.extend(args)
+		try:
+			p = Popen(command, stdout=PIPE, stderr=PIPE, universal_newlines=True)
+			stdout, stderr = p.communicate()
+			stdout = stdout.strip()
+			stderr = stderr.strip()
+			if p.returncode != 0:
+				raise FlasherError(stderr)
+			return stdout
+		except OSError:
+			raise FlasherError(gettext("The given executable does not exist."))
+
 	def check_setup_errors(self):
-		return dict(
-			# TODO not done yet
-			error=gettext("check_setup_errors: not implemented yet")
-		)
+		no_platformio_path = self._settings.get_platformio_cli_path() is None
+		if no_platformio_path:
+			return dict(
+				error=gettext("No path has been configured, check the plugin settings.")
+			)
+		try:
+			bad_exec = "platformio" in self.__exec(["--version"])
+		except FlasherError:
+			bad_exec = True
+		if bad_exec:
+			return dict(
+				error=gettext("The configured path does not point to PlatformIO-Core.")
+			)
+		return None
 
 	def upload(self):
 		self._firmware = None
@@ -37,4 +63,4 @@ class PlatformIOFlasher(BaseFlasher):
 
 	def flash(self):
 		# TODO not done yet
-		return BaseFlasher.flash(self)
+		return None, None
