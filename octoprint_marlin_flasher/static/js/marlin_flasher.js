@@ -18,6 +18,7 @@ $(function() {
         self.uploadProgress = ko.observable(0);
         self.flashingProgress = ko.observable(0);
         self.progressStep = ko.observable();
+        self.selectedPlatform = ko.observable();
 
         self.firmwareFileButton.fileupload({
             maxNumberOfFiles: 1,
@@ -279,6 +280,10 @@ $(function() {
         });
         self.onAllBound = function(viewModels) {
             self.loadBoardList();
+            self.selectedPlatform(self.settingsViewModel.settings.plugins.marlin_flasher.platform_type() + "");
+            self.settingsViewModel.settings.plugins.marlin_flasher.platform_type.subscribe(function(value) {
+                self.selectedPlatform(value + "");
+            });
         };
         self.onDataUpdaterPluginMessage = function(plugin, message) {
             if(plugin == "marlin_flasher") {
@@ -288,6 +293,16 @@ $(function() {
                 } else if(message.type === "settings_saved") {
                     self.loadBoardList();
                 }
+            }
+        };
+        self.onSettingsBeforeSave = function() {
+            self.settingsViewModel.settings.plugins.marlin_flasher.max_upload_size(parseInt(self.settingsViewModel.settings.plugins.marlin_flasher.max_upload_size()));
+            self.settingsViewModel.settings.plugins.marlin_flasher.platform_type(parseInt(self.selectedPlatform()));
+            if(self.settingsViewModel.settings.plugins.marlin_flasher.arduino.additional_urls() === "") {
+                self.settingsViewModel.settings.plugins.marlin_flasher.arduino.additional_urls(null);
+            }
+            if(self.settingsViewModel.settings.plugins.marlin_flasher.arduino.cli_path() === "") {
+                self.settingsViewModel.settings.plugins.marlin_flasher.arduino.cli_path(null);
             }
         };
     }

@@ -9,7 +9,7 @@
             <div class="control-group">
                 <label class="control-label" for="marlin_flasher_platform_type">{{ _('Platform') }}</label>
                 <div class="controls">
-                    <select id="marlin_flasher_platform_type" data-bind="value: settingsViewModel.settings.plugins.marlin_flasher.platform_type">
+                    <select id="marlin_flasher_platform_type" data-bind="value: selectedPlatform">
                         <option value="0">Arduino</option>
                         <option value="1">Platform.io</option>
                     </select>
