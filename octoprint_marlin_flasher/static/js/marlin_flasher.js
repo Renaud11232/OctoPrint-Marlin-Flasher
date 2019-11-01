@@ -298,6 +298,9 @@ $(function() {
             if(self.settingsViewModel.settings.plugins.marlin_flasher.arduino.cli_path() === "") {
                 self.settingsViewModel.settings.plugins.marlin_flasher.arduino.cli_path(null);
             }
+            if(self.settingsViewModel.settings.plugins.marlin_flasher.platformio.cli_path() === "") {
+                self.settingsViewModel.settings.plugins.marlin_flasher.platformio.cli_path(null);
+            }
         };
     }
 

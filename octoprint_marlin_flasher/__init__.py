@@ -29,7 +29,8 @@ class MarlinFlasherPlugin(octoprint.plugin.StartupPlugin,
 				additional_urls=None
 			),
 			platformio=dict(
-
+				cli_path=None,
+				config_ini="platformio.ini"
 			),
 			max_upload_size=20,
 			platform_type=PlatformType.ARDUINO
