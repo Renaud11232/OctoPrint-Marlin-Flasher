@@ -25,7 +25,7 @@ class PlatformIOFlasher(BaseFlasher):
 			zip_file.extractall(firmware_dir)
 			for root, dirs, files in os.walk(firmware_dir):
 				for f in files:
-					if f == self._settings.get_platformio_config_ini():
+					if f == "platformio.ini":
 						self._firmware = root
 						return dict(
 							path=root,

@@ -23,6 +23,3 @@ class SettingsWrapper:
 
 	def get_platformio_cli_path(self):
 		return self.__settings.get(["platformio", "cli_path"])
-
-	def get_platformio_config_ini(self):
-		return self.__settings.get(["platformio", "config_ini"])
