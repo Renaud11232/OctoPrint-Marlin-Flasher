@@ -279,11 +279,11 @@ $(function() {
             }
         });
         self.onAllBound = function(viewModels) {
-            self.loadBoardList();
             self.selectedPlatform(self.settingsViewModel.settings.plugins.marlin_flasher.platform_type() + "");
             self.settingsViewModel.settings.plugins.marlin_flasher.platform_type.subscribe(function(value) {
                 self.selectedPlatform(value + "");
             });
+            self.loadBoardList();
         };
         self.onDataUpdaterPluginMessage = function(plugin, message) {
             if(plugin == "marlin_flasher") {
