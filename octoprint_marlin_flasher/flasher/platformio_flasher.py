@@ -4,6 +4,7 @@ from subprocess import Popen, PIPE
 import zipfile
 import os
 import shutil
+import serial
 import flask
 from flask_babel import gettext
 
@@ -62,5 +63,47 @@ class PlatformIOFlasher(BaseFlasher):
 			)
 
 	def flash(self):
-		# TODO not done yet
-		return None, None
+		if self._firmware is None:
+			return None, dict(
+				error=gettext("You did not upload the firmware or it got reset by the previous flash process.")
+			)
+		if not self._printer.is_ready():
+			return None, dict(
+				error=gettext("The printer may not be connected or it may be busy.")
+			)
+		try:
+			self._plugin_manager.send_plugin_message(self._identifier, dict(
+				type="flash_progress",
+				step=gettext("Compiling"),
+				progress=0
+			))
+			self.__exec(["run", "-d", self._firmware])
+			self._plugin_manager.send_plugin_message(self._identifier, dict(
+				type="flash_progress",
+				step=gettext("Uploading"),
+				progress=50
+			))
+			transport = self._printer.get_transport()
+			if not isinstance(transport, serial.Serial):
+				return None, dict(
+					error=gettext("The printer is not connected through a Serial port and thus, cannot be flashed.")
+				)
+			flash_port = transport.port
+			_, port, baudrate, profile = self._printer.get_current_connection()
+			self._printer.disconnect()
+			self.__exec(["run", "-d", self._firmware, "-t", "upload", "--upload-port", flash_port])
+			self._printer.connect(port, baudrate, profile)
+			self._firmware = None
+			self._plugin_manager.send_plugin_message(self._identifier, dict(
+				type="flash_progress",
+				step=gettext("Done"),
+				progress=100
+			))
+			return dict(
+				message=gettext("Board successfully flashed.")
+			), None
+		except FlasherError as e:
+			return None, dict(
+				error=gettext("The flashing process failed"),
+				stderr=e.message
+			)
