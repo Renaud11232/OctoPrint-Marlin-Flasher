@@ -1,47 +1,68 @@
 # OctoPrint-Marlin-Flasher
 
-This plugins makes the upgrade of your Marlin (or any Arduino based) firmware possible directly within OctoPrint.
-Simply connect to your printer, upload your firmware code, select your motherboard type, and click flash.**DONE**.
+This plugins makes the upgrade of your Marlin firmware possible directly within OctoPrint.
+Simply connect to your printer, upload your firmware code, select your motherboard type, and click flash. **DONE**.
 
-![sketch](extras/assets/img/plugins/marlin_flasher/sketch.png)
+It also supports Platform.io so even 32 bits boards can be flashed!.
 
-![cores](extras/assets/img/plugins/marlin_flasher/cores.png)
+## Screenshots
 
-![libraries](extras/assets/img/plugins/marlin_flasher/libraries.png)
+### Arduino
 
-![flash](extras/assets/img/plugins/marlin_flasher/flash.png)
+![Arduino Sketch](.github/img/readme/arduino_sketch.png)
+
+![Arduino Cores](.github/img/readme/arduino_cores.png)
+
+![Arduino Libraries](.github/img/readme/arduino_libraries.png)
+
+![Arduino Flash](.github/img/readme/arduino_flash.png))
+
+### Platform.io
+
+![Platform.io Sketch](.github/img/readme/pio_project.png)
+
+![Platform.io Sketch](.github/img/readme/pio_flash.png)
 
 ## Setup
 
-First, you'll need to download and install `arduino-cli` from their official [GitHub page](https://github.com/arduino/arduino-cli).
-
-Then, install via the bundled [Plugin Manager](https://github.com/foosel/OctoPrint/wiki/Plugin:-Plugin-Manager)
+Install via the bundled [Plugin Manager](https://github.com/foosel/OctoPrint/wiki/Plugin:-Plugin-Manager)
 or manually using this URL:
 
     https://github.com/Renaud11232/Octoprint-Marlin-Flasher/archive/master.zip
 
+### Arduino
+
+First, you'll need to download `arduino-cli` from their official [GitHub page](https://github.com/arduino/arduino-cli/releases). Then all is left to do is to tell the plugin where you placed it via the settings.
+
+### Platfrom.io
+
+You first need to install PlatformIO-Core following their [official documentation](https://docs.platformio.org/en/latest/installation.html). Then as for Arduino, you need to tell the plugin where its installed.
+
 ## Configuration
 
-There are four configurable options:
-* The path to your `arduino-cli` executable
+There are a few configurable options:
 * The name of the Arduino sketch (defaults to `Marlin.ino`)
-* The maximum file upload size (defaults to `20MB`)
+* The path to your `arduino-cli` executable
 * The additional boards urls (ie: Sanguino)
+* The path for your PlatformIO-Core executable
+* The maximum file upload size (defaults to `20MB`)
+* The currently selected platform (Arduino, PlatformIO)
 
 All can be configured directly though the *Settings* menu. or via the [config.yaml](https://docs.octoprint.org/en/master/configuration/config_yaml.html)
 
 ```yaml
 plugins:
   marlin_flasher:
-    arduino_path: /path/to/arduino-cli
-    sketch_ino: Marlin.ino
+    arduino:
+      sketch_ino: Marlin.ino
+      cli_path: /path/to/arduino-cli
+      additional_urls: 'https://what.ever/boards.json'
+    platformio:
+      cli_path: /path/to/platformio
     max_upload_size: 20
-    additional_urls: 'https://what.ever/boards.json'
 ```
 
-You may also want to add custom boards ie: `Sanguino`. To do that edit the arduino-cli configuration file manually (cf: `arduino-cli` official documentation)
-
-## Step by step
+## Wiki
 
 If you need more help on how to setup and use the plugin feel free to check the [wiki](https://github.com/Renaud11232/OctoPrint-Marlin-Flasher/wiki)
 
