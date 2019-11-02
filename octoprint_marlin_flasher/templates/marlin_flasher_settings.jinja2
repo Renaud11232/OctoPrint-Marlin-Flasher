@@ -1,4 +1,6 @@
 <h3>{{ _('Marlin Flasher Settings') }}</h3>
 <div>
-    {% include "includes/config.jinja2" %}
+    {% with field_suffix = "settings" %}
+        {% include "includes/config.jinja2" %}
+    {% endwith %}
 </div>

@@ -1,30 +1,30 @@
 <div class="accordion-group">
     <div class="accordion-heading">
-        <a class="accordion-toggle" data-toggle="collapse" data-parent="#marlin_flasher_settings_accordion" href="#marlin_flasher_settings_arduino">
+        <a class="accordion-toggle" data-toggle="collapse" data-parent="#marlin_flasher_settings_accordion_{{field_suffix}}" href="#marlin_flasher_settings_arduino_{{field_suffix}}">
             {{ _('Arduino Settings') }}
         </a>
     </div>
-    <div id="marlin_flasher_settings_arduino" class="accordion-body collapse">
+    <div id="marlin_flasher_settings_arduino_{{field_suffix}}" class="accordion-body collapse">
         <div class="accordion-inner">
             <div class="alert alert-info">
                 <strong>{{ _('Warning !') }}</strong> {{ _('You must have arduino-cli version <strong>0.5.0</strong> or <strong>0.6.0</strong>. Other versions are not supported.') }}
             </div>
             <div class="control-group">
-                <label class="control-label" for="cli_path">{{ _('Path to arduino-cli') }}</label>
+                <label class="control-label" for="cli_path_{{field_suffix}}">{{ _('Path to arduino-cli') }}</label>
                 <div class="controls">
-                    <input type="text" data-bind="value: settingsViewModel.settings.plugins.marlin_flasher.arduino.cli_path" id="cli_path">
+                    <input type="text" data-bind="value: settingsViewModel.settings.plugins.marlin_flasher.arduino.cli_path" id="cli_path_{{field_suffix}}">
                 </div>
             </div>
             <div class="control-group">
-                <label class="control-label" for="sketch_ino">{{ _('Sketch .ino') }}</label>
+                <label class="control-label" for="sketch_ino_{{field_suffix}}">{{ _('Sketch .ino') }}</label>
                 <div class="controls">
-                    <input type="text" data-bind="value: settingsViewModel.settings.plugins.marlin_flasher.arduino.sketch_ino" id="sketch_ino">
+                    <input type="text" data-bind="value: settingsViewModel.settings.plugins.marlin_flasher.arduino.sketch_ino" id="sketch_ino_{{field_suffix}}">
                 </div>
             </div>
             <div class="control-group">
-                <label class="control-label" for="additional_urls">{{ _('Additional Board URLs') }}</label>
+                <label class="control-label" for="additional_urls_{{field_suffix}}">{{ _('Additional Board URLs') }}</label>
                 <div class="controls">
-                    <textarea class="input-block-level" id="additional_urls" rows="10" cols="100" data-bind="value: settingsViewModel.settings.plugins.marlin_flasher.arduino.additional_urls"></textarea>
+                    <textarea class="input-block-level" id="additional_urls_{{field_suffix}}" rows="10" cols="100" data-bind="value: settingsViewModel.settings.plugins.marlin_flasher.arduino.additional_urls"></textarea>
                     <span>{{ _('*one per line') }}</span>
                 </div>
             </div>
