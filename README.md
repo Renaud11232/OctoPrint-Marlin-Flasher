@@ -15,7 +15,7 @@ It also supports Platform.io so even 32 bits boards can be flashed!.
 
 ![Arduino Libraries](.github/img/arduino_libraries.png)
 
-![Arduino Flash](.github/img/arduino_flash.png))
+![Arduino Flash](.github/img/arduino_flash.png)
 
 ### Platform.io
 
