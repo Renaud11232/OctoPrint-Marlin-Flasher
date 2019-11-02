@@ -9,19 +9,19 @@ It also supports Platform.io so even 32 bits boards can be flashed!.
 
 ### Arduino
 
-![Arduino Sketch](.github/img/readme/arduino_sketch.png)
+![Arduino Sketch](.github/img/arduino_sketch.png)
 
-![Arduino Cores](.github/img/readme/arduino_cores.png)
+![Arduino Cores](.github/img/arduino_cores.png)
 
-![Arduino Libraries](.github/img/readme/arduino_libraries.png)
+![Arduino Libraries](.github/img/arduino_libraries.png)
 
-![Arduino Flash](.github/img/readme/arduino_flash.png))
+![Arduino Flash](.github/img/arduino_flash.png))
 
 ### Platform.io
 
-![Platform.io Sketch](.github/img/readme/pio_project.png)
+![Platform.io Sketch](.github/img/pio_project.png)
 
-![Platform.io Sketch](.github/img/readme/pio_flash.png)
+![Platform.io Sketch](.github/img/pio_flash.png)
 
 ## Setup
 
