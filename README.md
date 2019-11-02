@@ -21,7 +21,7 @@ It also supports Platform.io so even 32 bits boards can be flashed!.
 
 ![Platform.io Sketch](.github/img/pio_project.png)
 
-![Platform.io Sketch](.github/img/pio_flash.png)
+![Platform.io Flash](.github/img/pio_flash.png)
 
 ## Setup
 
