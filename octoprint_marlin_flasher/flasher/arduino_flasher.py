@@ -37,7 +37,11 @@ class ArduinoFlasher(BaseFlasher):
 				error=gettext("No path has been configured, check the plugin settings.")
 			)
 		try:
-			bad_version = re.match(r"(?:0\.[56]\..+?)\Z", self.__get_arduino().version()["VersionString"]) is None
+			version = self.__get_arduino().version()
+			if isinstance(version, dict):
+				bad_version = re.match(r"(?:0\.[56]\..+?)\Z", version["VersionString"]) is None
+			else:
+				raise pyduinocli.ArduinoError("Not arduino-cli")
 		except pyduinocli.ArduinoError:
 			return dict(
 				error=gettext("The configured path does not point to an arduino-cli executable.")
