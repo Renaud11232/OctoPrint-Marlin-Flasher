@@ -10,7 +10,7 @@ plugin_license = "MIT"
 plugin_requires = [
 	"pyduinocli>=0.3.1",
 	"intelhex",
-	"marshmallow==2.20.5",
+	"marshmallow<3",
 	"flask>=0.10.1,<0.11"
 ]
 plugin_additional_data = []
