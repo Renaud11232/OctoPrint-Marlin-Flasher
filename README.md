@@ -60,6 +60,7 @@ plugins:
     platformio:
       cli_path: /path/to/platformio
     max_upload_size: 20
+    platform_type: arduino
 ```
 
 ## Wiki
