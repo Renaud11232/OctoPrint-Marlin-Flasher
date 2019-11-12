@@ -93,8 +93,8 @@ class ArduinoFlasher(BaseFlasher):
 	def core_search(self):
 		try:
 			arduino = self.__get_arduino()
-			arduino.core_update_index()
-			result = arduino.core_search(flask.request.values["query"].split(" "))
+			arduino.core.update_index()
+			result = arduino.core.search(flask.request.values["query"].split(" "))
 			return result, None
 		except pyduinocli.ArduinoError as e:
 			return None, self.__error_to_dict(e)
@@ -102,8 +102,8 @@ class ArduinoFlasher(BaseFlasher):
 	def lib_search(self):
 		try:
 			arduino = self.__get_arduino()
-			arduino.core_update_index()
-			result = arduino.lib_search(flask.request.values["query"].split(" "))
+			arduino.core.update_index()
+			result = arduino.lib.search(flask.request.values["query"].split(" "))
 			return result, None
 		except pyduinocli.ArduinoError as e:
 			return None, self.__error_to_dict(e)
@@ -111,7 +111,7 @@ class ArduinoFlasher(BaseFlasher):
 	def core_install(self):
 		try:
 			arduino = self.__get_arduino()
-			arduino.core_install([flask.request.values["core"]])
+			arduino.core.install([flask.request.values["core"]])
 			return dict(
 				core=flask.request.values["core"]
 			), None
@@ -121,7 +121,7 @@ class ArduinoFlasher(BaseFlasher):
 	def lib_install(self):
 		try:
 			arduino = self.__get_arduino()
-			arduino.lib_install([flask.request.values["lib"]])
+			arduino.lib.install([flask.request.values["lib"]])
 			return dict(
 				lib=flask.request.values["lib"]
 			), None
@@ -131,7 +131,7 @@ class ArduinoFlasher(BaseFlasher):
 	def core_uninstall(self):
 		try:
 			arduino = self.__get_arduino()
-			arduino.core_uninstall([flask.request.values["core"]])
+			arduino.core.uninstall([flask.request.values["core"]])
 			return dict(
 				core=flask.request.values["core"]
 			), None
@@ -141,7 +141,7 @@ class ArduinoFlasher(BaseFlasher):
 	def lib_uninstall(self):
 		try:
 			arduino = self.__get_arduino()
-			arduino.lib_uninstall([flask.request.values["lib"].replace(" ", "_")])
+			arduino.lib.uninstall([flask.request.values["lib"].replace(" ", "_")])
 			return dict(
 				lib=flask.request.values["lib"]
 			), None
@@ -151,8 +151,8 @@ class ArduinoFlasher(BaseFlasher):
 	def board_listall(self):
 		try:
 			arduino = self.__get_arduino()
-			arduino.core_update_index()
-			result = arduino.board_listall()
+			arduino.core.update_index()
+			result = arduino.board.listall()
 			return result, None
 		except pyduinocli.ArduinoError as e:
 			return None, self.__error_to_dict(e)
@@ -160,7 +160,7 @@ class ArduinoFlasher(BaseFlasher):
 	def board_details(self):
 		try:
 			arduino = self.__get_arduino()
-			result = arduino.board_details(flask.request.values["fqbn"])
+			result = arduino.board.details(flask.request.values["fqbn"])
 			return result, None
 		except pyduinocli.ArduinoError as e:
 			return self.__error_to_dict(e)
