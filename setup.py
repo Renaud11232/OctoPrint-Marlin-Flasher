@@ -1,7 +1,7 @@
 plugin_identifier = "marlin_flasher"
 plugin_package = "octoprint_marlin_flasher"
 plugin_name = "OctoPrint-Marlin-Flasher"
-plugin_version = "0.3.1rc1"
+plugin_version = "0.3.1"
 plugin_description = """Plugin that allows you to flash your printer with the latest Marlin version, or Arduino code"""
 plugin_author = "Renaud Gaspard"
 plugin_author_email = "gaspardrenaud@hotmail.com"
