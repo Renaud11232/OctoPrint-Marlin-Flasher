@@ -69,6 +69,4 @@ If you need more help on how to setup and use the plugin feel free to check the 
 
 ## Need help ?
 
-If you need help please [open an issue](https://github.com/Renaud11232/OctoPrint-Marlin-Flasher/issues/new) or join my discord server
-
-[![Discord Banner](https://discordapp.com/api/guilds/569257302184689674/widget.png?style=banner2)](https://discord.gg/evMfXwT)
+If you need help please [open an issue](https://github.com/Renaud11232/OctoPrint-Marlin-Flasher/issues/new).
