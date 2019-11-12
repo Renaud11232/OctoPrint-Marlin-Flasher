@@ -32,7 +32,7 @@ class PlatformIOFlasher(BaseFlasher):
 				error=gettext("No path has been configured, check the plugin settings.")
 			)
 		try:
-			bad_exec = "platformio" in self.__exec(["--version"])
+			bad_exec = "platformio" not in self.__exec(["--version"]).lower()
 		except FlasherError:
 			bad_exec = True
 		if bad_exec:
