@@ -41,7 +41,7 @@ class ArduinoFlasher(BaseFlasher):
 		try:
 			version = self.__get_arduino().version()
 			if isinstance(version, dict):
-				bad_version = re.match(r"(?:0\.[56]\..+?)\Z", version["VersionString"]) is None
+				bad_version = re.match(r"(?:0\.[567]\..+?)\Z", version["VersionString"]) is None
 			else:
 				not_arduino = True
 		except pyduinocli.ArduinoError:
@@ -141,6 +141,7 @@ class ArduinoFlasher(BaseFlasher):
 	def lib_uninstall(self):
 		try:
 			arduino = self.__get_arduino()
+			# TODO this is not needed for versions >= 0.7.0
 			arduino.lib.uninstall([flask.request.values["lib"].replace(" ", "_")])
 			return dict(
 				lib=flask.request.values["lib"]
@@ -163,7 +164,7 @@ class ArduinoFlasher(BaseFlasher):
 			result = arduino.board.details(flask.request.values["fqbn"])
 			return result, None
 		except pyduinocli.ArduinoError as e:
-			return self.__error_to_dict(e)
+			return None, self.__error_to_dict(e)
 
 	def flash(self):
 		if self._firmware is None:
