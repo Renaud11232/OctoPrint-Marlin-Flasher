@@ -20,6 +20,7 @@ $(function() {
         self.uploadProgress = ko.observable(0);
         self.flashingProgress = ko.observable(0);
         self.progressStep = ko.observable();
+        self.flashButtonEnabled = ko.observable(true);
 
         self.fileUploadParams = {
             maxNumberOfFiles: 1,
@@ -263,6 +264,7 @@ $(function() {
         };
         self.selectedBoard.subscribe(function(newValue) {
             self.boardOptions([]);
+            self.flashButtonEnabled(false);
             if (newValue) {
                 $.ajax({
                     type: "GET",
@@ -275,6 +277,7 @@ $(function() {
                     if(data) {
                         self.boardOptions(data.config_options);
                     }
+                    self.flashButtonEnabled(true);
                 }).fail(function(jqXHR, status, error) {
                     new PNotify({
                         title: gettext("Board option fetch failed"),

@@ -31,7 +31,7 @@
                 </div>
                 <div class="control-group">
                     <div class="controls">
-                        <button id="arduino_flash-button" class="btn btn-warning" type="submit" data-loading-text="{{ _('Flashing...') }}" ><i class="icon-warning-sign"></i> {{ _('Flash') }}</button>
+                        <button id="arduino_flash-button" class="btn btn-warning" type="submit" data-loading-text="{{ _('Flashing...') }}" data-bind="enable: flashButtonEnabled"><i class="icon-warning-sign"></i> {{ _('Flash') }}</button>
                     </div>
                 </div>
                 <span data-bind="text: progressStep"></span>
