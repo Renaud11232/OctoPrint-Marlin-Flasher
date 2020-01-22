@@ -1,4 +1,4 @@
-# OctoPrint-Marlin-Flasher
+# OctoPrint-Marlin-Flasher [![Donate](https://img.shields.io/badge/Donate-PayPal-green.svg)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=UD54SHVYDV6NU&source=url)
 
 This plugins makes the upgrade of your Marlin firmware possible directly within OctoPrint.
 Simply connect to your printer, upload your firmware code, select your motherboard type, and click flash. **DONE**.
@@ -70,3 +70,7 @@ If you need more help on how to setup and use the plugin feel free to check the 
 ## Need help ?
 
 If you need help please [open an issue](https://github.com/Renaud11232/OctoPrint-Marlin-Flasher/issues/new).
+
+## Donations
+
+If you like what I have done and feel generous, you can thank me by [donating](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=UD54SHVYDV6NU&source=url). Any amount is fine, I'll still be very thankful.
