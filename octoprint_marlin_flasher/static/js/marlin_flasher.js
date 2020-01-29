@@ -22,37 +22,55 @@ $(function() {
         self.progressStep = ko.observable();
         self.flashButtonEnabled = ko.observable(true);
 
+        self.showError = function(title, errorData) {
+            var text = "";
+            if(errorData.error) {
+                text = errorData.error;
+            }
+            if(errorData.cause) {
+                if(text) {
+                    text += "\n";
+                }
+                text += gettext("Cause : ") + errorData.cause;
+            }
+            new PNotify({
+                title: title,
+                text: text,
+                type: "error"
+            });
+            if(errorData.stderr) {
+                self.stderr(errorData.stderr);
+                self.stderrModal.modal("show");
+            }
+        };
+
+        self.showSuccess = function(title, text) {
+            new PNotify({
+                title: title,
+                text: text,
+                type: "success"
+            });
+        }
+
         self.fileUploadParams = {
             maxNumberOfFiles: 1,
             headers: OctoPrint.getRequestHeaders(),
             done: function(e, data) {
-                new PNotify({
-                    title: gettext("Firmware upload successful"),
-                    text: data.result.file,
-                    type: "success"
-                });
+                self.showSuccess(gettext("Firmware upload successful"), data.result.file);
                 self.uploadProgress(0);
             },
             error: function(jqXHR, status, error) {
                 if(error === "") {
-                    new PNotify({
-                        title: gettext("Firmware upload failed"),
-                        text: gettext("Check the maximum firmware size"),
-                        type: "error"
+                    self.showError(gettext("Firmware upload failed"), {
+                        error: gettext("Check the maximum firmware size")
                     });
                 } else {
                     if(typeof jqXHR.responseJSON.error === "undefined") {
-                        new PNotify({
-                            title: gettext("Firmware upload failed"),
-                            text: gettext("The given file was not valid"),
-                            type: "error"
+                        self.showError(gettext("Firmware upload failed"), {
+                            error: gettext("The given file was not valid")
                         });
                     } else {
-                        new PNotify({
-                            title: gettext("Firmware upload failed"),
-                            text: jqXHR.responseJSON.error,
-                            type: "error"
-                        });
+                        self.showError(gettext("Firmware upload failed"), jqXHR.responseJSON);
                     }
                 };
                 self.uploadProgress(0);
@@ -74,11 +92,7 @@ $(function() {
             }).done(function (data) {
                 self.coreSearchResult(data);
             }).fail(function(jqXHR, status, error) {
-                new PNotify({
-                    title: gettext("Core search failed"),
-                    text: jqXHR.responseJSON.error,
-                    type: "error"
-                });
+                self.showError(gettext("Core search failed"), jqXHR.responseJSON);
             }).always(function() {
                 self.searchCoreButton.button("reset");
             });
@@ -94,17 +108,9 @@ $(function() {
                 }
             }).done(function(data) {
                 self.loadBoardList();
-                new PNotify({
-                    title: gettext("Core install successful"),
-                    text: gettext("Successfully installed {core}").replace("{core}", data.core),
-                    type: "success"
-                });
+                self.showSuccess(gettext("Core install successful"), gettext("Successfully installed {core}").replace("{core}", data.core));
             }).fail(function(jqXHR, status, error) {
-                new PNotify({
-                    title: gettext("Core install failed"),
-                    text: jqXHR.responseJSON.error,
-                    type: "error"
-                });
+                self.showError(gettext("Core install failed"), jqXHR.responseJSON);
             }).always(function() {
                 $(event.currentTarget).button("reset");
             });
@@ -120,17 +126,9 @@ $(function() {
                 }
             }).done(function(data) {
                 self.loadBoardList();
-                new PNotify({
-                    title: gettext("Core uninstall successful"),
-                    text: gettext("Successfully uninstalled {core}").replace("{core}", data.core),
-                    type: "success"
-                });
+                self.showSuccess(gettext("Core uninstall successful"), gettext("Successfully uninstalled {core}").replace("{core}", data.core));
             }).fail(function(jqXHR, status, error) {
-                new PNotify({
-                    title: gettext("Core uninstall failed"),
-                    text: jqXHR.responseJSON.error,
-                    type: "error"
-                });
+                self.showError(gettext("Core uninstall failed"), jqXHR.responseJSON);
             }).always(function() {
                 $(event.currentTarget).button("reset");
             });
@@ -149,11 +147,7 @@ $(function() {
                     self.libSearchResult([]);
                 }
             }).fail(function(jqXHR, status, error) {
-                new PNotify({
-                    title: gettext("Lib search failed"),
-                    text: jqXHR.responseJSON.error,
-                    type: "error"
-                });
+                self.showError(gettext("Lib search failed"), jqXHR.responseJSON);
             }).always(function() {
                 self.searchLibButton.button("reset");
             });
@@ -168,17 +162,9 @@ $(function() {
                     lib: data.name
                 }
             }).done(function(data) {
-                new PNotify({
-                    title: gettext("Lib install successful"),
-                    text: gettext("Successfully installed {lib}").replace("{lib}", data.lib),
-                    type: "success"
-                });
+                self.showSuccess(gettext("Lib install successful"), gettext("Successfully installed {lib}").replace("{lib}", data.lib));
             }).fail(function(jqXHR, status, error) {
-                new PNotify({
-                    title: gettext("Lib install failed"),
-                    text: jqXHR.responseJSON.error,
-                    type: "error"
-                });
+                self.showError(gettext("Lib install failed"), jqXHR.responseJSON);
             }).always(function() {
                 $(event.currentTarget).button("reset");
             });
@@ -193,17 +179,9 @@ $(function() {
                     lib: data.name
                 }
             }).done(function(data) {
-                new PNotify({
-                    title: gettext("Lib uninstall successful"),
-                    text: gettext("Successfully uninstalled {lib}").replace("{lib}", data.lib),
-                    type: "success"
-                });
+                self.showSuccess(gettext("Lib uninstall successful"), gettext("Successfully uninstalled {lib}").replace("{lib}", data.lib));
             }).fail(function(jqXHR, status, error) {
-                new PNotify({
-                    title: gettext("Lib uninstall failed"),
-                    text: jqXHR.responseJSON.error,
-                    type: "error"
-                });
+                self.showError(gettext("Lib uninstall failed"), jqXHR.responseJSON);
             }).always(function() {
                 $(event.currentTarget).button("reset");
             });
@@ -221,11 +199,7 @@ $(function() {
                         self.boardList([]);
                     }
                 }).fail(function(jqXHR, status, error) {
-                    new PNotify({
-                        title: gettext("Board list fetch failed"),
-                        text: jqXHR.responseJSON.error,
-                        type: "error"
-                    });
+                    self.showError(gettext("Board list fetch failed"), jqXHR.responseJSON);
                 });
             }
         };
@@ -238,25 +212,11 @@ $(function() {
                 url: "/plugin/marlin_flasher/flash",
                 data: $(form).serialize()
             }).done(function (data) {
-                new PNotify({
-                    title: gettext("Flashing successful"),
-                    text: data.message,
-                    type: "success"
-                });
+                self.showSuccess(gettext("Flashing successful"), data.message);
             }).fail(function(jqXHR, status, error) {
-                new PNotify({
-                    title: gettext("Flashing failed"),
-                    text: jqXHR.responseJSON.error,
-                    type: "error"
-                });
+                self.showError(gettext("Flashing failed"), jqXHR.responseJSON);
                 self.progressStep(null);
                 self.flashingProgress(0);
-                if(jqXHR.responseJSON.stderr) {
-                    self.stderr(jqXHR.responseJSON.stderr);
-                    self.stderrModal.modal("show");
-                } else {
-                    self.stderr(null);
-                }
             }).always(function() {
                 self.arduinoFlashButton.button("reset");
                 self.platformioFlashButton.button("reset");
@@ -279,11 +239,7 @@ $(function() {
                     }
                     self.flashButtonEnabled(true);
                 }).fail(function(jqXHR, status, error) {
-                    new PNotify({
-                        title: gettext("Board option fetch failed"),
-                        text: jqXHR.responseJSON.error,
-                        type: "error"
-                    });
+                    self.showError(gettext("Board option fetch failed"), jqXHR.responseJSON);
                 });
             }
         });
