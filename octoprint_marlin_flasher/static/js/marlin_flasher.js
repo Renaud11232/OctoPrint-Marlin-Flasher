@@ -20,7 +20,7 @@ $(function() {
         self.uploadProgress = ko.observable(0);
         self.flashingProgress = ko.observable(0);
         self.progressStep = ko.observable();
-        self.flashButtonEnabled = ko.observable(true);
+        self.flashButtonEnabled = ko.observable(false);
 
         self.showError = function(title, errorData) {
             var text = "";
