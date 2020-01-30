@@ -21,6 +21,7 @@ $(function() {
         self.flashingProgress = ko.observable(0);
         self.progressStep = ko.observable();
         self.flashButtonEnabled = ko.observable(false);
+        self.boardOptionsLoading = ko.observable(false);
 
         self.showError = function(title, errorData) {
             var text = "";
@@ -98,7 +99,9 @@ $(function() {
             });
         };
         self.installCore = function(data, event) {
-            $(event.currentTarget).button("loading");
+            $(event.currentTarget).hide();
+            var loader = $("<div>").addClass("loader").addClass("loader-centered").addClass("loader-install");
+            $(event.currentTarget).after(loader);
             $.ajax({
                 type: "POST",
                 headers: OctoPrint.getRequestHeaders(),
@@ -112,11 +115,14 @@ $(function() {
             }).fail(function(jqXHR, status, error) {
                 self.showError(gettext("Core install failed"), jqXHR.responseJSON);
             }).always(function() {
-                $(event.currentTarget).button("reset");
+                loader.remove();
+                $(event.currentTarget).show();
             });
         };
         self.uninstallCore = function(data, event) {
-            $(event.currentTarget).button("loading");
+            $(event.currentTarget).hide();
+            var loader = $("<div>").addClass("loader").addClass("loader-centered").addClass("loader-uninstall");
+            $(event.currentTarget).after(loader);
             $.ajax({
                 type: "POST",
                 headers: OctoPrint.getRequestHeaders(),
@@ -130,7 +136,8 @@ $(function() {
             }).fail(function(jqXHR, status, error) {
                 self.showError(gettext("Core uninstall failed"), jqXHR.responseJSON);
             }).always(function() {
-                $(event.currentTarget).button("reset");
+                loader.remove();
+                $(event.currentTarget).show();
             });
         };
         self.searchLib = function(form) {
@@ -153,7 +160,9 @@ $(function() {
             });
         };
         self.installLib = function(data, event) {
-            $(event.currentTarget).button("loading");
+            $(event.currentTarget).hide();
+            var loader = $("<div>").addClass("loader").addClass("loader-centered").addClass("loader-install");
+            $(event.currentTarget).after(loader);
             $.ajax({
                 type: "POST",
                 headers: OctoPrint.getRequestHeaders(),
@@ -166,11 +175,14 @@ $(function() {
             }).fail(function(jqXHR, status, error) {
                 self.showError(gettext("Lib install failed"), jqXHR.responseJSON);
             }).always(function() {
-                $(event.currentTarget).button("reset");
+                loader.remove();
+                $(event.currentTarget).show();
             });
         };
         self.uninstallLib =  function(data, event) {
-            $(event.currentTarget).button("loading");
+            $(event.currentTarget).hide();
+            var loader = $("<div>").addClass("loader").addClass("loader-centered").addClass("loader-uninstall");
+            $(event.currentTarget).after(loader);
             $.ajax({
                 type: "POST",
                 headers: OctoPrint.getRequestHeaders(),
@@ -183,7 +195,8 @@ $(function() {
             }).fail(function(jqXHR, status, error) {
                 self.showError(gettext("Lib uninstall failed"), jqXHR.responseJSON);
             }).always(function() {
-                $(event.currentTarget).button("reset");
+                loader.remove();
+                $(event.currentTarget).show();
             });
         };
         self.loadBoardList = function() {
@@ -226,6 +239,7 @@ $(function() {
             self.boardOptions([]);
             self.flashButtonEnabled(false);
             if (newValue) {
+                self.boardOptionsLoading(true);
                 $.ajax({
                     type: "GET",
                     headers: OctoPrint.getRequestHeaders(),
@@ -240,6 +254,8 @@ $(function() {
                     self.flashButtonEnabled(true);
                 }).fail(function(jqXHR, status, error) {
                     self.showError(gettext("Board option fetch failed"), jqXHR.responseJSON);
+                }).always(function() {
+                    self.boardOptionsLoading(false);
                 });
             }
         });
