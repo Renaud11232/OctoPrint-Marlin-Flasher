@@ -88,7 +88,6 @@ class PlatformIOFlasher(BaseFlasher):
 				return None, dict(
 					error=gettext("The printer is not connected through a Serial port and thus, cannot be flashed.")
 				)
-			flash_port = transport.port
 			_, port, baudrate, profile = self._printer.get_current_connection()
 			self._printer.disconnect()
 			self.__exec(["run", "-d", self._firmware, "-t", "upload"])
