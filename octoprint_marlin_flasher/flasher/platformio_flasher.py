@@ -91,7 +91,7 @@ class PlatformIOFlasher(BaseFlasher):
 			flash_port = transport.port
 			_, port, baudrate, profile = self._printer.get_current_connection()
 			self._printer.disconnect()
-			self.__exec(["run", "-d", self._firmware, "-t", "upload", "--upload-port", flash_port])
+			self.__exec(["run", "-d", self._firmware, "-t", "upload"])
 			self._printer.connect(port, baudrate, profile)
 			self._firmware = None
 			self._plugin_manager.send_plugin_message(self._identifier, dict(
