@@ -3,6 +3,7 @@ import zipfile
 import re
 import os
 import shutil
+from threading import Thread
 import serial
 import flask
 from flask_babel import gettext
@@ -183,6 +184,14 @@ class ArduinoFlasher(BaseFlasher):
 		fqbn = flask.request.values["fqbn"]
 		if options:
 			fqbn = "%s:%s" % (fqbn, options)
+		thread = Thread(target=self.__background_flash, args=(fqbn,))
+		thread.setDaemon(True)
+		thread.start()
+		return dict(
+			message=gettext("Flash process started.")
+		), None
+
+	def __background_flash(self, fqbn):
 		try:
 			arduino = self.__get_arduino()
 			if self.__is_ino:
@@ -205,9 +214,12 @@ class ArduinoFlasher(BaseFlasher):
 				))
 			transport = self._printer.get_transport()
 			if not isinstance(transport, serial.Serial):
-				return None, dict(
+				self._plugin_manager.send_plugin_message(self._identifier, dict(
+					type="flash_result",
+					success=False,
 					error=gettext("The printer is not connected through a Serial port and thus, cannot be flashed.")
-				)
+				))
+				return
 			flash_port = transport.port
 			_, port, baudrate, profile = self._printer.get_current_connection()
 			self._printer.disconnect()
@@ -222,8 +234,15 @@ class ArduinoFlasher(BaseFlasher):
 				step=gettext("Done"),
 				progress=100
 			))
-			return dict(
+			self._plugin_manager.send_plugin_message(self._identifier, dict(
+				type="flash_result",
+				success=True,
 				message=gettext("Board successfully flashed.")
-			), None
+			))
 		except pyduinocli.ArduinoError as e:
-			return None, self.__error_to_dict(e)
+			error = self.__error_to_dict(e)
+			error.update(dict(
+				type="flash_result",
+				success=False
+			))
+			self._plugin_manager.send_plugin_message(self._identifier, error)

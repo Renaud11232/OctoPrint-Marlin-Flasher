@@ -4,6 +4,7 @@ from subprocess import Popen, PIPE
 import zipfile
 import os
 import shutil
+from threading import Thread
 import serial
 import flask
 from flask_babel import gettext
@@ -71,6 +72,14 @@ class PlatformIOFlasher(BaseFlasher):
 			return None, dict(
 				error=gettext("The printer may not be connected or it may be busy.")
 			)
+		thread = Thread(target=self.__background_flash)
+		thread.setDaemon(True)
+		thread.start()
+		return dict(
+			message=gettext("Flash process started.")
+		), None
+
+	def __background_flash(self):
 		try:
 			self._plugin_manager.send_plugin_message(self._identifier, dict(
 				type="flash_progress",
@@ -85,9 +94,12 @@ class PlatformIOFlasher(BaseFlasher):
 			))
 			transport = self._printer.get_transport()
 			if not isinstance(transport, serial.Serial):
-				return None, dict(
+				self._plugin_manager.send_plugin_message(self._identifier, dict(
+					type="flash_result",
+					success=False,
 					error=gettext("The printer is not connected through a Serial port and thus, cannot be flashed.")
-				)
+				))
+				return
 			_, port, baudrate, profile = self._printer.get_current_connection()
 			self._printer.disconnect()
 			self.__exec(["run", "-d", self._firmware, "-t", "upload"])
@@ -98,11 +110,15 @@ class PlatformIOFlasher(BaseFlasher):
 				step=gettext("Done"),
 				progress=100
 			))
-			return dict(
+			self._plugin_manager.send_plugin_message(self._identifier, dict(
+				type="flash_result",
+				success=True,
 				message=gettext("Board successfully flashed.")
-			), None
+			))
 		except FlasherError as e:
-			return None, dict(
+			self._plugin_manager.send_plugin_message(self._identifier, dict(
+				type="flash_result",
+				success=False,
 				error=gettext("The flashing process failed"),
 				stderr=e.message
-			)
+			))

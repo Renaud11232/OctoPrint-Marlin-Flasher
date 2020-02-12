@@ -224,13 +224,8 @@ $(function() {
                 headers: OctoPrint.getRequestHeaders(),
                 url: "/plugin/marlin_flasher/flash",
                 data: $(form).serialize()
-            }).done(function (data) {
-                self.showSuccess(gettext("Flashing successful"), data.message);
             }).fail(function(jqXHR, status, error) {
-                self.showError(gettext("Flashing failed"), jqXHR.responseJSON);
-                self.progressStep(null);
-                self.flashingProgress(0);
-            }).always(function() {
+                self.showError(gettext("Flashing failed to start"), jqXHR.responseJSON);
                 self.arduinoFlashButton.button("reset");
                 self.platformioFlashButton.button("reset");
             });
@@ -269,6 +264,16 @@ $(function() {
                     self.flashingProgress(message.progress);
                 } else if(message.type === "settings_saved") {
                     self.loadBoardList();
+                } else if(message.type === "flash_result") {
+                    if(message.success) {
+                        self.showSuccess(gettext("Flashing successful"), message.message);
+                    } else {
+                        self.showError(gettext("Flashing failed"), message);
+                        self.progressStep(null);
+                        self.flashingProgress(0);
+                    }
+                    self.arduinoFlashButton.button("reset");
+                    self.platformioFlashButton.button("reset");
                 }
             }
         };
