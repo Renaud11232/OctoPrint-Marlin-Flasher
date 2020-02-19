@@ -94,20 +94,26 @@ class PlatformIOFlasher(BaseFlasher):
 			return None, dict(
 				error=gettext("The printer may not be connected or it may be busy.")
 			)
-		thread = Thread(target=self.__background_flash)
+		env = None
+		if "env" in flask.request.values and flask.request.values["env"]:
+			env = flask.request.values["env"]
+		thread = Thread(target=self.__background_flash, args=(env,))
 		thread.start()
 		return dict(
 			message=gettext("Flash process started.")
 		), None
 
-	def __background_flash(self):
+	def __background_flash(self, env):
 		try:
 			self._plugin_manager.send_plugin_message(self._identifier, dict(
 				type="flash_progress",
 				step=gettext("Compiling"),
 				progress=0
 			))
-			self.__exec(["run", "-d", self._firmware])
+			pio_args = ["run", "-d", self._firmware]
+			if env:
+				pio_args.extend(["-e", env])
+			self.__exec(pio_args)
 			self._plugin_manager.send_plugin_message(self._identifier, dict(
 				type="flash_progress",
 				step=gettext("Uploading"),
@@ -123,7 +129,8 @@ class PlatformIOFlasher(BaseFlasher):
 				return
 			_, port, baudrate, profile = self._printer.get_current_connection()
 			self._printer.disconnect()
-			self.__exec(["run", "-d", self._firmware, "-t", "upload"])
+			pio_args.extend(["-t", "upload"])
+			self.__exec(pio_args)
 			self._printer.connect(port, baudrate, profile)
 			self._firmware = None
 			self._plugin_manager.send_plugin_message(self._identifier, dict(
