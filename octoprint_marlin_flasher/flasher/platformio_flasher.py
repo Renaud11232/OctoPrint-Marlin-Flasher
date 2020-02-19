@@ -66,9 +66,7 @@ class PlatformIOFlasher(BaseFlasher):
 
 	def board_details(self):
 		if self._firmware is None:
-			return None, dict(
-				error=gettext("You did not upload the firmware or it got reset by the previous flash process.")
-			)
+			return [], None
 		try:
 			with open(os.path.join(self._firmware, "Marlin", "Configuration.h"), "r") as configuration_h:
 				configuration_h_content = configuration_h.read()

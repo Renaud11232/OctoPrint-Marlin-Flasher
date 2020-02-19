@@ -8,8 +8,17 @@
         <div class="accordion-inner">
             <form class="form-horizontal" data-bind="submit: flash">
                 <div class="control-group">
+                    <label class="control-label" for="env">{{ _('Environment') }}</label>
                     <div class="controls">
-                        <button id="platformio_flash-button" class="btn btn-warning" type="submit" data-loading-text="{{ _('Flashing...') }}" ><i class="icon-warning-sign"></i> {{ _('Flash') }}</button>
+                        <select id="env" name="env" data-bind="options: envList,
+                                                               optionsCaption: gettext('PlatformIO default env'),
+                                                               value: selectedEnv"></select>
+                    </div>
+                </div>
+                <div class="control-group">
+                    <div class="controls">
+                        <button id="platformio_flash-button" class="btn btn-warning" type="submit" data-loading-text="{{ _('Flashing...') }}" data-bind="visible: !envListLoading()" ><i class="icon-warning-sign"></i> {{ _('Flash') }}</button>
+                        <div class="loader loader-options" data-bind="visible: envListLoading"></div>
                     </div>
                 </div>
                 <span data-bind="text: progressStep"></span>

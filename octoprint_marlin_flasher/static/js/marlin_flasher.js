@@ -15,6 +15,9 @@ $(function() {
         self.libSearchResult = ko.observableArray();
         self.boardList = ko.observableArray();
         self.selectedBoard = ko.observable();
+        self.envList = ko.observableArray([]);
+        self.selectedEnv = ko.observable();
+        self.envListLoading = ko.observable(false);
         self.boardOptions = ko.observableArray();
         self.stderr = ko.observable();
         self.uploadProgress = ko.observable(0);
@@ -59,6 +62,7 @@ $(function() {
             done: function(e, data) {
                 self.showSuccess(gettext("Firmware upload successful"), data.result.file);
                 self.uploadProgress(0);
+                self.loadEnvList();
             },
             error: function(jqXHR, status, error) {
                 if(error === "") {
@@ -216,6 +220,26 @@ $(function() {
                 });
             }
         };
+        self.loadEnvList = function() {
+            if(self.loginStateViewModel.isAdmin() && self.settingsViewModel.settings.plugins.marlin_flasher.platform_type() == "platform_io") {
+                self.envList([]);
+                self.envListLoading(true);
+                $.ajax({
+                    type: "GET",
+                    headers: OctoPrint.getRequestHeaders(),
+                    url: "/plugin/marlin_flasher/board/details",
+                }).done(function (data) {
+                    if(data) {
+                        self.envList(data);
+                        if(data.length === 1) {
+                            self.selectedEnv(data[0]);
+                        }
+                    }
+                }).always(function() {
+                    self.envListLoading(false);
+                });
+            }
+        };
         self.flash = function(form) {
             self.arduinoFlashButton.button("loading");
             self.platformioFlashButton.button("loading");
@@ -256,6 +280,7 @@ $(function() {
         });
         self.onAllBound = function(viewModels) {
             self.loadBoardList();
+            self.loadEnvList();
         };
         self.onDataUpdaterPluginMessage = function(plugin, message) {
             if(plugin == "marlin_flasher") {
@@ -264,6 +289,7 @@ $(function() {
                     self.flashingProgress(message.progress);
                 } else if(message.type === "settings_saved") {
                     self.loadBoardList();
+                    self.loadEnvList();
                 } else if(message.type === "flash_result") {
                     if(message.success) {
                         self.showSuccess(gettext("Flashing successful"), message.message);
