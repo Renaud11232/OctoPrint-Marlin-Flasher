@@ -34,7 +34,7 @@ class PlatformIOValidator(BaseValidator):
 		return platformio.PlatformIOUnsupportedSchema().validate(flask.request.values)
 
 	def validate_board_details(self):
-		return platformio.PlatformIOUnsupportedSchema().validate(flask.request.values)
+		return None
 
 	def validate_flash(self):
 		return Schema().validate(flask.request.values)

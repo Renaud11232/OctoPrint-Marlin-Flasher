@@ -4,6 +4,7 @@ from subprocess import Popen, PIPE
 import zipfile
 import os
 import shutil
+import re
 from threading import Thread
 import serial
 import flask
@@ -62,6 +63,29 @@ class PlatformIOFlasher(BaseFlasher):
 			return None, dict(
 				error=gettext("No Platform.io configuration file were found in the given file.")
 			)
+
+	def board_details(self):
+		if self._firmware is None:
+			return None, dict(
+				error=gettext("You did not upload the firmware or it got reset by the previous flash process.")
+			)
+		try:
+			with open(os.path.join(self._firmware, "Marlin", "Configuration.h"), "r") as configuration_h:
+				configuration_h_content = configuration_h.read()
+				match = re.search(r"^ *#define +MOTHERBOARD +(.*?) *$", configuration_h_content, re.MULTILINE)
+				if not match:
+					return [], None
+				# Removes the BOARD_ part of the name
+				motherboard = match.group(1)[6:]
+				with open(os.path.join(self._firmware, "Marlin", "src", "pins", "pins.h"), "r") as pins_h:
+					pins_h_content = pins_h.read()
+					match = re.search(r"^ *#(el|)if +MB\(%s\) *(\r\n|\n) *.*? +(env:.*?) *$" % motherboard, pins_h_content, re.MULTILINE)
+					if not match:
+						return [], None
+					envs = [env.split(":")[1] for env in match.group(3).split(" ") if env.startswith("env:")]
+					return envs, None
+		except OSError as _:
+			return [], None
 
 	def flash(self):
 		if self._firmware is None:
