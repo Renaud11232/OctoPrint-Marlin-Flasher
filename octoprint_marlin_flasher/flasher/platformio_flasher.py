@@ -97,7 +97,6 @@ class PlatformIOFlasher(BaseFlasher):
 				error=gettext("The printer may not be connected or it may be busy.")
 			)
 		thread = Thread(target=self.__background_flash)
-		thread.setDaemon(True)
 		thread.start()
 		return dict(
 			message=gettext("Flash process started.")

@@ -185,7 +185,6 @@ class ArduinoFlasher(BaseFlasher):
 		if options:
 			fqbn = "%s:%s" % (fqbn, options)
 		thread = Thread(target=self.__background_flash, args=(fqbn,))
-		thread.setDaemon(True)
 		thread.start()
 		return dict(
 			message=gettext("Flash process started.")
