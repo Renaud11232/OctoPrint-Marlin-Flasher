@@ -77,12 +77,13 @@ class PlatformIOFlasher(BaseFlasher):
 				motherboard = match.group(1)[6:]
 				with open(os.path.join(self._firmware, "Marlin", "src", "pins", "pins.h"), "r") as pins_h:
 					pins_h_content = pins_h.read()
-					match = re.search(r"^ *#(el|)if +MB\(%s\) *(\r\n|\n) *.*? +(env:.*?) *$" % motherboard, pins_h_content, re.MULTILINE)
+					match = re.search(r"^ *#(el|)if +MB\(%s\) *(\r\n|\n).*?(env:.*?) *$" % motherboard, pins_h_content, re.MULTILINE)
 					if not match:
 						return [], None
 					envs = [env.split(":")[1] for env in match.group(3).split(" ") if env.startswith("env:")]
 					return envs, None
 		except OSError as _:
+			# Files are not where they should, maybe it's not Marlin... No env found, the user will select the default one
 			return [], None
 
 	def flash(self):
