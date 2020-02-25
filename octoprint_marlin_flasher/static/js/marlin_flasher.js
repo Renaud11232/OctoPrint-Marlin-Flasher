@@ -25,6 +25,7 @@ $(function() {
         self.progressStep = ko.observable();
         self.flashButtonEnabled = ko.observable(false);
         self.boardOptionsLoading = ko.observable(false);
+        self.uploadTime = ko.observable();
 
         self.showError = function(title, errorData) {
             var text = "";
@@ -63,6 +64,7 @@ $(function() {
                 self.showSuccess(gettext("Firmware upload successful"), data.result.file);
                 self.uploadProgress(0);
                 self.loadEnvList();
+                self.loadUploadTime();
             },
             error: function(jqXHR, status, error) {
                 if(error === "") {
@@ -87,6 +89,19 @@ $(function() {
 
         self.arduinoFirmwareFileButton.fileupload(self.fileUploadParams);
         self.platformioFirmwareFileButton.fileupload(self.fileUploadParams);
+
+        self.loadUploadTime = function() {
+            $.ajax({
+                type: "GET",
+                headers: OctoPrint.getRequestHeaders(),
+                url: "/plugin/marlin_flasher/firmware"
+            }).done(function(data) {
+                self.uploadTime(data.upload_time);
+            }).fail(function(jqXHR, status, error) {
+                self.showError(gettext("Upload time fetch failed"), jqXHR.responseJSON);
+            });
+        };
+
         self.searchCore = function(form) {
             self.searchCoreButton.button("loading");
             $.ajax({
@@ -281,6 +296,7 @@ $(function() {
         self.onAllBound = function(viewModels) {
             self.loadBoardList();
             self.loadEnvList();
+            self.loadUploadTime();
         };
         self.onDataUpdaterPluginMessage = function(plugin, message) {
             if(plugin == "marlin_flasher") {
@@ -290,6 +306,7 @@ $(function() {
                 } else if(message.type === "settings_saved") {
                     self.loadBoardList();
                     self.loadEnvList();
+                    self.loadUploadTime();
                 } else if(message.type === "flash_result") {
                     if(message.success) {
                         self.showSuccess(gettext("Flashing successful"), message.message);
@@ -300,6 +317,7 @@ $(function() {
                     }
                     self.arduinoFlashButton.button("reset");
                     self.platformioFlashButton.button("reset");
+                    self.loadUploadTime();
                 }
             }
         };

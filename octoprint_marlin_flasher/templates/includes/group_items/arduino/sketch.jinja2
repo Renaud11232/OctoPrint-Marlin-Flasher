@@ -3,6 +3,7 @@
         <a class="accordion-toggle" data-toggle="collapse" data-parent="#marlin_flasher_arduino_accordion" href="#sketch">
             {{ _('Sketch') }}
         </a>
+        (<span data-bind="text: uploadTime() ? uploadTime() : gettext('Not uploaded')"></span>)
     </div>
     <div id="sketch" class="accordion-body collapse in">
         <div class="accordion-inner">

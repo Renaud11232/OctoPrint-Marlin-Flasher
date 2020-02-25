@@ -104,7 +104,7 @@ class MarlinFlasherPlugin(octoprint.plugin.StartupPlugin,
 	@octoprint.plugin.BlueprintPlugin.route("/firmware", methods=["GET"])
 	@restricted_access
 	@admin_permission.require(403)
-	def upload_firmware(self):
+	def firmware(self):
 		errors = self.__validator.validate_firmware()
 		if errors:
 			return flask.make_response(flask.jsonify(errors), 400)
