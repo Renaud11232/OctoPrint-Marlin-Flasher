@@ -12,6 +12,9 @@ class ArduinoValidator(BaseValidator):
 		}
 		return type("_ArduinoUploadSchema", (Schema,), request_fields)().validate(flask.request.values)
 
+	def validate_firmware(self):
+		return None
+
 	def validate_core_search(self):
 		request_fields = {
 			"query": fields.Str(required=False)

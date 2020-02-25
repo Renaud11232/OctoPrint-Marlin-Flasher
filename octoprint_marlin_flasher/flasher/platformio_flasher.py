@@ -6,6 +6,7 @@ import os
 import shutil
 import re
 from threading import Thread
+from datetime import datetime
 import serial
 import flask
 from flask_babel import gettext
@@ -56,6 +57,7 @@ class PlatformIOFlasher(BaseFlasher):
 				for f in files:
 					if f == "platformio.ini":
 						self._firmware = root
+						self._firmware_upload_time = datetime.now()
 						return dict(
 							path=root,
 							file=f
@@ -63,6 +65,12 @@ class PlatformIOFlasher(BaseFlasher):
 			return None, dict(
 				error=gettext("No Platform.io configuration file were found in the given file.")
 			)
+
+	def firmware(self):
+		return dict(
+			firmware=self._firmware,
+			upload_time=self._firmware_upload_time
+		), None
 
 	def board_details(self):
 		if self._firmware is None:
@@ -134,6 +142,7 @@ class PlatformIOFlasher(BaseFlasher):
 			self.__exec(pio_args)
 			self._printer.connect(port, baudrate, profile)
 			self._firmware = None
+			self._firmware_upload_time = None
 			self._plugin_manager.send_plugin_message(self._identifier, dict(
 				type="flash_progress",
 				step=gettext("Done"),

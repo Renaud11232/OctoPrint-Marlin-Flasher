@@ -7,7 +7,6 @@ from .platform_type import PlatformType
 class MarlinFlasher:
 
 	def __init__(self, settings, printer, plugin, plugin_manager, identifier):
-		self.__firmware = None
 		self.__settings = settings
 		self.__arduino_flasher = ArduinoFlasher(settings, printer, plugin, plugin_manager, identifier)
 		self.__platformio_flasher = PlatformIOFlasher(settings, printer, plugin, plugin_manager, identifier)
@@ -34,6 +33,9 @@ class MarlinFlasher:
 
 	def upload(self):
 		return self.__get_implementation().upload()
+
+	def firmware(self):
+		return self.__get_implementation().firmware()
 
 	def core_search(self):
 		impl = self.__get_implementation()

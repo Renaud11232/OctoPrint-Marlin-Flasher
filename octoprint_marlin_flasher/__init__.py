@@ -101,6 +101,18 @@ class MarlinFlasherPlugin(octoprint.plugin.StartupPlugin,
 			return flask.make_response(flask.jsonify(errors), 400)
 		return flask.make_response(flask.jsonify(result), 200)
 
+	@octoprint.plugin.BlueprintPlugin.route("/firmware", methods=["GET"])
+	@restricted_access
+	@admin_permission.require(403)
+	def upload_firmware(self):
+		errors = self.__validator.validate_firmware()
+		if errors:
+			return flask.make_response(flask.jsonify(errors), 400)
+		result, errors = self.__flasher.firmware()
+		if errors:
+			return flask.make_response(flask.jsonify(errors), 400)
+		return flask.make_response(flask.jsonify(result), 200)
+
 	@octoprint.plugin.BlueprintPlugin.route("/cores/search", methods=["GET"])
 	@restricted_access
 	@admin_permission.require(403)

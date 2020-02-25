@@ -10,11 +10,15 @@ class BaseFlasher:
 		self._plugin_manager = plugin_manager
 		self._identifier = identifier
 		self._firmware = None
+		self._firmware_upload_time = None
 
 	def check_setup_errors(self):
 		raise FlasherError("Unsupported function call.")
 
 	def upload(self):
+		raise FlasherError("Unsupported function call.")
+
+	def firmware(self):
 		raise FlasherError("Unsupported function call.")
 
 	def core_search(self):

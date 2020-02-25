@@ -12,6 +12,9 @@ class PlatformIOValidator(BaseValidator):
 		}
 		return type("_PlatformIOUploadSchema", (Schema,), request_fields)().validate(flask.request.values)
 
+	def validate_firmware(self):
+		return None
+
 	def validate_core_search(self):
 		return platformio.PlatformIOUnsupportedSchema().validate(flask.request.values)
 

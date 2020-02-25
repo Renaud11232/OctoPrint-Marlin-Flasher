@@ -12,6 +12,9 @@ class UnsupportedPlatformValidator(BaseValidator):
 	def validate_upload(self):
 		return self.__schema.validate(flask.request.values)
 
+	def validate_firmware(self):
+		return self.__schema.validate(flask.request.values)
+
 	def validate_core_search(self):
 		return self.__schema.validate(flask.request.values)
 

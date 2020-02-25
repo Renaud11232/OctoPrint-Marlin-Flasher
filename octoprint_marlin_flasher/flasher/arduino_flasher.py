@@ -4,6 +4,7 @@ import re
 import os
 import shutil
 from threading import Thread
+from datetime import datetime
 import serial
 import flask
 from flask_babel import gettext
@@ -75,6 +76,7 @@ class ArduinoFlasher(BaseFlasher):
 					for f in files:
 						if f == self._settings.get_arduino_sketch_ino():
 							self._firmware = root
+							self._firmware_upload_time = datetime.now()
 							return dict(
 								path=root,
 								file=f
@@ -90,6 +92,12 @@ class ArduinoFlasher(BaseFlasher):
 				path=self._plugin.get_plugin_data_folder(),
 				file="firmware.hex"
 			), None
+
+	def firmware(self):
+		return dict(
+			firmware=self._firmware,
+			upload_time=self._firmware_upload_time
+		), None
 
 	def core_search(self):
 		try:
@@ -228,6 +236,7 @@ class ArduinoFlasher(BaseFlasher):
 				arduino.upload(fqbn=fqbn, port=flash_port, input=self._firmware)
 			self._printer.connect(port, baudrate, profile)
 			self._firmware = None
+			self._firmware_upload_time = None
 			self._plugin_manager.send_plugin_message(self._identifier, dict(
 				type="flash_progress",
 				step=gettext("Done"),
