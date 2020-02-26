@@ -260,19 +260,17 @@ $(function() {
                         if(data.length === 1) {
                             self.selectedEnv(data[0]);
                         }
-                        if(data.length > 0) {
-                            $.ajax({
-                                type: "GET",
-                                headers: OctoPrint.getRequestHeaders(),
-                                url: "/plugin/marlin_flasher/last_flash_options",
-                            }).done(function (data) {
-                                if(data) {
-                                    self.lastFlashOptions = data;
-                                    self.selectedEnv(data.env);
-                                }
-                            });
-                        }
                     }
+                    $.ajax({
+                        type: "GET",
+                        headers: OctoPrint.getRequestHeaders(),
+                        url: "/plugin/marlin_flasher/last_flash_options",
+                    }).done(function (data) {
+                        if(data) {
+                            self.lastFlashOptions = data;
+                            self.selectedEnv(data.env);
+                        }
+                    });
                 }).always(function() {
                     self.envListLoading(false);
                 });
