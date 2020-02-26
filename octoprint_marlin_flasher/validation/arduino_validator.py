@@ -13,7 +13,7 @@ class ArduinoValidator(BaseValidator):
 		return type("_ArduinoUploadSchema", (Schema,), request_fields)().validate(flask.request.values)
 
 	def validate_firmware(self):
-		return None
+		return Schema().validate(flask.request.values)
 
 	def validate_core_search(self):
 		request_fields = {
@@ -65,3 +65,6 @@ class ArduinoValidator(BaseValidator):
 			"fqbn": fields.Str(required=True)
 		}
 		return type("_ArduinoFlashSchema", (Schema,), request_fields)().validate(flask.request.values)
+
+	def validate_last_flash_options(self):
+		return Schema().validate(flask.request.values)

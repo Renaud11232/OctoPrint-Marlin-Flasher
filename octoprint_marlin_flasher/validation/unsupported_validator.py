@@ -41,3 +41,6 @@ class UnsupportedPlatformValidator(BaseValidator):
 
 	def validate_flash(self):
 		return self.__schema.validate(flask.request.values)
+
+	def validate_last_flash_options(self):
+		return self.__schema.validate(flask.request.values)

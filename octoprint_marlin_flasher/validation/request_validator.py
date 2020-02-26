@@ -53,3 +53,6 @@ class RequestValidator:
 
 	def validate_flash(self):
 		return self.__get_implementation().validate_flash()
+
+	def validate_last_flash_options(self):
+		return self.__get_implementation().validate_last_flash_options()

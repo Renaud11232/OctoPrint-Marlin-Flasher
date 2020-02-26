@@ -32,10 +32,12 @@ class MarlinFlasher:
 		return self.__get_implementation().check_setup_errors()
 
 	def upload(self):
-		return self.__get_implementation().upload()
+		impl = self.__get_implementation()
+		return self.__run_after_check(impl, impl.upload)
 
 	def firmware(self):
-		return self.__get_implementation().firmware()
+		impl = self.__get_implementation()
+		return self.__run_after_check(impl, impl.firmware)
 
 	def core_search(self):
 		impl = self.__get_implementation()
@@ -72,3 +74,7 @@ class MarlinFlasher:
 	def flash(self):
 		impl = self.__get_implementation()
 		return self.__run_after_check(impl, impl.flash)
+
+	def last_flash_options(self):
+		impl = self.__get_implementation()
+		return self.__run_after_check(impl, impl.last_flash_options)

@@ -221,6 +221,18 @@ class MarlinFlasherPlugin(octoprint.plugin.StartupPlugin,
 			return flask.make_response(flask.jsonify(errors), 400)
 		return flask.make_response(flask.jsonify(result), 200)
 
+	@octoprint.plugin.BlueprintPlugin.route("/last_flash_options", methods=["GET"])
+	@restricted_access
+	@admin_permission.require(403)
+	def last_flash_options(self):
+		errors = self.__validator.validate_last_flash_options()
+		if errors:
+			return flask.make_response(flask.jsonify(errors), 400)
+		result, errors = self.__flasher.last_flash_options()
+		if errors:
+			return flask.make_response(flask.jsonify(errors), 400)
+		return flask.make_response(flask.jsonify(result), 200)
+
 	def get_update_information(self):
 		return dict(
 			marlin_flasher=dict(

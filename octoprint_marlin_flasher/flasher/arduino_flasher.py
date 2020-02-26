@@ -3,6 +3,7 @@ import zipfile
 import re
 import os
 import shutil
+import json
 from threading import Thread
 from datetime import datetime
 import serial
@@ -194,6 +195,11 @@ class ArduinoFlasher(BaseFlasher):
 			fqbn = "%s:%s" % (fqbn, options)
 		thread = Thread(target=self.__background_flash, args=(fqbn,))
 		thread.start()
+		try:
+			with open(os.path.join(self._plugin.get_plugin_data_folder(), "last_options_arduino.json"), "w") as output:
+				json.dump(flask.request.values, output)
+		except (OSError, IOError) as _:
+			pass
 		return dict(
 			message=gettext("Flash process started.")
 		), None
@@ -254,3 +260,10 @@ class ArduinoFlasher(BaseFlasher):
 				success=False
 			))
 			self._plugin_manager.send_plugin_message(self._identifier, error)
+
+	def last_flash_options(self):
+		try:
+			with open(os.path.join(self._plugin.get_plugin_data_folder(), "last_options_arduino.json"), "r") as jsonfile:
+				return json.load(jsonfile), None
+		except (OSError, IOError) as _:
+			return dict(), None

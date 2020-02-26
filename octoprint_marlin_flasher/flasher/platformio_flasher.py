@@ -5,6 +5,7 @@ import zipfile
 import os
 import shutil
 import re
+import json
 from threading import Thread
 from datetime import datetime
 import serial
@@ -90,7 +91,7 @@ class PlatformIOFlasher(BaseFlasher):
 						return [], None
 					envs = [env.split(":")[1] for env in match.group(3).split(" ") if env.startswith("env:")]
 					return envs, None
-		except OSError as _:
+		except (OSError, IOError) as _:
 			# Files are not where they should, maybe it's not Marlin... No env found, the user will select the default one
 			return [], None
 
@@ -108,6 +109,11 @@ class PlatformIOFlasher(BaseFlasher):
 			env = flask.request.values["env"]
 		thread = Thread(target=self.__background_flash, args=(env,))
 		thread.start()
+		try:
+			with open(os.path.join(self._plugin.get_plugin_data_folder(), "last_options_platformio.json"), "w") as output:
+				json.dump(flask.request.values, output)
+		except (OSError, IOError) as _:
+			pass
 		return dict(
 			message=gettext("Flash process started.")
 		), None
@@ -160,3 +166,10 @@ class PlatformIOFlasher(BaseFlasher):
 				error=gettext("The flashing process failed"),
 				stderr=e.message
 			))
+
+	def last_flash_options(self):
+		try:
+			with open(os.path.join(self._plugin.get_plugin_data_folder(), "last_options_platformio.json"), "r") as jsonfile:
+				return json.load(jsonfile), None
+		except (OSError, IOError) as _:
+			return dict(), None

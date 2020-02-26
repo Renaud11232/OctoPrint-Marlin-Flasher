@@ -13,7 +13,7 @@ class PlatformIOValidator(BaseValidator):
 		return type("_PlatformIOUploadSchema", (Schema,), request_fields)().validate(flask.request.values)
 
 	def validate_firmware(self):
-		return None
+		return Schema().validate(flask.request.values)
 
 	def validate_core_search(self):
 		return platformio.PlatformIOUnsupportedSchema().validate(flask.request.values)
@@ -37,7 +37,13 @@ class PlatformIOValidator(BaseValidator):
 		return platformio.PlatformIOUnsupportedSchema().validate(flask.request.values)
 
 	def validate_board_details(self):
-		return None
+		return Schema().validate(flask.request.values)
 
 	def validate_flash(self):
+		request_fields = {
+			"env": fields.Str(required=False)
+		}
+		return type("_PlatformIOFlashSchema", (Schema,), request_fields)().validate(flask.request.values)
+
+	def validate_last_flash_options(self):
 		return Schema().validate(flask.request.values)

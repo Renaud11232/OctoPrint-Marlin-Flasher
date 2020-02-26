@@ -47,3 +47,6 @@ class BaseFlasher:
 
 	def flash(self):
 		raise FlasherError("Unsupported function call.")
+
+	def last_flash_options(self):
+		raise FlasherError("Unsupported function call.")

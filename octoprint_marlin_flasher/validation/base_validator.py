@@ -38,3 +38,6 @@ class BaseValidator:
 
 	def validate_flash(self):
 		raise ValidatorError("Unsupported function call.")
+
+	def validate_last_flash_options(self):
+		raise ValidatorError("Unsupported function call.")
