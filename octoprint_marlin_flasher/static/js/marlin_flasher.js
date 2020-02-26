@@ -26,7 +26,6 @@ $(function() {
         self.flashButtonEnabled = ko.observable(false);
         self.boardOptionsLoading = ko.observable(false);
         self.uploadTime = ko.observable();
-        self.shouldLoadPreviousOptions = true;
         self.lastFlashOptions = null;
 
         self.showError = function(title, errorData) {
@@ -232,18 +231,16 @@ $(function() {
                     } else {
                         self.boardList([]);
                     }
-                    if(self.shouldLoadPreviousOptions) {
-                        $.ajax({
-                            type: "GET",
-                            headers: OctoPrint.getRequestHeaders(),
-                            url: "/plugin/marlin_flasher/last_flash_options",
-                        }).done(function (data) {
-                            if(data) {
-                                self.lastFlashOptions = data;
-                                self.selectedBoard(data.fqbn);
-                            }
-                        });
-                    }
+                    $.ajax({
+                        type: "GET",
+                        headers: OctoPrint.getRequestHeaders(),
+                        url: "/plugin/marlin_flasher/last_flash_options",
+                    }).done(function (data) {
+                        if(data) {
+                            self.lastFlashOptions = data;
+                            self.selectedBoard(data.fqbn);
+                        }
+                    });
                 }).fail(function(jqXHR, status, error) {
                     self.showError(gettext("Board list fetch failed"), jqXHR.responseJSON);
                 });
@@ -263,7 +260,7 @@ $(function() {
                         if(data.length === 1) {
                             self.selectedEnv(data[0]);
                         }
-                        if(data.length > 0 && self.shouldLoadPreviousOptions) {
+                        if(data.length > 0) {
                             $.ajax({
                                 type: "GET",
                                 headers: OctoPrint.getRequestHeaders(),
@@ -271,7 +268,6 @@ $(function() {
                             }).done(function (data) {
                                 if(data) {
                                     self.lastFlashOptions = data;
-                                    self.shouldLoadPreviousOptions = false;
                                     self.selectedEnv(data.env);
                                 }
                             });
@@ -312,13 +308,12 @@ $(function() {
                     if(data) {
                         self.boardOptions(data.config_options);
                     }
-                    if(self.shouldLoadPreviousOptions && self.lastFlashOptions) {
+                    if(self.lastFlashOptions) {
                         for(var key in self.lastFlashOptions) {
                             if(key !== "fqbn") {
                                 $("#flash form select[name=" + key + "]").val(self.lastFlashOptions[key]);
                             }
                         }
-                        self.shouldLoadPreviousOptions = false;
                         self.lastFlashOptions = null;
                     }
                     self.flashButtonEnabled(true);
@@ -340,7 +335,6 @@ $(function() {
                     self.progressStep(message.step);
                     self.flashingProgress(message.progress);
                 } else if(message.type === "settings_saved") {
-                    self.shouldLoadPreviousOptions = true;
                     self.loadBoardList();
                     self.loadEnvList();
                     self.loadUploadTime();
