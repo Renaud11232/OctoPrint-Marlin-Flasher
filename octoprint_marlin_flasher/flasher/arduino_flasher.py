@@ -64,13 +64,13 @@ class ArduinoFlasher(BaseFlasher):
 	def upload(self):
 		self._firmware = None
 		uploaded_file_path = flask.request.values["firmware_file." + self._settings.get_upload_path_suffix()]
+		firmware_dir = os.path.join(self._plugin.get_plugin_data_folder(), "firmware_arduino")
+		if os.path.exists(firmware_dir):
+			shutil.rmtree(firmware_dir)
 		try:
 			with zipfile.ZipFile(uploaded_file_path, "r") as zip_file:
 				self.__is_ino = True
-				firmware_dir = os.path.join(self._plugin.get_plugin_data_folder(), "firmware")
 				sketch_dir = os.path.join(firmware_dir, os.path.splitext(self._settings.get_arduino_sketch_ino())[0])
-				if os.path.exists(firmware_dir):
-					shutil.rmtree(firmware_dir)
 				os.makedirs(sketch_dir)
 				zip_file.extractall(sketch_dir)
 				for root, dirs, files in os.walk(sketch_dir):
@@ -87,10 +87,12 @@ class ArduinoFlasher(BaseFlasher):
 				)
 		except zipfile.BadZipfile:
 			self.__is_ino = False
-			self._firmware = os.path.join(self._plugin.get_plugin_data_folder(), "firmware.hex")
+			os.makedirs(firmware_dir)
+			self._firmware = os.path.join(firmware_dir, "firmware.hex")
+			self._firmware_upload_time = datetime.now()
 			shutil.copyfile(uploaded_file_path, self._firmware)
 			return dict(
-				path=self._plugin.get_plugin_data_folder(),
+				path=firmware_dir,
 				file="firmware.hex"
 			), None
 

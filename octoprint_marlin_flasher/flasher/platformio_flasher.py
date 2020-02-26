@@ -49,7 +49,7 @@ class PlatformIOFlasher(BaseFlasher):
 		self._firmware = None
 		uploaded_file_path = flask.request.values["firmware_file." + self._settings.get_upload_path_suffix()]
 		with zipfile.ZipFile(uploaded_file_path, "r") as zip_file:
-			firmware_dir = os.path.join(self._plugin.get_plugin_data_folder(), "firmware")
+			firmware_dir = os.path.join(self._plugin.get_plugin_data_folder(), "firmware_platformio")
 			if os.path.exists(firmware_dir):
 				shutil.rmtree(firmware_dir)
 			os.makedirs(firmware_dir)
