@@ -11,7 +11,7 @@ plugin_requires = [
 	"pyduinocli>=0.7.0,<0.8",
 	"intelhex",
 	"marshmallow<3",
-	"flask>=0.10.1,<0.11"
+	"flask>=0.10.1"
 ]
 plugin_additional_data = []
 plugin_additional_packages = []
