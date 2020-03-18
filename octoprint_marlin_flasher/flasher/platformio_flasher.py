@@ -88,13 +88,18 @@ class PlatformIOFlasher(BaseFlasher):
 				motherboard = match.group(1)[6:]
 				self._plugin._logger.info(os.path.join(self._firmware, "Marlin", "src", "pins", "pins.h"))
 				with open(os.path.join(self._firmware, "Marlin", "src", "pins", "pins.h"), "r") as pins_h:
-					pins_h_content = pins_h.read()
-					match = re.search(r"^ *#(el|)if +MB\(%s\) *(\r\n|\n).*?(env:.*?) *$" % motherboard, pins_h_content, re.MULTILINE)
+					pins_h_line = pins_h.readline()
+					while pins_h_line:
+						match = re.search(r"^ *#(el|)if +MB\(%s\) *$" % motherboard, pins_h_line)
+						if match:
+							match = re.search(r"^.*?(env:.*?) *$", pins_h.readline())
+							if match:
+								envs = [env.split(":")[1] for env in match.group(1).split(" ") if env.startswith("env:")]
+								return envs, None
+						pins_h_line = pins_h.readline()
+					# match = re.search(r"^ *#(el|)if +MB\(%s\) *(\r\n|\n).*?(env:.*?) *$" % motherboard, pins_h_content, re.MULTILINE)
 					self._plugin._logger.info(match)
-					if not match:
-						return [], None
-					envs = [env.split(":")[1] for env in match.group(3).split(" ") if env.startswith("env:")]
-					return envs, None
+					return [], None
 		except (OSError, IOError) as _:
 			# Files are not where they should, maybe it's not Marlin... No env found, the user will select the default one
 			return [], None
