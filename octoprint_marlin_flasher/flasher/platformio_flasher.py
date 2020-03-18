@@ -77,18 +77,20 @@ class PlatformIOFlasher(BaseFlasher):
 		if self._firmware is None:
 			return [], None
 		try:
+			self._plugin._logger.info(os.path.join(self._firmware, "Marlin", "Configuration.h"))
 			with open(os.path.join(self._firmware, "Marlin", "Configuration.h"), "r") as configuration_h:
 				configuration_h_content = configuration_h.read()
 				match = re.search(r"^ *#define +MOTHERBOARD +(.*?) *$", configuration_h_content, re.MULTILINE)
-				self._plugin._logger.info(match.group())
+				self._plugin._logger.info(match)
 				if not match:
 					return [], None
 				# Removes the BOARD_ part of the name
 				motherboard = match.group(1)[6:]
+				self._plugin._logger.info(os.path.join(self._firmware, "Marlin", "src", "pins", "pins.h"))
 				with open(os.path.join(self._firmware, "Marlin", "src", "pins", "pins.h"), "r") as pins_h:
 					pins_h_content = pins_h.read()
 					match = re.search(r"^ *#(el|)if +MB\(%s\) *(\r\n|\n).*?(env:.*?) *$" % motherboard, pins_h_content, re.MULTILINE)
-					self._plugin._logger.info(match.group())
+					self._plugin._logger.info(match)
 					if not match:
 						return [], None
 					envs = [env.split(":")[1] for env in match.group(3).split(" ") if env.startswith("env:")]
