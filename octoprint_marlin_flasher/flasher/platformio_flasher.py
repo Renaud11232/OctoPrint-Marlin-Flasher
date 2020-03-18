@@ -86,10 +86,12 @@ class PlatformIOFlasher(BaseFlasher):
 					return [], None
 				# Removes the BOARD_ part of the name
 				motherboard = match.group(1)[6:]
+				self._plugin._logger.info(motherboard)
 				self._plugin._logger.info(os.path.join(self._firmware, "Marlin", "src", "pins", "pins.h"))
 				with open(os.path.join(self._firmware, "Marlin", "src", "pins", "pins.h"), "r") as pins_h:
 					pins_h_line = pins_h.readline()
 					while pins_h_line:
+						self._plugin._logger.info(pins_h_line)
 						match = re.search(r"^ *#(el|)if +MB\(%s\) *$" % motherboard, pins_h_line)
 						if match:
 							self._plugin._logger.info(match.group())
