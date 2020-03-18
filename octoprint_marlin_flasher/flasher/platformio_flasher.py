@@ -80,7 +80,7 @@ class PlatformIOFlasher(BaseFlasher):
 			self._plugin._logger.info(os.path.join(self._firmware, "Marlin", "Configuration.h"))
 			with open(os.path.join(self._firmware, "Marlin", "Configuration.h"), "r") as configuration_h:
 				configuration_h_content = configuration_h.read()
-				match = re.search(r"^ *#define +MOTHERBOARD +(.*?) *$", configuration_h_content, re.MULTILINE)
+				match = re.search(r"^ *#define +MOTHERBOARD +(.*?) *(\r|)$", configuration_h_content, re.MULTILINE)
 				self._plugin._logger.info(match)
 				if not match:
 					return [], None
@@ -89,20 +89,12 @@ class PlatformIOFlasher(BaseFlasher):
 				self._plugin._logger.info(motherboard)
 				self._plugin._logger.info(os.path.join(self._firmware, "Marlin", "src", "pins", "pins.h"))
 				with open(os.path.join(self._firmware, "Marlin", "src", "pins", "pins.h"), "r") as pins_h:
-					pins_h_line = pins_h.readline()
-					while pins_h_line:
-						self._plugin._logger.info(pins_h_line)
-						match = re.search(r"^ *#(el|)if +MB\(%s\) *$" % motherboard, pins_h_line)
-						if match:
-							self._plugin._logger.info(match.group())
-							match = re.search(r"^.*?(env:.*?) *$", pins_h.readline())
-							if match:
-								self._plugin._logger.info(match.group())
-								envs = [env.split(":")[1] for env in match.group(1).split(" ") if env.startswith("env:")]
-								return envs, None
-						pins_h_line = pins_h.readline()
-					# match = re.search(r"^ *#(el|)if +MB\(%s\) *(\r\n|\n).*?(env:.*?) *$" % motherboard, pins_h_content, re.MULTILINE)
-					return [], None
+					pins_h_content = pins_h.read()
+					match = re.search(r"^ *#(el|)if +MB\(%s\) *(\r\n|\n).*?(env:.*?) *(\r|)$" % motherboard, pins_h_content, re.MULTILINE)
+					if not match:
+						return [], None
+					envs = [env.split(":")[1] for env in match.group(3).split(" ") if env.startswith("env:")]
+					return envs, None
 		except (OSError, IOError) as _:
 			# Files are not where they should, maybe it's not Marlin... No env found, the user will select the default one
 			return [], None
