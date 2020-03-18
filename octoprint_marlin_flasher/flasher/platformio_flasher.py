@@ -92,13 +92,14 @@ class PlatformIOFlasher(BaseFlasher):
 					while pins_h_line:
 						match = re.search(r"^ *#(el|)if +MB\(%s\) *$" % motherboard, pins_h_line)
 						if match:
+							self._plugin._logger.info(match.group())
 							match = re.search(r"^.*?(env:.*?) *$", pins_h.readline())
 							if match:
+								self._plugin._logger.info(match.group())
 								envs = [env.split(":")[1] for env in match.group(1).split(" ") if env.startswith("env:")]
 								return envs, None
 						pins_h_line = pins_h.readline()
 					# match = re.search(r"^ *#(el|)if +MB\(%s\) *(\r\n|\n).*?(env:.*?) *$" % motherboard, pins_h_content, re.MULTILINE)
-					self._plugin._logger.info(match)
 					return [], None
 		except (OSError, IOError) as _:
 			# Files are not where they should, maybe it's not Marlin... No env found, the user will select the default one
