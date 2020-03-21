@@ -86,7 +86,7 @@ class PlatformIOFlasher(BaseFlasher):
 				motherboard = match.group(1)[6:]
 				with open(os.path.join(self._firmware, "Marlin", "src", "pins", "pins.h"), "r") as pins_h:
 					pins_h_content = pins_h.read()
-					match = re.search(r"^[ \t]*#(el)?if[ \t]+MB\(%s\)[ \t]*\r?\n.*?(env:.*?)[ \t]*\r?$" % motherboard, pins_h_content, re.MULTILINE)
+					match = re.search(r"^[ \t]*#(el)?if[ \t]+MB\(%s\)[ \t]*\r?\n.*?(env:.*?)[ \t]*\r?$" % re.escape(motherboard), pins_h_content, re.MULTILINE)
 					if not match:
 						return [], None
 					envs = [env.split(":")[1] for env in match.group(2).split(" ") if env.startswith("env:")]
