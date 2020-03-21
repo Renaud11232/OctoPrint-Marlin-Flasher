@@ -266,7 +266,7 @@ $(function() {
                         headers: OctoPrint.getRequestHeaders(),
                         url: "/plugin/marlin_flasher/last_flash_options",
                     }).done(function (data) {
-                        if(data) {
+                        if(data && data.env) {
                             self.lastFlashOptions = data;
                             self.selectedEnv(data.env);
                         }
