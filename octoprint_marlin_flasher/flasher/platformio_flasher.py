@@ -79,17 +79,17 @@ class PlatformIOFlasher(BaseFlasher):
 		try:
 			with open(os.path.join(self._firmware, "Marlin", "Configuration.h"), "r") as configuration_h:
 				configuration_h_content = configuration_h.read()
-				match = re.search(r"^ *#define +MOTHERBOARD +(.*?) *(\r|)$", configuration_h_content, re.MULTILINE)
+				match = re.search(r"^[ \t]*#define[ \t]+MOTHERBOARD[ \t]+(\S*?)[ \t]*\r?$", configuration_h_content, re.MULTILINE)
 				if not match:
 					return [], None
 				# Removes the BOARD_ part of the name
 				motherboard = match.group(1)[6:]
 				with open(os.path.join(self._firmware, "Marlin", "src", "pins", "pins.h"), "r") as pins_h:
 					pins_h_content = pins_h.read()
-					match = re.search(r"^ *#(el|)if +MB\(%s\) *(\r\n|\n).*?(env:.*?) *(\r|)$" % motherboard, pins_h_content, re.MULTILINE)
+					match = re.search(r"^[ \t]*#(el)?if[ \t]+MB\(%s\)[ \t]*\r?\n.*?(env:.*?)[ \t]*\r?$" % motherboard, pins_h_content, re.MULTILINE)
 					if not match:
 						return [], None
-					envs = [env.split(":")[1] for env in match.group(3).split(" ") if env.startswith("env:")]
+					envs = [env.split(":")[1] for env in match.group(2).split(" ") if env.startswith("env:")]
 					return envs, None
 		except (OSError, IOError) as _:
 			# Files are not where they should, maybe it's not Marlin... No env found, the user will select the default one
