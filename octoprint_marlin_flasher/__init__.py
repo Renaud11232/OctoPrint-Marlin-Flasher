@@ -84,10 +84,10 @@ class MarlinFlasherPlugin(octoprint.plugin.StartupPlugin,
 		return 2
 
 	def is_wizard_required(self):
-		if self.__flasher.check_setup_errors():
-			return True
+		if self.__settings_wrapper.get_platform_type() == PlatformType.ARDUINO:
+			return not self.__settings_wrapper.get_arduino_cli_path() or not self.__settings_wrapper.get_arduino_sketch_ino()
 		else:
-			return False
+			return not self.__settings_wrapper.get_platformio_cli_path()
 
 	@octoprint.plugin.BlueprintPlugin.route("/upload_firmware", methods=["POST"])
 	@restricted_access
