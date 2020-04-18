@@ -15,16 +15,15 @@ pre.scrollable-pre {
 }
 
 .loader {
-  border: 3px solid #f3f3f3;
-  border-top: 3px solid;
-  border-radius: 50%;
-  width: 24px;
-  height: 24px;
-  animation: spin-loader 2s linear infinite;
+    border: 3px solid #f3f3f3;
+    border-radius: 50%;
+    width: 24px;
+    height: 24px;
+    animation: spin-loader 2s linear infinite;
 }
 
-.loader-centered{
-  margin: 0 auto;
+.loader-centered {
+    margin: 0 auto;
 }
 
 .loader-install {
@@ -40,6 +39,10 @@ pre.scrollable-pre {
 }
 
 @keyframes spin-loader {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
 }
