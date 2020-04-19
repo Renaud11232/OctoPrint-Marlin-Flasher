@@ -44,7 +44,7 @@ class ArduinoFlasher(BaseFlasher):
 		try:
 			version = self.__get_arduino().version()
 			if isinstance(version, dict):
-				bad_version = re.match(r"(?:0\.[56789]\..+?)\Z", version["VersionString"]) is None
+				bad_version = re.match(r"(?:0\.(5|6|7|8|9|10)\..+?)\Z", version["VersionString"]) is None
 			else:
 				not_arduino = True
 		except pyduinocli.ArduinoError:
