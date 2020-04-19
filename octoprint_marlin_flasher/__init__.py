@@ -3,6 +3,7 @@ from __future__ import absolute_import
 import octoprint.plugin
 from octoprint.server.util.flask import restricted_access
 from octoprint.server import admin_permission
+from octoprint.events import Events
 import flask
 from .flasher import MarlinFlasher
 from .validation import RequestValidator
@@ -15,7 +16,8 @@ class MarlinFlasherPlugin(octoprint.plugin.StartupPlugin,
 						  octoprint.plugin.AssetPlugin,
 						  octoprint.plugin.TemplatePlugin,
 						  octoprint.plugin.WizardPlugin,
-						  octoprint.plugin.BlueprintPlugin):
+						  octoprint.plugin.BlueprintPlugin,
+						  octoprint.plugin.EventHandlerPlugin):
 
 	def on_after_startup(self):
 		self.__flasher = MarlinFlasher(self.__settings_wrapper, self._printer, self, self._plugin_manager, self._identifier)
@@ -90,6 +92,10 @@ class MarlinFlasherPlugin(octoprint.plugin.StartupPlugin,
 			return not self.__settings_wrapper.get_arduino_cli_path() or not self.__settings_wrapper.get_arduino_sketch_ino()
 		else:
 			return not self.__settings_wrapper.get_platformio_cli_path()
+
+	def on_event(self, event, payload):
+		if event == Events.CONNECTED:
+			self.__flasher.handle_connected_event()
 
 	@octoprint.plugin.BlueprintPlugin.route("/upload_firmware", methods=["POST"])
 	@restricted_access

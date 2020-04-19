@@ -78,3 +78,6 @@ class MarlinFlasher:
 	def last_flash_options(self):
 		impl = self.__get_implementation()
 		return self.__run_after_check(impl, impl.last_flash_options)
+
+	def handle_connected_event(self):
+		return self.__get_implementation().handle_connected_event()

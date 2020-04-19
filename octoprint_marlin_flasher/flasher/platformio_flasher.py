@@ -142,6 +142,7 @@ class PlatformIOFlasher(BaseFlasher):
 					error=gettext("The printer is not connected through a Serial port and thus, cannot be flashed.")
 				))
 				return
+			self._run_pre_flash_script()
 			_, port, baudrate, profile = self._printer.get_current_connection()
 			self._printer.disconnect()
 			pio_args.extend(["-t", "upload"])
@@ -149,6 +150,7 @@ class PlatformIOFlasher(BaseFlasher):
 			self._printer.connect(port, baudrate, profile)
 			self._firmware = None
 			self._firmware_upload_time = None
+			self._shoud_run_post_script = True
 			self._plugin_manager.send_plugin_message(self._identifier, dict(
 				type="flash_progress",
 				step=gettext("Done"),
