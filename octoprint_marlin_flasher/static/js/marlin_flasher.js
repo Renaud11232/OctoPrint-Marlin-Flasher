@@ -80,7 +80,7 @@ $(function() {
                     } else {
                         self.showError(gettext("Firmware upload failed"), jqXHR.responseJSON);
                     }
-                };
+                }
                 self.uploadProgress(0);
             },
             progress: function(e, data) {
@@ -220,7 +220,7 @@ $(function() {
             });
         };
         self.loadBoardList = function() {
-            if(self.loginStateViewModel.isAdmin() && self.settingsViewModel.settings.plugins.marlin_flasher.platform_type() == "arduino") {
+            if(self.loginStateViewModel.isAdmin() && self.settingsViewModel.settings.plugins.marlin_flasher.platform_type() === "arduino") {
                 $.ajax({
                     type: "GET",
                     headers: OctoPrint.getRequestHeaders(),
@@ -247,7 +247,7 @@ $(function() {
             }
         };
         self.loadEnvList = function() {
-            if(self.loginStateViewModel.isAdmin() && self.settingsViewModel.settings.plugins.marlin_flasher.platform_type() == "platform_io") {
+            if(self.loginStateViewModel.isAdmin() && self.settingsViewModel.settings.plugins.marlin_flasher.platform_type() === "platform_io") {
                 self.envList([]);
                 self.envListLoading(true);
                 $.ajax({
@@ -328,7 +328,7 @@ $(function() {
             self.loadUploadTime();
         };
         self.onDataUpdaterPluginMessage = function(plugin, message) {
-            if(plugin == "marlin_flasher") {
+            if(plugin === "marlin_flasher") {
                 if(message.type === "flash_progress") {
                     self.progressStep(message.step);
                     self.flashingProgress(message.progress);
@@ -360,6 +360,12 @@ $(function() {
             }
             if(self.settingsViewModel.settings.plugins.marlin_flasher.platformio.cli_path() === "") {
                 self.settingsViewModel.settings.plugins.marlin_flasher.platformio.cli_path(null);
+            }
+            if(self.settingsViewModel.settings.plugins.marlin_flasher.pre_flash_script() === "") {
+                self.settingsViewModel.settings.plugins.marlin_flasher.pre_flash_script(null);
+            }
+            if(self.settingsViewModel.settings.plugins.marlin_flasher.post_flash_script() === "") {
+                self.settingsViewModel.settings.plugins.marlin_flasher.post_flash_script(null);
             }
         };
     }

@@ -16,6 +16,18 @@
                 </div>
             </div>
             <div class="control-group">
+                <label class="control-label" for="pre_flash_script_{{field_suffix}}">{{ _('Pre flash script') }}</label>
+                <div class="controls">
+                    <textarea class="input-block-level" id="pre_flash_script_{{field_suffix}}" rows="5" cols="100" data-bind="value: settingsViewModel.settings.plugins.marlin_flasher.pre_flash_script"></textarea>
+                </div>
+            </div>
+            <div class="control-group">
+                <label class="control-label" for="post_flash_script_{{field_suffix}}">{{ _('Post flash script') }}</label>
+                <div class="controls">
+                    <textarea class="input-block-level" id="post_flash_script_{{field_suffix}}" rows="5" cols="100" data-bind="value: settingsViewModel.settings.plugins.marlin_flasher.post_flash_script"></textarea>
+                </div>
+            </div>
+            <div class="control-group">
                 <label class="control-label" for="upload_size_{{field_suffix}}">{{ _('Maximum upload') }}</label>
                 <div class="controls">
                     <div class="input-append">

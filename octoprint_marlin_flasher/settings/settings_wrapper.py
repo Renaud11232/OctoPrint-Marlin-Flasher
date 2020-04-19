@@ -23,3 +23,9 @@ class SettingsWrapper:
 
 	def get_platformio_cli_path(self):
 		return self.__settings.get(["platformio", "cli_path"])
+
+	def get_pre_flash_script(self):
+		return self.__settings.get(["pre_flash_script"])
+
+	def get_post_flash_script(self):
+		return self.__settings.get(["post_flash_script"])

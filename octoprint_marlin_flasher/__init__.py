@@ -32,7 +32,9 @@ class MarlinFlasherPlugin(octoprint.plugin.StartupPlugin,
 				cli_path=None
 			),
 			max_upload_size=20,
-			platform_type=PlatformType.ARDUINO
+			platform_type=PlatformType.ARDUINO,
+			pre_flash_script=None,
+			post_flash_script=None
 		)
 
 	def get_settings_version(self):
@@ -81,7 +83,7 @@ class MarlinFlasherPlugin(octoprint.plugin.StartupPlugin,
 		)
 
 	def get_wizard_version(self):
-		return 2
+		return 3
 
 	def is_wizard_required(self):
 		if self.__settings_wrapper.get_platform_type() == PlatformType.ARDUINO:
