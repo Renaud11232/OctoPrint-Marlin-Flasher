@@ -92,15 +92,17 @@ $(function() {
         self.platformioFirmwareFileButton.fileupload(self.fileUploadParams);
 
         self.loadUploadTime = function() {
-            $.ajax({
-                type: "GET",
-                headers: OctoPrint.getRequestHeaders(),
-                url: "/plugin/marlin_flasher/firmware"
-            }).done(function(data) {
-                self.uploadTime(data.upload_time);
-            }).fail(function(jqXHR, status, error) {
-                self.showError(gettext("Upload time fetch failed"), jqXHR.responseJSON);
-            });
+            if(self.loginStateViewModel.isAdmin()) {
+                $.ajax({
+                    type: "GET",
+                    headers: OctoPrint.getRequestHeaders(),
+                    url: "/plugin/marlin_flasher/firmware"
+                }).done(function(data) {
+                    self.uploadTime(data.upload_time);
+                }).fail(function(jqXHR, status, error) {
+                    self.showError(gettext("Upload time fetch failed"), jqXHR.responseJSON);
+                });
+            }
         };
 
         self.searchCore = function(form) {
