@@ -47,7 +47,8 @@ There are a few configurable options:
 * The path for your PlatformIO-Core executable
 * The maximum file upload size (defaults to `20MB`)
 * The currently selected platform (Arduino, PlatformIO)
-* The GCODE scipts you want to run before and after the flashing process
+* The GCODE scripts you want to run before and after the flashing process
+* Time delays to wait before and after the flashing process
 
 All can be configured directly though the *Settings* menu. or via the [config.yaml](https://docs.octoprint.org/en/master/configuration/config_yaml.html)
 
@@ -63,7 +64,9 @@ plugins:
     max_upload_size: 20
     platform_type: arduino
     pre_flash_script: 'M117 Pre flash'
+    pre_flash_delay: 5
     post_flash_script: 'M117 Post flash'
+    post_flash_delay: 5
 ```
 
 ## Wiki
