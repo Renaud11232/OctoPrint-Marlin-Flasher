@@ -369,6 +369,14 @@ $(function() {
             if(self.settingsViewModel.settings.plugins.marlin_flasher.post_flash_script() === "") {
                 self.settingsViewModel.settings.plugins.marlin_flasher.post_flash_script(null);
             }
+            if(self.settingsViewModel.settings.plugins.marlin_flasher.pre_flash_delay() === "") {
+                self.settingsViewModel.settings.plugins.marlin_flasher.pre_flash_delay("0");
+            }
+            self.settingsViewModel.settings.plugins.marlin_flasher.pre_flash_delay(parseInt(self.settingsViewModel.settings.plugins.marlin_flasher.pre_flash_delay()));
+            if(self.settingsViewModel.settings.plugins.marlin_flasher.post_flash_delay() === "") {
+                self.settingsViewModel.settings.plugins.marlin_flasher.post_flash_delay("0");
+            }
+            self.settingsViewModel.settings.plugins.marlin_flasher.post_flash_delay(parseInt(self.settingsViewModel.settings.plugins.marlin_flasher.post_flash_delay()));
         };
     }
 

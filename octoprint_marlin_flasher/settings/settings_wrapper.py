@@ -27,5 +27,11 @@ class SettingsWrapper:
 	def get_pre_flash_script(self):
 		return self.__settings.get(["pre_flash_script"])
 
+	def get_pre_flash_delay(self):
+		return self.__settings.get(["pre_flash_delay"])
+
 	def get_post_flash_script(self):
 		return self.__settings.get(["post_flash_script"])
+
+	def get_post_flash_delay(self):
+		return self.__settings.get(["post_flash_delay"])

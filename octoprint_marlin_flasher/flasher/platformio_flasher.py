@@ -143,14 +143,16 @@ class PlatformIOFlasher(BaseFlasher):
 				))
 				return
 			self._run_pre_flash_script()
+			self._wait_pre_flash_delay()
 			_, port, baudrate, profile = self._printer.get_current_connection()
 			self._printer.disconnect()
 			pio_args.extend(["-t", "upload"])
 			self.__exec(pio_args)
+			self._wait_post_flash_delay()
 			self._printer.connect(port, baudrate, profile)
 			self._firmware = None
 			self._firmware_upload_time = None
-			self._shoud_run_post_script = True
+			self._should_run_post_script = True
 			self._plugin_manager.send_plugin_message(self._identifier, dict(
 				type="flash_progress",
 				step=gettext("Done"),

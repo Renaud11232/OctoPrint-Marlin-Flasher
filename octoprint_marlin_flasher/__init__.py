@@ -36,7 +36,9 @@ class MarlinFlasherPlugin(octoprint.plugin.StartupPlugin,
 			max_upload_size=20,
 			platform_type=PlatformType.ARDUINO,
 			pre_flash_script=None,
-			post_flash_script=None
+			pre_flash_delay=0,
+			post_flash_script=None,
+			post_flash_delay=0
 		)
 
 	def get_settings_version(self):
