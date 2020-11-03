@@ -47,6 +47,7 @@ class PlatformIOFlasher(BaseFlasher):
 
 	def upload(self):
 		self._firmware = None
+		self._firmware_version = None
 		uploaded_file_path = flask.request.values["firmware_file." + self._settings.get_upload_path_suffix()]
 		with zipfile.ZipFile(uploaded_file_path, "r") as zip_file:
 			firmware_dir = os.path.join(self._plugin.get_plugin_data_folder(), "firmware_platformio")
@@ -59,10 +60,23 @@ class PlatformIOFlasher(BaseFlasher):
 					if f == "platformio.ini":
 						self._firmware = root
 						self._firmware_upload_time = datetime.now()
-						return dict(
-							path=root,
-							file=f
-						), None
+						if self._firmware_version != None:
+							return dict(
+								path=root,
+								file=f
+							), None
+					if f == "Version.h":
+						versionfile = file(os.path.join(root, f))
+						for line in versionfile:
+							if "SHORT_BUILD_VERSION" in line:
+								version = re.findall('"([^"]*)"', line)
+								if version:
+									self._firmware_version = version[0]
+						if self._firmware != None:
+							return dict(
+								path=root,
+								file="platformio.ini"
+							), None
 			return None, dict(
 				error=gettext("No Platform.io configuration file were found in the given file.")
 			)
@@ -70,6 +84,7 @@ class PlatformIOFlasher(BaseFlasher):
 	def firmware(self):
 		return dict(
 			firmware=self._firmware,
+			version=self._firmware_version,
 			upload_time=self._firmware_upload_time
 		), None
 
@@ -151,6 +166,7 @@ class PlatformIOFlasher(BaseFlasher):
 			self._wait_post_flash_delay()
 			self._printer.connect(port, baudrate, profile)
 			self._firmware = None
+			self._firmware_version = None
 			self._firmware_upload_time = None
 			self._should_run_post_script = True
 			self._plugin_manager.send_plugin_message(self._identifier, dict(

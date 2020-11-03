@@ -11,6 +11,7 @@ class BaseFlasher:
 		self._plugin_manager = plugin_manager
 		self._identifier = identifier
 		self._firmware = None
+		self._firmware_version = None
 		self._firmware_upload_time = None
 		self._should_run_post_script = False
 
