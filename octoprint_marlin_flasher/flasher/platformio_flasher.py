@@ -48,6 +48,7 @@ class PlatformIOFlasher(BaseFlasher):
 	def upload(self):
 		self._firmware = None
 		self._firmware_version = None
+		version_txt = None
 		uploaded_file_path = flask.request.values["firmware_file." + self._settings.get_upload_path_suffix()]
 		with zipfile.ZipFile(uploaded_file_path, "r") as zip_file:
 			firmware_dir = os.path.join(self._plugin.get_plugin_data_folder(), "firmware_platformio")
@@ -60,19 +61,33 @@ class PlatformIOFlasher(BaseFlasher):
 					if f == "platformio.ini":
 						self._firmware = root
 						self._firmware_upload_time = datetime.now()
-						if self._firmware_version != None:
+						if self._firmware_version != None and version_txt != None:
 							return dict(
 								path=root,
 								file=f
 							), None
 					if f == "Version.h":
-						versionfile = file(os.path.join(root, f))
+						versionfile = open(os.path.join(root, f), "r")
 						for line in versionfile:
 							if "SHORT_BUILD_VERSION" in line:
 								version = re.findall('"([^"]*)"', line)
 								if version:
 									self._firmware_version = version[0]
-						if self._firmware != None:
+						if self._firmware != None and version_txt != None:
+							self._firmware_version += " " + version_txt
+							return dict(
+								path=root,
+								file="platformio.ini"
+							), None
+					if f == "Configuration.h":
+						versionfile = open(os.path.join(root, f), "r")
+						for line in versionfile:
+							if "STRING_CONFIG_H_AUTHOR" in line:
+								version = re.findall('"([^"]*)"', line)
+								if version:
+									version_txt = version[0]
+						if self._firmware != None and self._firmware_version != None:
+							self._firmware_version += " " + version_txt
 							return dict(
 								path=root,
 								file="platformio.ini"
