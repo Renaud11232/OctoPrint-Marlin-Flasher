@@ -92,6 +92,7 @@ class ArduinoFlasher(BaseFlasher):
 									version = re.findall('"([^"]*)"', line)
 									if version:
 										self._firmware_version = version[0]
+										break
 							if self._firmware != None and version_txt != None:
 								self._firmware_version += " " + version_txt
 								return dict(
@@ -105,6 +106,7 @@ class ArduinoFlasher(BaseFlasher):
 									version = re.findall('"([^"]*)"', line)
 									if version:
 										version_txt = version[0]
+										break
 							if self._firmware != None and self._firmware_version != None:
 								self._firmware_version += " " + version_txt
 								return dict(
