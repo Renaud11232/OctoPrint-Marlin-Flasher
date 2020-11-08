@@ -64,7 +64,8 @@ class ArduinoFlasher(BaseFlasher):
 	def upload(self):
 		self._firmware = None
 		self._firmware_version = None
-		version_txt = None
+		self._firmware_author = None
+		self._firmware_upload_time = None
 		uploaded_file_path = flask.request.values["firmware_file." + self._settings.get_upload_path_suffix()]
 		firmware_dir = os.path.join(self._plugin.get_plugin_data_folder(), "firmware_arduino")
 		if os.path.exists(firmware_dir):
@@ -80,39 +81,27 @@ class ArduinoFlasher(BaseFlasher):
 						if f == self._settings.get_arduino_sketch_ino():
 							self._firmware = root
 							self._firmware_upload_time = datetime.now()
-							if self._firmware_version != None and version_txt != None:
-								return dict(
-									path=root,
-									file=f
-								), None
-						if f == "Version.h":
-							versionfile = open(os.path.join(root, f), "r")
-							for line in versionfile:
-								if "SHORT_BUILD_VERSION" in line:
-									version = re.findall('"([^"]*)"', line)
-									if version:
-										self._firmware_version = version[0]
-										break
-							if self._firmware != None and version_txt != None:
-								self._firmware_version += " " + version_txt
-								return dict(
-									path=root,
-									file=self._settings.get_arduino_sketch_ino()
-								), None
-						if f == "Configuration.h":
-							versionfile = open(os.path.join(root, f), "r")
-							for line in versionfile:
-								if "STRING_CONFIG_H_AUTHOR" in line:
-									version = re.findall('"([^"]*)"', line)
-									if version:
-										version_txt = version[0]
-										break
-							if self._firmware != None and self._firmware_version != None:
-								self._firmware_version += " " + version_txt
-								return dict(
-									path=root,
-									file=self._settings.get_arduino_sketch_ino()
-								), None
+						elif f == "Version.h":
+							with open(os.path.join(root, f), "r") as versionfile:
+								for line in versionfile:
+									if "SHORT_BUILD_VERSION" in line:
+										version = re.findall('"([^"]*)"', line)
+										if version:
+											self._firmware_version = version[0]
+											break
+						elif f == "Configuration.h":
+							with open(os.path.join(root, f), "r") as configfile:
+								for line in configfile:
+									if "STRING_CONFIG_H_AUTHOR" in line:
+										author = re.findall('"([^"]*)"', line)
+										if author:
+											self._firmware_author = author[0]
+											break
+				if self._firmware:
+					return dict(
+						path=self._firmware,
+						file=self._settings.get_arduino_sketch_ino()
+					), None
 				return None, dict(
 					error=gettext("No valid sketch were found in the given file.")
 				)
@@ -131,6 +120,7 @@ class ArduinoFlasher(BaseFlasher):
 		return dict(
 			firmware=self._firmware,
 			version=self._firmware_version,
+			author=self._firmware_author,
 			upload_time=self._firmware_upload_time
 		), None
 
@@ -280,6 +270,7 @@ class ArduinoFlasher(BaseFlasher):
 			self._printer.connect(port, baudrate, profile)
 			self._firmware = None
 			self._firmware_version = None
+			self._firmware_author = None
 			self._firmware_upload_time = None
 			self._should_run_post_script = True
 			self._plugin_manager.send_plugin_message(self._identifier, dict(

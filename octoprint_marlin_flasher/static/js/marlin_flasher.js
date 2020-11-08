@@ -26,6 +26,7 @@ $(function() {
         self.flashButtonEnabled = ko.observable(false);
         self.boardOptionsLoading = ko.observable(false);
         self.firmwareVersion = ko.observable();
+        self.firmwareAuthor = ko.observable();
         self.uploadTime = ko.observable();
         self.lastFlashOptions = null;
 
@@ -66,7 +67,7 @@ $(function() {
                 self.showSuccess(gettext("Firmware upload successful"), data.result.file);
                 self.uploadProgress(0);
                 self.loadEnvList();
-                self.loadUploadTime();
+                self.loadFirmwareInfo();
             },
             error: function(jqXHR, status, error) {
                 if(error === "") {
@@ -83,6 +84,7 @@ $(function() {
                     }
                 }
                 self.uploadProgress(0);
+                self.loadFirmwareInfo();
             },
             progress: function(e, data) {
                 self.uploadProgress((data.loaded / data.total) * 100);
@@ -92,7 +94,7 @@ $(function() {
         self.arduinoFirmwareFileButton.fileupload(self.fileUploadParams);
         self.platformioFirmwareFileButton.fileupload(self.fileUploadParams);
 
-        self.loadUploadTime = function() {
+        self.loadFirmwareInfo = function() {
             if(self.loginStateViewModel.isAdmin()) {
                 $.ajax({
                     type: "GET",
@@ -100,6 +102,7 @@ $(function() {
                     url: "/plugin/marlin_flasher/firmware"
                 }).done(function(data) {
                     self.firmwareVersion(data.version);
+                    self.firmwareAuthor(data.author);
                     self.uploadTime(data.upload_time);
                 }).fail(function(jqXHR, status, error) {
                     self.showError(gettext("Upload time fetch failed"), jqXHR.responseJSON);
@@ -329,7 +332,7 @@ $(function() {
         self.onAllBound = function(viewModels) {
             self.loadBoardList();
             self.loadEnvList();
-            self.loadUploadTime();
+            self.loadFirmwareInfo();
         };
         self.onDataUpdaterPluginMessage = function(plugin, message) {
             if(plugin === "marlin_flasher") {
@@ -339,7 +342,7 @@ $(function() {
                 } else if(message.type === "settings_saved") {
                     self.loadBoardList();
                     self.loadEnvList();
-                    self.loadUploadTime();
+                    self.loadFirmwareInfo();
                 } else if(message.type === "flash_result") {
                     if(message.success) {
                         self.showSuccess(gettext("Flashing successful"), message.message);
@@ -350,7 +353,7 @@ $(function() {
                     }
                     self.arduinoFlashButton.button("reset");
                     self.platformioFlashButton.button("reset");
-                    self.loadUploadTime();
+                    self.loadFirmwareInfo();
                 }
             }
         };
