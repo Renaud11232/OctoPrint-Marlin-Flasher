@@ -25,6 +25,7 @@ $(function() {
         self.progressStep = ko.observable();
         self.flashButtonEnabled = ko.observable(false);
         self.boardOptionsLoading = ko.observable(false);
+        self.firmwareVersion = ko.observable();
         self.uploadTime = ko.observable();
         self.lastFlashOptions = null;
 
@@ -98,6 +99,7 @@ $(function() {
                     headers: OctoPrint.getRequestHeaders(),
                     url: "/plugin/marlin_flasher/firmware"
                 }).done(function(data) {
+                    self.firmwareVersion(data.version);
                     self.uploadTime(data.upload_time);
                 }).fail(function(jqXHR, status, error) {
                     self.showError(gettext("Upload time fetch failed"), jqXHR.responseJSON);

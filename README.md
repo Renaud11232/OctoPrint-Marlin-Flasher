@@ -34,7 +34,7 @@ or manually using this URL:
 
 First, you'll need to download `arduino-cli` from their official [GitHub page](https://github.com/arduino/arduino-cli/releases). Then all is left to do is to tell the plugin where you placed it via the settings.
 
-### Platfrom.io
+### Platform.io
 
 You first need to install PlatformIO-Core following their [official documentation](https://docs.platformio.org/en/latest/installation.html). Then as for Arduino, you need to tell the plugin where its installed.
 

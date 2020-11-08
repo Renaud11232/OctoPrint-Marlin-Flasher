@@ -3,6 +3,7 @@
         <a class="accordion-toggle" data-toggle="collapse" data-parent="#marlin_flasher_arduino_accordion" href="#flash">
             {{ _('Flash') }}
         </a>
+        <span data-bind="text: firmwareVersion() ? 'Version: ' + firmwareVersion() : ''"></span>
     </div>
     <div id="flash" class="accordion-body collapse">
         <div class="accordion-inner">
