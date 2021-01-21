@@ -49,8 +49,7 @@ class MarlinFlasherPlugin(octoprint.plugin.StartupPlugin,
 
 	def on_settings_migrate(self, target, current):
 		defaults = self.get_settings_defaults()
-		current_migration = current
-		if current_migration is None or current_migration < 0:
+		if current is None or current < 1:
 			max_sketch_size = self._settings.get(["max_sketch_size"])
 			if max_sketch_size is None:
 				max_sketch_size = defaults["max_upload_size"]
@@ -67,7 +66,6 @@ class MarlinFlasherPlugin(octoprint.plugin.StartupPlugin,
 			additional_urls = self._settings.get(["additional_urls"])
 			self._settings.set(["additional_urls"], None)
 			self._settings.set(["arduino", "additional_urls"], additional_urls)
-			current_migration = 1
 
 	def on_settings_save(self, data):
 		result = super(MarlinFlasherPlugin, self).on_settings_save(data)
@@ -97,7 +95,11 @@ class MarlinFlasherPlugin(octoprint.plugin.StartupPlugin,
 
 	def on_event(self, event, payload):
 		if event == Events.CONNECTED:
-			self.__flasher.handle_connected_event()
+			try:
+				self.__flasher.handle_connected_event()
+			except AttributeError:
+				# The plugin hasn't finished booting, and should not care about a printer reconnecting
+				pass
 
 	@octoprint.plugin.BlueprintPlugin.route("/upload_firmware", methods=["POST"])
 	@restricted_access
