@@ -9,6 +9,9 @@ class BaseValidator:
 	def validate_upload(self):
 		raise ValidatorError("Unsupported function call.")
 
+	def validate_download(self):
+		raise ValidatorError("Unsupported function call.")
+
 	def validate_firmware(self):
 		raise ValidatorError("Unsupported function call.")
 

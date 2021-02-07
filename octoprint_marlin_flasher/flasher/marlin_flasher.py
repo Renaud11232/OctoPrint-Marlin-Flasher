@@ -35,6 +35,10 @@ class MarlinFlasher:
 		impl = self.__get_implementation()
 		return self.__run_after_check(impl, impl.upload)
 
+	def download(self):
+		impl = self.__get_implementation()
+		return self.__run_after_check(impl, impl.download)
+
 	def firmware(self):
 		impl = self.__get_implementation()
 		return self.__run_after_check(impl, impl.firmware)

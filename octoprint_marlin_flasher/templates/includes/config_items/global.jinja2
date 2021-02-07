@@ -16,6 +16,15 @@
                 </div>
             </div>
             <div class="control-group">
+                <label class="control-label" for="marlin_flasher_retrieving_method_{{field_suffix}}">{{ _('Retrieving method') }}</label>
+                <div class="controls">
+                    <select id="marlin_flasher_retrieving_method_{{field_suffix}}" data-bind="value: settingsViewModel.settings.plugins.marlin_flasher.retrieving_method">
+                        <option value="upload">Upload file</option>
+                        <option value="url">Download from URL</option>
+                    </select>
+                </div>
+            </div>
+            <div class="control-group">
                 <label class="control-label" for="pre_flash_delay_{{field_suffix}}">{{ _('Pre flash delay') }}</label>
                 <div class="controls">
                     <div class="input-append">

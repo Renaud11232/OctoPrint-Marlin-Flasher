@@ -45,13 +45,21 @@ class PlatformIOFlasher(BaseFlasher):
 			)
 		return None
 
-	def upload(self):
+	def _validate_firmware_file(self, file_path):
+		try:
+			with zipfile.ZipFile(file_path, "r") as _:
+				return None
+		except zipfile.BadZipfile:
+			return dict(
+				error=gettext("Invalid file type.")
+			)
+
+	def _handle_firmware_file(self, firmware_file_path):
 		self._firmware = None
 		self._firmware_version = None
 		self._firmware_author = None
 		self._firmware_upload_time = None
-		uploaded_file_path = flask.request.values["firmware_file." + self._settings.get_upload_path_suffix()]
-		with zipfile.ZipFile(uploaded_file_path, "r") as zip_file:
+		with zipfile.ZipFile(firmware_file_path, "r") as zip_file:
 			firmware_dir = os.path.join(self._plugin.get_plugin_data_folder(), "firmware_platformio")
 			if os.path.exists(firmware_dir):
 				shutil.rmtree(firmware_dir)

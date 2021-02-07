@@ -6,6 +6,7 @@ from octoprint.server import admin_permission
 from octoprint.events import Events
 import flask
 from .flasher import MarlinFlasher
+from .flasher.retrieving_method import RetrievingMethod
 from .validation import RequestValidator
 from .settings import SettingsWrapper
 from .flasher.platform_type import PlatformType
@@ -38,7 +39,8 @@ class MarlinFlasherPlugin(octoprint.plugin.StartupPlugin,
 			pre_flash_script=None,
 			pre_flash_delay=0,
 			post_flash_script=None,
-			post_flash_delay=0
+			post_flash_delay=0,
+			retrieving_method=RetrievingMethod.UPLOAD
 		)
 
 	def get_settings_version(self):
@@ -109,6 +111,18 @@ class MarlinFlasherPlugin(octoprint.plugin.StartupPlugin,
 		if errors:
 			return flask.make_response(flask.jsonify(errors), 400)
 		result, errors = self.__flasher.upload()
+		if errors:
+			return flask.make_response(flask.jsonify(errors), 400)
+		return flask.make_response(flask.jsonify(result), 200)
+
+	@octoprint.plugin.BlueprintPlugin.route("/download_firmware", methods=["POST"])
+	@restricted_access
+	@admin_permission.require(403)
+	def download_firmware(self):
+		errors = self.__validator.validate_download()
+		if errors:
+			return flask.make_response(flask.jsonify(errors), 400)
+		result, errors = self.__flasher.download()
 		if errors:
 			return flask.make_response(flask.jsonify(errors), 400)
 		return flask.make_response(flask.jsonify(result), 200)

@@ -1,16 +1,21 @@
 import flask
 from marshmallow import Schema, fields
 from .base_validator import BaseValidator
-from .validators import arduino
 
 
 class ArduinoValidator(BaseValidator):
 
 	def validate_upload(self):
 		request_fields = {
-			"firmware_file." + self._settings.get_upload_path_suffix(): fields.Str(required=True, validate=arduino.is_correct_file_type)
+			"firmware_file." + self._settings.get_upload_path_suffix(): fields.Str(required=True)
 		}
 		return type("_ArduinoUploadSchema", (Schema,), request_fields)().validate(flask.request.values)
+
+	def validate_download(self):
+		request_fields = {
+			"url": fields.Url(required=True)
+		}
+		return type("_ArduinoDownloadSchema", (Schema,), request_fields)().validate(flask.request.values)
 
 	def validate_firmware(self):
 		return Schema().validate(flask.request.values)

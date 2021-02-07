@@ -6,6 +6,9 @@ class SettingsWrapper:
 	def get_max_upload_size(self):
 		return self.__settings.get_int(["max_upload_size"])
 
+	def get_retrieving_method(self):
+		return self.__settings.get(["retrieving_method"])
+
 	def get_platform_type(self):
 		return self.__settings.get(["platform_type"])
 

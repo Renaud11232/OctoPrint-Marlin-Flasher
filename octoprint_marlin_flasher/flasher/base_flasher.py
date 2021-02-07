@@ -1,5 +1,9 @@
 from .flasher_error import FlasherError
 import time
+import flask
+import requests
+import tempfile
+import os
 
 
 class BaseFlasher:
@@ -34,6 +38,9 @@ class BaseFlasher:
 	def _wait_post_flash_delay(self):
 		time.sleep(self._settings.get_post_flash_delay())
 
+	def _validate_firmware_file(self, file_path):
+		raise FlasherError("Unsupported function call.")
+
 	def handle_connected_event(self):
 		if self._should_run_post_script:
 			self._run_post_flash_script()
@@ -43,6 +50,26 @@ class BaseFlasher:
 		raise FlasherError("Unsupported function call.")
 
 	def upload(self):
+		uploaded_file_path = flask.request.values["firmware_file." + self._settings.get_upload_path_suffix()]
+		errors = self._validate_firmware_file(uploaded_file_path)
+		if errors:
+			return None, errors
+		return self._handle_firmware_file(uploaded_file_path)
+
+	def download(self):
+		r = requests.get(flask.request.values["url"])
+		with tempfile.NamedTemporaryFile(delete=False) as temp:
+			temp.write(r.content)
+			temp_path = temp.name
+		errors = self._validate_firmware_file(temp_path)
+		if errors:
+			os.remove(temp_path)
+			return None, errors
+		result = self._handle_firmware_file(temp_path)
+		os.remove(temp_path)
+		return result
+
+	def _handle_firmware_file(self, firmware_file_path):
 		raise FlasherError("Unsupported function call.")
 
 	def firmware(self):

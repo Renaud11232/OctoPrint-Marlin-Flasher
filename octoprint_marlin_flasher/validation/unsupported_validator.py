@@ -1,15 +1,27 @@
 import flask
 from .base_validator import BaseValidator
-from .validators import unsupported
+from flask_babel import gettext
+from marshmallow import Schema
+
+
+class UnsupportedSchema(Schema):
+
+	def validate(self, _):
+		return dict(
+			error=gettext("The configured platform is not supported. Check your settings")
+		)
 
 
 class UnsupportedPlatformValidator(BaseValidator):
 
 	def __init__(self, settings):
 		BaseValidator.__init__(self, settings)
-		self.__schema = unsupported.UnsupportedSchema()
+		self.__schema = UnsupportedSchema()
 
 	def validate_upload(self):
+		return self.__schema.validate(flask.request.values)
+
+	def validate_download(self):
 		return self.__schema.validate(flask.request.values)
 
 	def validate_firmware(self):

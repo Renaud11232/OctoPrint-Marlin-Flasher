@@ -28,6 +28,8 @@ $(function() {
         self.firmwareVersion = ko.observable();
         self.firmwareAuthor = ko.observable();
         self.uploadTime = ko.observable();
+        self.firmwareURL = ko.observable();
+        self.downloadingFirmware = ko.observable(false);
         self.lastFlashOptions = null;
 
         self.showError = function(title, errorData) {
@@ -75,7 +77,7 @@ $(function() {
                         error: gettext("Check the maximum firmware size")
                     });
                 } else {
-                    if(typeof jqXHR.responseJSON.error === "undefined") {
+                    if(jqXHR.responseJSON.error === undefined) {
                         self.showError(gettext("Firmware upload failed"), {
                             error: gettext("The given file was not valid")
                         });
@@ -90,6 +92,33 @@ $(function() {
                 self.uploadProgress((data.loaded / data.total) * 100);
             }
         }
+
+        self.downloadFirmware = function() {
+            self.downloadingFirmware(true);
+            $.ajax({
+                type: "POST",
+                headers: OctoPrint.getRequestHeaders(),
+                url: "/plugin/marlin_flasher/download_firmware",
+                data: {
+                    url: self.firmwareURL
+                }
+            }).done(function(data) {
+                self.showSuccess(gettext("Firmware download successful"), data.file);
+                self.loadEnvList();
+                self.loadFirmwareInfo();
+                self.downloadingFirmware(false);
+            }).fail(function(jqXHR) {
+                if(jqXHR.responseJSON.error === undefined) {
+                    self.showError(gettext("Firmware download failed"), {
+                        error: gettext("The URL is not valid")
+                    });
+                } else {
+                    self.showError(gettext("Firmware download failed"), jqXHR.responseJSON);
+                }
+                self.loadFirmwareInfo();
+                self.downloadingFirmware(false);
+            });
+        };
 
         self.arduinoFirmwareFileButton.fileupload(self.fileUploadParams);
         self.platformioFirmwareFileButton.fileupload(self.fileUploadParams);

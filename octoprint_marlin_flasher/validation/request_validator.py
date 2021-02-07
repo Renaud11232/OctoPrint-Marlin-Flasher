@@ -24,6 +24,9 @@ class RequestValidator:
 	def validate_upload(self):
 		return self.__get_implementation().validate_upload()
 
+	def validate_download(self):
+		return self.__get_implementation().validate_download()
+
 	def validate_firmware(self):
 		return self.__get_implementation().validate_firmware()
 

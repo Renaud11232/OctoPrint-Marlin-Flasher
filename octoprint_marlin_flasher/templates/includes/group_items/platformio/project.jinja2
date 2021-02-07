@@ -3,14 +3,14 @@
         <a class="accordion-toggle" data-toggle="collapse" data-parent="#marlin_flasher_platformio_accordion" href="#platformio_project">
             {{ _('Platform.io Project') }}
         </a>
-        (<span data-bind="text: uploadTime() ? uploadTime() : gettext('Not uploaded')"></span>)
+        (<span data-bind="text: uploadTime() ? uploadTime() : gettext('No firmware')"></span>)
     </div>
     <div id="platformio_project" class="accordion-body collapse in">
         <div class="accordion-inner">
             <p>
-                {{ _("Here you can upload whatever firmware you want to be running on your printer. Make sure it's a zip file containing a valid Platform.io project for your board.") }}
+                {{ _("Here you can set whatever firmware you want to be running on your printer. Make sure it's a zip file containing a valid Platform.io project for your board.") }}
             </p>
-            <form class="form-horizontal">
+            <form class="form-horizontal" data-bind="visible: settingsViewModel.settings.plugins.marlin_flasher.retrieving_method() === 'upload'">
                 <div class="control-group">
                     <label class="control-label" for="platformio_firmware_file">{{ _('Platform.io project') }} :</label>
                     <div class="controls">
@@ -22,6 +22,16 @@
                 </div>
                 <div class="progress">
                     <div class="bar" data-bind="style: {width: uploadProgress() + '%'}"></div>
+                </div>
+            </form>
+            <form class="form-horizontal" data-bind="visible: settingsViewModel.settings.plugins.marlin_flasher.retrieving_method() === 'url'">
+                <div class="control-group row-fluid">
+                    <div class="span9">
+                        <input type="text" class="input-block-level" placeholder="Enter URL..." data-bind="value: firmwareURL,
+                                                                                                           disable: downloadingFirmware">
+                    </div>
+                    <button class="btn btn-primary span3" data-bind="click: downloadFirmware,
+                                                                     disable: downloadingFirmware">Download</button>
                 </div>
             </form>
         </div>

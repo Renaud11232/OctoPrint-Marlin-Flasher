@@ -10,6 +10,7 @@ import serial
 import flask
 from flask_babel import gettext
 import pyduinocli
+import intelhex
 
 
 class ArduinoFlasher(BaseFlasher):
@@ -61,17 +62,30 @@ class ArduinoFlasher(BaseFlasher):
 			)
 		return None
 
-	def upload(self):
+	def _validate_firmware_file(self, file_path):
+		try:
+			with zipfile.ZipFile(file_path, "r") as _:
+				return None
+		except zipfile.BadZipfile:
+			try:
+				ih = intelhex.IntelHex()
+				ih.loadhex(file_path)
+				return None
+			except intelhex.IntelHexError:
+				return dict(
+					error=gettext("Invalid file type.")
+				)
+
+	def _handle_firmware_file(self, firmware_file_path):
 		self._firmware = None
 		self._firmware_version = None
 		self._firmware_author = None
 		self._firmware_upload_time = None
-		uploaded_file_path = flask.request.values["firmware_file." + self._settings.get_upload_path_suffix()]
 		firmware_dir = os.path.join(self._plugin.get_plugin_data_folder(), "firmware_arduino")
 		if os.path.exists(firmware_dir):
 			shutil.rmtree(firmware_dir)
 		try:
-			with zipfile.ZipFile(uploaded_file_path, "r") as zip_file:
+			with zipfile.ZipFile(firmware_file_path, "r") as zip_file:
 				self.__is_ino = True
 				sketch_dir = os.path.join(firmware_dir, os.path.splitext(self._settings.get_arduino_sketch_ino())[0])
 				os.makedirs(sketch_dir)
@@ -110,7 +124,7 @@ class ArduinoFlasher(BaseFlasher):
 			os.makedirs(firmware_dir)
 			self._firmware = os.path.join(firmware_dir, "firmware.hex")
 			self._firmware_upload_time = datetime.now()
-			shutil.copyfile(uploaded_file_path, self._firmware)
+			shutil.copyfile(firmware_file_path, self._firmware)
 			return dict(
 				path=firmware_dir,
 				file="firmware.hex"
@@ -175,8 +189,7 @@ class ArduinoFlasher(BaseFlasher):
 	def lib_uninstall(self):
 		try:
 			arduino = self.__get_arduino()
-			# TODO this is not needed for versions >= 0.7.0
-			arduino.lib.uninstall([flask.request.values["lib"].replace(" ", "_")])
+			arduino.lib.uninstall([flask.request.values["lib"]])
 			return dict(
 				lib=flask.request.values["lib"]
 			), None
