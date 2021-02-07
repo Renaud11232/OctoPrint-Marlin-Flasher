@@ -44,7 +44,7 @@ class ArduinoFlasher(BaseFlasher):
 		try:
 			version = self.__get_arduino().version()
 			if isinstance(version, dict):
-				bad_version = re.match(r"(?:0\.(5|6|7|8|9|10)\..+?)\Z", version["VersionString"]) is None
+				bad_version = re.match(r"(?:0\.(?:15)\..+?)\Z", version["VersionString"]) is None
 			else:
 				not_arduino = True
 		except pyduinocli.ArduinoError:
@@ -265,7 +265,7 @@ class ArduinoFlasher(BaseFlasher):
 			if self.__is_ino:
 				arduino.upload(sketch=self._firmware, fqbn=fqbn, port=flash_port)
 			else:
-				arduino.upload(fqbn=fqbn, port=flash_port, input=self._firmware)
+				arduino.upload(fqbn=fqbn, port=flash_port, input_file=self._firmware)
 			self._wait_post_flash_delay()
 			self._printer.connect(port, baudrate, profile)
 			self._firmware = None
