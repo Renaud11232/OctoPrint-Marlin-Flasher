@@ -71,7 +71,7 @@ class ArduinoFlasher(BaseFlasher):
 				ih = intelhex.IntelHex()
 				ih.loadhex(file_path)
 				return None
-			except intelhex.IntelHexError:
+			except:
 				return dict(
 					error=gettext("Invalid file type.")
 				)
@@ -242,6 +242,7 @@ class ArduinoFlasher(BaseFlasher):
 		), None
 
 	def __background_flash(self, fqbn):
+		disconnected = False
 		try:
 			arduino = self.__get_arduino()
 			if self.__is_ino:
@@ -250,7 +251,15 @@ class ArduinoFlasher(BaseFlasher):
 					step=gettext("Compiling"),
 					progress=0
 				))
-				arduino.compile(self._firmware, fqbn=fqbn)
+				result = arduino.compile(self._firmware, fqbn=fqbn)
+				if not result["success"]:
+					self._plugin_manager.send_plugin_message(self._identifier, dict(
+						type="flash_result",
+						success=False,
+						stderr=result["compiler_err"],
+						error=result["compiler_out"]
+					))
+					return
 				self._plugin_manager.send_plugin_message(self._identifier, dict(
 					type="flash_progress",
 					step=gettext("Uploading"),
@@ -275,17 +284,18 @@ class ArduinoFlasher(BaseFlasher):
 			flash_port = transport.port
 			_, port, baudrate, profile = self._printer.get_current_connection()
 			self._printer.disconnect()
+			disconnected = True
 			if self.__is_ino:
 				arduino.upload(sketch=self._firmware, fqbn=fqbn, port=flash_port)
 			else:
 				arduino.upload(fqbn=fqbn, port=flash_port, input_file=self._firmware)
 			self._wait_post_flash_delay()
+			self._should_run_post_script = True
 			self._printer.connect(port, baudrate, profile)
 			self._firmware = None
 			self._firmware_version = None
 			self._firmware_author = None
 			self._firmware_upload_time = None
-			self._should_run_post_script = True
 			self._plugin_manager.send_plugin_message(self._identifier, dict(
 				type="flash_progress",
 				step=gettext("Done"),
@@ -297,6 +307,8 @@ class ArduinoFlasher(BaseFlasher):
 				message=gettext("Board successfully flashed.")
 			))
 		except pyduinocli.ArduinoError as e:
+			if disconnected:
+				self._printer.connect(port, baudrate, profile)
 			error = self.__error_to_dict(e)
 			error.update(dict(
 				type="flash_result",

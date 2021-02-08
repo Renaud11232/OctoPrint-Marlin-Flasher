@@ -149,6 +149,7 @@ class PlatformIOFlasher(BaseFlasher):
 		), None
 
 	def __background_flash(self, env):
+		disconnected = False
 		try:
 			self._plugin_manager.send_plugin_message(self._identifier, dict(
 				type="flash_progress",
@@ -176,15 +177,16 @@ class PlatformIOFlasher(BaseFlasher):
 			self._wait_pre_flash_delay()
 			_, port, baudrate, profile = self._printer.get_current_connection()
 			self._printer.disconnect()
+			disconnected = True
 			pio_args.extend(["-t", "upload"])
 			self.__exec(pio_args)
 			self._wait_post_flash_delay()
+			self._should_run_post_script = True
 			self._printer.connect(port, baudrate, profile)
 			self._firmware = None
 			self._firmware_version = None
 			self._firmware_author = None
 			self._firmware_upload_time = None
-			self._should_run_post_script = True
 			self._plugin_manager.send_plugin_message(self._identifier, dict(
 				type="flash_progress",
 				step=gettext("Done"),
@@ -196,6 +198,8 @@ class PlatformIOFlasher(BaseFlasher):
 				message=gettext("Board successfully flashed.")
 			))
 		except FlasherError as e:
+			if disconnected:
+				self._printer.connect(port, baudrate, profile)
 			self._plugin_manager.send_plugin_message(self._identifier, dict(
 				type="flash_result",
 				success=False,
