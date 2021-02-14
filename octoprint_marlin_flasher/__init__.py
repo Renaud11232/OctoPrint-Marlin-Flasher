@@ -21,7 +21,7 @@ class MarlinFlasherPlugin(octoprint.plugin.StartupPlugin,
 						  octoprint.plugin.EventHandlerPlugin):
 
 	def on_after_startup(self):
-		self.__flasher = MarlinFlasher(self.__settings_wrapper, self._printer, self, self._plugin_manager, self._identifier)
+		self.__flasher = MarlinFlasher(self.__settings_wrapper, self._printer, self, self._plugin_manager, self._identifier, self._logger)
 		self.__validator = RequestValidator(self.__settings_wrapper)
 
 	def get_settings_defaults(self):
@@ -90,10 +90,7 @@ class MarlinFlasherPlugin(octoprint.plugin.StartupPlugin,
 		return 3
 
 	def is_wizard_required(self):
-		if self.__settings_wrapper.get_platform_type() == PlatformType.ARDUINO:
-			return not self.__settings_wrapper.get_arduino_cli_path() or not self.__settings_wrapper.get_arduino_sketch_ino()
-		else:
-			return not self.__settings_wrapper.get_platformio_cli_path()
+		return True
 
 	def on_event(self, event, payload):
 		if event == Events.CONNECTED:

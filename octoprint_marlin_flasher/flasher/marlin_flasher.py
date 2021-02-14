@@ -6,11 +6,11 @@ from .platform_type import PlatformType
 
 class MarlinFlasher:
 
-	def __init__(self, settings, printer, plugin, plugin_manager, identifier):
+	def __init__(self, settings, printer, plugin, plugin_manager, identifier, logger):
 		self.__settings = settings
-		self.__arduino_flasher = ArduinoFlasher(settings, printer, plugin, plugin_manager, identifier)
-		self.__platformio_flasher = PlatformIOFlasher(settings, printer, plugin, plugin_manager, identifier)
-		self.__unsupported_flasher = UnsupportedFlasher(settings, printer, plugin, plugin_manager, identifier)
+		self.__arduino_flasher = ArduinoFlasher(settings, printer, plugin, plugin_manager, identifier, logger)
+		self.__platformio_flasher = PlatformIOFlasher(settings, printer, plugin, plugin_manager, identifier, logger)
+		self.__unsupported_flasher = UnsupportedFlasher(settings, printer, plugin, plugin_manager, identifier, logger)
 
 	def __get_implementation(self):
 		platform = self.__settings.get_platform_type()
