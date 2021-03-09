@@ -267,7 +267,19 @@ class MarlinFlasherPlugin(octoprint.plugin.StartupPlugin,
 				repo="OctoPrint-Marlin-Flasher",
 				current=self._plugin_version,
 
-				pip="https://github.com/Renaud11232/OctoPrint-Marlin-Flasher/archive/{target_version}.zip"
+				pip="https://github.com/Renaud11232/OctoPrint-Marlin-Flasher/archive/{target_version}.zip",
+
+				stable_branch=dict(
+					name="Stable",
+					branch="master"
+				),
+
+				prerelease_branches=[
+					dict(
+						name="Prerelease",
+						branch="prerelease"
+					)
+				]
 			)
 		)
 
