@@ -38,7 +38,7 @@ screenshots:
   caption: The flash menu where you start the flashing process using Arduino
 - url:  /assets/img/plugins/marlin_flasher/pio_project.png
   alt: pio_project
-  caption: The Platform.io project menu where you can upload your PlatformIO firmware
+  caption: The PlatformIO project menu where you can upload your PlatformIO firmware
 - url: /assets/img/plugins/marlin_flasher/pio_flash.png
   alt: arduino_flash
   caption: The flash menu where you start the flashing process using PlatformIO
@@ -57,7 +57,7 @@ compatibility:
 
 ---
 
-Adds the ability to easily update your Arduino and Platform.io based printer firmware with just a few clicks directly through OctoPrint.
+Adds the ability to easily update your Arduino and PlatformIO based printer firmware with just a few clicks directly through OctoPrint.
 You can install multiple libraries if your firmware needs it, upload your firmware code, and just hit Flash.
 
 Please be aware that I'm not responsible for any damage made to your printer if something had to go wrong during the flashing process.

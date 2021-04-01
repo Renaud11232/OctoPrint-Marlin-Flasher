@@ -35,10 +35,10 @@ class PlatformIOFlasher(BaseFlasher):
 			raise FlasherError(gettext("The given executable does not exist."))
 
 	def check_setup_errors(self):
-		self._logger.debug("Checking Platform.io configuration...")
+		self._logger.debug("Checking PlatformIO configuration...")
 		no_platformio_path = self._settings.get_platformio_cli_path() is None
 		if no_platformio_path:
-			self._logger.info("No Platform.io path was configured")
+			self._logger.info("No PlatformIO path was configured")
 			return dict(
 				error=gettext("No path has been configured, check the plugin settings.")
 			)
@@ -110,7 +110,7 @@ class PlatformIOFlasher(BaseFlasher):
 					file="platformio.ini"
 				), None
 			return None, dict(
-				error=gettext("No Platform.io configuration file were found in the given file.")
+				error=gettext("No PlatformIO configuration file were found in the given file.")
 			)
 
 	def firmware(self):

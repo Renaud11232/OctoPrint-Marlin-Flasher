@@ -3,7 +3,7 @@
 This plugins makes the upgrade of your Marlin firmware possible directly within OctoPrint.
 Simply connect to your printer, upload your firmware code, select your motherboard type, and click flash. **DONE**.
 
-It also supports Platform.io so even 32 bits boards can be flashed!.
+It also supports PlatformIO so even 32 bits boards can be flashed!.
 
 ## Screenshots
 
@@ -17,11 +17,11 @@ It also supports Platform.io so even 32 bits boards can be flashed!.
 
 ![Arduino Flash](.github/img/arduino_flash.png)
 
-### Platform.io
+### PlatformIO
 
-![Platform.io Sketch](.github/img/pio_project.png)
+![PlatformIO Sketch](.github/img/pio_project.png)
 
-![Platform.io Flash](.github/img/pio_flash.png)
+![PlatformIO Flash](.github/img/pio_flash.png)
 
 ## Setup
 
@@ -34,7 +34,7 @@ or manually using this URL:
 
 First, you'll need to download `arduino-cli` from their official [GitHub page](https://github.com/arduino/arduino-cli/releases). Then all is left to do is to tell the plugin where you placed it via the settings.
 
-### Platform.io
+### PlatformIO
 
 You first need to install PlatformIO-Core following their [official documentation](https://docs.platformio.org/en/latest/installation.html). Then as for Arduino, you need to tell the plugin where its installed.
 
@@ -67,6 +67,7 @@ plugins:
     pre_flash_delay: 5
     post_flash_script: 'M117 Post flash'
     post_flash_delay: 5
+    retrieving_method: upload
 ```
 
 ## Wiki
