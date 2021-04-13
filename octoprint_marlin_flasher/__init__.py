@@ -12,15 +12,15 @@ from .settings import SettingsWrapper
 from .flasher.platform_type import PlatformType
 
 
-class MarlinFlasherPlugin(octoprint.plugin.StartupPlugin,
-						  octoprint.plugin.SettingsPlugin,
+class MarlinFlasherPlugin(octoprint.plugin.SettingsPlugin,
 						  octoprint.plugin.AssetPlugin,
 						  octoprint.plugin.TemplatePlugin,
 						  octoprint.plugin.WizardPlugin,
 						  octoprint.plugin.BlueprintPlugin,
 						  octoprint.plugin.EventHandlerPlugin):
 
-	def on_after_startup(self):
+	def initialize(self):
+		self.__settings_wrapper = SettingsWrapper(self._settings)
 		self.__flasher = MarlinFlasher(self.__settings_wrapper, self._printer, self, self._plugin_manager, self._identifier, self._logger)
 		self.__validator = RequestValidator(self.__settings_wrapper)
 
@@ -45,9 +45,6 @@ class MarlinFlasherPlugin(octoprint.plugin.StartupPlugin,
 
 	def get_settings_version(self):
 		return 1
-
-	def on_settings_initialized(self):
-		self.__settings_wrapper = SettingsWrapper(self._settings)
 
 	def on_settings_migrate(self, target, current):
 		defaults = self.get_settings_defaults()
