@@ -1,5 +1,6 @@
 from .base_flasher import BaseFlasher
 from .flasher_error import FlasherError
+from collections import deque
 from subprocess import Popen, PIPE
 import zipfile
 import os
@@ -20,16 +21,23 @@ class PlatformIOFlasher(BaseFlasher):
 		command.extend(args)
 		try:
 			self._logger.debug("Executing command : %s" % " ".join(command))
-			p = Popen(command, stdout=PIPE, stderr=PIPE, universal_newlines=True)
-			stdout, stderr = p.communicate()
-			stdout = stdout.strip()
-			stderr = stderr.strip()
+			logs = deque()
+			with Popen(command, stdout=PIPE, stderr=PIPE, universal_newlines=True) as p:
+				def log_output(stream):
+					for line in stream:
+						self._logger.debug(line.rstrip())
+						logs.append(line)
+				stdout_thread = Thread(target=log_output, args=(p.stdout,))
+				stderr_thread = Thread(target=log_output, args=(p.stderr,))
+				stdout_thread.start()
+				stderr_thread.start()
+				stdout_thread.join()
+				stderr_thread.join()
 			self._logger.debug("Return code : %d" % p.returncode)
-			self._logger.debug("Standard output : %s" % stdout)
-			self._logger.debug("Error output : %s" % stderr)
+			output = "".join(logs)
 			if p.returncode != 0:
-				raise FlasherError(stderr)
-			return stdout
+				raise FlasherError(output)
+			return output
 		except OSError:
 			self._logger.debug("The executable does not exist")
 			raise FlasherError(gettext("The given executable does not exist."))
