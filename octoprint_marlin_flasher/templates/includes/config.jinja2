@@ -1,7 +1,5 @@
 <form class="form-horizontal">
-    <div class="accordion" id="marlin_flasher_settings_accordion_{{field_suffix}}">
-        {% include "includes/config_items/global.jinja2" %}
-        {% include "includes/config_items/arduino.jinja2" %}
-        {% include "includes/config_items/platformio.jinja2" %}
-    </div>
+    {% include "includes/config_items/global.jinja2" %}
+    {% include "includes/config_items/arduino.jinja2" %}
+    {% include "includes/config_items/platformio.jinja2" %}
 </form>

@@ -1,17 +1,9 @@
-<div class="accordion-group">
-    <div class="accordion-heading">
-        <a class="accordion-toggle" data-toggle="collapse" data-parent="#marlin_flasher_settings_accordion_{{field_suffix}}" href="#marlin_flasher_settings_platformio_{{field_suffix}}">
-            {{ _('PlatformIO Settings') }}
-        </a>
-    </div>
-    <div id="marlin_flasher_settings_platformio_{{field_suffix}}" class="accordion-body collapse">
-        <div class="accordion-inner">
-            <div class="control-group">
-                <label class="control-label" for="core_path_{{field_suffix}}">{{ _('Path to Platformio-Core') }}</label>
-                <div class="controls">
-                    <input type="text" data-bind="value: settingsViewModel.settings.plugins.marlin_flasher.platformio.cli_path" id="core_path_{{field_suffix}}">
-                </div>
-            </div>
+<fieldset id="marlin_flasher_settings_general_{{field_suffix}}" data-bind="visible: settingsViewModel.settings.plugins.marlin_flasher.platform_type() === 'platform_io'">
+    <legend>{{ _('PlatformIO') }}</legend>
+    <div class="control-group" title="{{ _('Full path to the the platformio-core executable') }}">
+        <label class="control-label" for="core_path_{{field_suffix}}">{{ _('Path to Platformio-Core') }}</label>
+        <div class="controls">
+            <input type="text" class="input-block-level" data-bind="value: settingsViewModel.settings.plugins.marlin_flasher.platformio.cli_path" id="core_path_{{field_suffix}}">
         </div>
     </div>
-</div>
+</fieldset>

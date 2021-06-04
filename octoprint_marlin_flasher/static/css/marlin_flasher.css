@@ -9,6 +9,10 @@ pre.scrollable-pre {
     white-space: pre;
 }
 
+#marlin_flasher_settings_general_wizard textarea, #marlin_flasher_settings_general_settings textarea {
+    white-space: nowrap;
+}
+
 .modal.modal-lg {
     width: 800px;
     margin-left: -400px;

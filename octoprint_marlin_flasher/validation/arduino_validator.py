@@ -5,6 +5,9 @@ from .base_validator import BaseValidator
 
 class ArduinoValidator(BaseValidator):
 
+	def validate_install(self):
+		return None
+
 	def validate_upload(self):
 		request_fields = {
 			"firmware_file." + self._settings.get_upload_path_suffix(): fields.Str(required=True)

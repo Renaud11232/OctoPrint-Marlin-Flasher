@@ -1,6 +1,6 @@
 <div id="marlin_flasher_modal" class="modal modal-lg hide fade">
     <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
         <h3>{{ _('Error Output') }}</h3>
     </div>
     <div class="modal-body">
@@ -11,5 +11,16 @@
     </div>
     <div class="modal-footer">
         <a href="#" class="btn" data-dismiss="modal" aria-hidden="true">{{ _('Close') }}</a>
+    </div>
+</div>
+<div id="marlin_flasher_arduino_install_modal" data-backdrop="static" class="modal modal-lg hide fade">
+    <div class="modal-header">
+        <h3>{{ _('Arduino installation') }}</h3>
+    </div>
+    <div class="modal-body">
+        <pre class="scrollable-pre" data-bind="text: arduinoInstallationLogs().join('\n')"></pre>
+    </div>
+    <div class="modal-footer">
+        <button class="btn" data-dismiss="modal" data-bind="disable: installingArduino">{{ _('Close') }}</button>
     </div>
 </div>

@@ -5,9 +5,9 @@ from octoprint.server.util.flask import restricted_access
 from octoprint.server import admin_permission
 from octoprint.events import Events
 import flask
-from .flasher import MarlinFlasher
+from .flasher import MarlinFlasher, PlatformIOFlasher, ArduinoFlasher
 from .flasher.retrieving_method import RetrievingMethod
-from .validation import RequestValidator
+from .validation import RequestValidator, ArduinoValidator, PlatformIOValidator
 from .settings import SettingsWrapper
 from .flasher.platform_type import PlatformType
 
@@ -21,8 +21,10 @@ class MarlinFlasherPlugin(octoprint.plugin.SettingsPlugin,
 
 	def initialize(self):
 		self.__settings_wrapper = SettingsWrapper(self._settings)
-		self.__flasher = MarlinFlasher(self.__settings_wrapper, self._printer, self, self._plugin_manager, self._identifier, self._logger)
-		self.__validator = RequestValidator(self.__settings_wrapper)
+		self.__arduino = ArduinoFlasher(self.__settings_wrapper, self._printer, self, self._plugin_manager, self._identifier, self._logger)
+		self.__platformio = PlatformIOFlasher(self.__settings_wrapper, self._printer, self, self._plugin_manager, self._identifier, self._logger)
+		self.__arduino_validator = ArduinoValidator(self.__settings_wrapper)
+		self.__platformio_validator = PlatformIOValidator(self.__settings_wrapper)
 
 	def get_settings_defaults(self):
 		return dict(
@@ -84,174 +86,186 @@ class MarlinFlasherPlugin(octoprint.plugin.SettingsPlugin,
 		)
 
 	def get_wizard_version(self):
-		return 3
+		return 4
 
 	def is_wizard_required(self):
 		return True
 
 	def on_event(self, event, payload):
 		if event == Events.CONNECTED:
-			try:
-				self.__flasher.handle_connected_event()
-			except AttributeError:
-				# The plugin hasn't finished booting, and should not care about a printer reconnecting
-				pass
+			platform = self.__settings_wrapper.get_platform_type()
+			if platform == PlatformType.ARDUINO:
+				self.__arduino.handle_connected_event()
+			elif platform == PlatformType.PLATFORM_IO:
+				self.__platformio.handle_connected_event()
 
-	@octoprint.plugin.BlueprintPlugin.route("/upload_firmware", methods=["POST"])
+	@octoprint.plugin.BlueprintPlugin.route("/arduino/install", methods=["POST"])
 	@restricted_access
 	@admin_permission.require(403)
-	def upload_firmware(self):
-		errors = self.__validator.validate_upload()
+	def arduino_install(self):
+		errors = self.__arduino_validator.validate_install()
 		if errors:
 			return flask.make_response(flask.jsonify(errors), 400)
-		result, errors = self.__flasher.upload()
+		result, errors = self.__arduino.start_install()
 		if errors:
 			return flask.make_response(flask.jsonify(errors), 400)
 		return flask.make_response(flask.jsonify(result), 200)
 
-	@octoprint.plugin.BlueprintPlugin.route("/download_firmware", methods=["POST"])
-	@restricted_access
-	@admin_permission.require(403)
-	def download_firmware(self):
-		errors = self.__validator.validate_download()
-		if errors:
-			return flask.make_response(flask.jsonify(errors), 400)
-		result, errors = self.__flasher.download()
-		if errors:
-			return flask.make_response(flask.jsonify(errors), 400)
-		return flask.make_response(flask.jsonify(result), 200)
-
-	@octoprint.plugin.BlueprintPlugin.route("/firmware", methods=["GET"])
-	@restricted_access
-	@admin_permission.require(403)
-	def firmware(self):
-		errors = self.__validator.validate_firmware()
-		if errors:
-			return flask.make_response(flask.jsonify(errors), 400)
-		result, errors = self.__flasher.firmware()
-		if errors:
-			return flask.make_response(flask.jsonify(errors), 400)
-		return flask.make_response(flask.jsonify(result), 200)
-
-	@octoprint.plugin.BlueprintPlugin.route("/cores/search", methods=["GET"])
-	@restricted_access
-	@admin_permission.require(403)
-	def search_cores(self):
-		errors = self.__validator.validate_core_search()
-		if errors:
-			return flask.make_response(flask.jsonify(errors), 400)
-		result, errors = self.__flasher.core_search()
-		if errors:
-			return flask.make_response(flask.jsonify(errors), 400)
-		return flask.make_response(flask.jsonify(result), 200)
-
-	@octoprint.plugin.BlueprintPlugin.route("/libs/search", methods=["GET"])
-	@restricted_access
-	@admin_permission.require(403)
-	def search_libs(self):
-		errors = self.__validator.validate_lib_search()
-		if errors:
-			return flask.make_response(flask.jsonify(errors), 400)
-		result, errors = self.__flasher.lib_search()
-		if errors:
-			return flask.make_response(flask.jsonify(errors), 400)
-		return flask.make_response(flask.jsonify(result), 200)
-
-	@octoprint.plugin.BlueprintPlugin.route("/cores/install", methods=["POST"])
-	@restricted_access
-	@admin_permission.require(403)
-	def install_core(self):
-		errors = self.__validator.validate_core_install()
-		if errors:
-			return flask.make_response(flask.jsonify(errors), 400)
-		result, errors = self.__flasher.core_install()
-		if errors:
-			return flask.make_response(flask.jsonify(errors), 400)
-		return flask.make_response(flask.jsonify(result), 200)
-
-	@octoprint.plugin.BlueprintPlugin.route("/libs/install", methods=["POST"])
-	@restricted_access
-	@admin_permission.require(403)
-	def install_lib(self):
-		errors = self.__validator.validate_lib_install()
-		if errors:
-			return flask.make_response(flask.jsonify(errors), 400)
-		result, errors = self.__flasher.lib_install()
-		if errors:
-			return flask.make_response(flask.jsonify(errors), 400)
-		return flask.make_response(flask.jsonify(result), 200)
-
-	@octoprint.plugin.BlueprintPlugin.route("/cores/uninstall", methods=["POST"])
-	@restricted_access
-	@admin_permission.require(403)
-	def uninstall_core(self):
-		errors = self.__validator.validate_core_uninstall()
-		if errors:
-			return flask.make_response(flask.jsonify(errors), 400)
-		result, errors = self.__flasher.core_uninstall()
-		if errors:
-			return flask.make_response(flask.jsonify(errors), 400)
-		return flask.make_response(flask.jsonify(result), 200)
-
-	@octoprint.plugin.BlueprintPlugin.route("/libs/uninstall", methods=["POST"])
-	@restricted_access
-	@admin_permission.require(403)
-	def uninstall_lib(self):
-		errors = self.__validator.validate_lib_uninstall()
-		if errors:
-			return flask.make_response(flask.jsonify(errors), 400)
-		result, errors = self.__flasher.lib_uninstall()
-		if errors:
-			return flask.make_response(flask.jsonify(errors), 400)
-		return flask.make_response(flask.jsonify(result), 200)
-
-	@octoprint.plugin.BlueprintPlugin.route("/board/listall", methods=["GET"])
-	@restricted_access
-	@admin_permission.require(403)
-	def board_listall(self):
-		errors = self.__validator.validate_board_listall()
-		if errors:
-			return flask.make_response(flask.jsonify(errors), 400)
-		result, errors = self.__flasher.board_listall()
-		if errors:
-			return flask.make_response(flask.jsonify(errors), 400)
-		return flask.make_response(flask.jsonify(result), 200)
-
-	@octoprint.plugin.BlueprintPlugin.route("/board/details", methods=["GET"])
-	@restricted_access
-	@admin_permission.require(403)
-	def board_detail(self):
-		errors = self.__validator.validate_board_details()
-		if errors:
-			return flask.make_response(flask.jsonify(errors), 400)
-		result, errors = self.__flasher.board_details()
-		if errors:
-			return flask.make_response(flask.jsonify(errors), 400)
-		return flask.make_response(flask.jsonify(result), 200)
-
-	@octoprint.plugin.BlueprintPlugin.route("/flash", methods=["POST"])
-	@restricted_access
-	@admin_permission.require(403)
-	def flash(self):
-		errors = self.__validator.validate_flash()
-		if errors:
-			return flask.make_response(flask.jsonify(errors), 400)
-		result, errors = self.__flasher.flash()
-		if errors:
-			return flask.make_response(flask.jsonify(errors), 400)
-		return flask.make_response(flask.jsonify(result), 200)
-
-	@octoprint.plugin.BlueprintPlugin.route("/last_flash_options", methods=["GET"])
-	@restricted_access
-	@admin_permission.require(403)
-	def last_flash_options(self):
-		errors = self.__validator.validate_last_flash_options()
-		if errors:
-			return flask.make_response(flask.jsonify(errors), 400)
-		result, errors = self.__flasher.last_flash_options()
-		if errors:
-			return flask.make_response(flask.jsonify(errors), 400)
-		return flask.make_response(flask.jsonify(result), 200)
+	# @octoprint.plugin.BlueprintPlugin.route("/upload_firmware", methods=["POST"])
+	# @restricted_access
+	# @admin_permission.require(403)
+	# def upload_firmware(self):
+	# 	errors = self.__validator.validate_upload()
+	# 	if errors:
+	# 		return flask.make_response(flask.jsonify(errors), 400)
+	# 	result, errors = self.__flasher.upload()
+	# 	if errors:
+	# 		return flask.make_response(flask.jsonify(errors), 400)
+	# 	return flask.make_response(flask.jsonify(result), 200)
+	#
+	# @octoprint.plugin.BlueprintPlugin.route("/download_firmware", methods=["POST"])
+	# @restricted_access
+	# @admin_permission.require(403)
+	# def download_firmware(self):
+	# 	errors = self.__validator.validate_download()
+	# 	if errors:
+	# 		return flask.make_response(flask.jsonify(errors), 400)
+	# 	result, errors = self.__flasher.download()
+	# 	if errors:
+	# 		return flask.make_response(flask.jsonify(errors), 400)
+	# 	return flask.make_response(flask.jsonify(result), 200)
+	#
+	# @octoprint.plugin.BlueprintPlugin.route("/firmware", methods=["GET"])
+	# @restricted_access
+	# @admin_permission.require(403)
+	# def firmware(self):
+	# 	errors = self.__validator.validate_firmware()
+	# 	if errors:
+	# 		return flask.make_response(flask.jsonify(errors), 400)
+	# 	result, errors = self.__flasher.firmware()
+	# 	if errors:
+	# 		return flask.make_response(flask.jsonify(errors), 400)
+	# 	return flask.make_response(flask.jsonify(result), 200)
+	#
+	# @octoprint.plugin.BlueprintPlugin.route("/cores/search", methods=["GET"])
+	# @restricted_access
+	# @admin_permission.require(403)
+	# def search_cores(self):
+	# 	errors = self.__validator.validate_core_search()
+	# 	if errors:
+	# 		return flask.make_response(flask.jsonify(errors), 400)
+	# 	result, errors = self.__flasher.core_search()
+	# 	if errors:
+	# 		return flask.make_response(flask.jsonify(errors), 400)
+	# 	return flask.make_response(flask.jsonify(result), 200)
+	#
+	# @octoprint.plugin.BlueprintPlugin.route("/libs/search", methods=["GET"])
+	# @restricted_access
+	# @admin_permission.require(403)
+	# def search_libs(self):
+	# 	errors = self.__validator.validate_lib_search()
+	# 	if errors:
+	# 		return flask.make_response(flask.jsonify(errors), 400)
+	# 	result, errors = self.__flasher.lib_search()
+	# 	if errors:
+	# 		return flask.make_response(flask.jsonify(errors), 400)
+	# 	return flask.make_response(flask.jsonify(result), 200)
+	#
+	# @octoprint.plugin.BlueprintPlugin.route("/cores/install", methods=["POST"])
+	# @restricted_access
+	# @admin_permission.require(403)
+	# def install_core(self):
+	# 	errors = self.__validator.validate_core_install()
+	# 	if errors:
+	# 		return flask.make_response(flask.jsonify(errors), 400)
+	# 	result, errors = self.__flasher.core_install()
+	# 	if errors:
+	# 		return flask.make_response(flask.jsonify(errors), 400)
+	# 	return flask.make_response(flask.jsonify(result), 200)
+	#
+	# @octoprint.plugin.BlueprintPlugin.route("/libs/install", methods=["POST"])
+	# @restricted_access
+	# @admin_permission.require(403)
+	# def install_lib(self):
+	# 	errors = self.__validator.validate_lib_install()
+	# 	if errors:
+	# 		return flask.make_response(flask.jsonify(errors), 400)
+	# 	result, errors = self.__flasher.lib_install()
+	# 	if errors:
+	# 		return flask.make_response(flask.jsonify(errors), 400)
+	# 	return flask.make_response(flask.jsonify(result), 200)
+	#
+	# @octoprint.plugin.BlueprintPlugin.route("/cores/uninstall", methods=["POST"])
+	# @restricted_access
+	# @admin_permission.require(403)
+	# def uninstall_core(self):
+	# 	errors = self.__validator.validate_core_uninstall()
+	# 	if errors:
+	# 		return flask.make_response(flask.jsonify(errors), 400)
+	# 	result, errors = self.__flasher.core_uninstall()
+	# 	if errors:
+	# 		return flask.make_response(flask.jsonify(errors), 400)
+	# 	return flask.make_response(flask.jsonify(result), 200)
+	#
+	# @octoprint.plugin.BlueprintPlugin.route("/libs/uninstall", methods=["POST"])
+	# @restricted_access
+	# @admin_permission.require(403)
+	# def uninstall_lib(self):
+	# 	errors = self.__validator.validate_lib_uninstall()
+	# 	if errors:
+	# 		return flask.make_response(flask.jsonify(errors), 400)
+	# 	result, errors = self.__flasher.lib_uninstall()
+	# 	if errors:
+	# 		return flask.make_response(flask.jsonify(errors), 400)
+	# 	return flask.make_response(flask.jsonify(result), 200)
+	#
+	# @octoprint.plugin.BlueprintPlugin.route("/board/listall", methods=["GET"])
+	# @restricted_access
+	# @admin_permission.require(403)
+	# def board_listall(self):
+	# 	errors = self.__validator.validate_board_listall()
+	# 	if errors:
+	# 		return flask.make_response(flask.jsonify(errors), 400)
+	# 	result, errors = self.__flasher.board_listall()
+	# 	if errors:
+	# 		return flask.make_response(flask.jsonify(errors), 400)
+	# 	return flask.make_response(flask.jsonify(result), 200)
+	#
+	# @octoprint.plugin.BlueprintPlugin.route("/board/details", methods=["GET"])
+	# @restricted_access
+	# @admin_permission.require(403)
+	# def board_detail(self):
+	# 	errors = self.__validator.validate_board_details()
+	# 	if errors:
+	# 		return flask.make_response(flask.jsonify(errors), 400)
+	# 	result, errors = self.__flasher.board_details()
+	# 	if errors:
+	# 		return flask.make_response(flask.jsonify(errors), 400)
+	# 	return flask.make_response(flask.jsonify(result), 200)
+	#
+	# @octoprint.plugin.BlueprintPlugin.route("/flash", methods=["POST"])
+	# @restricted_access
+	# @admin_permission.require(403)
+	# def flash(self):
+	# 	errors = self.__validator.validate_flash()
+	# 	if errors:
+	# 		return flask.make_response(flask.jsonify(errors), 400)
+	# 	result, errors = self.__flasher.flash()
+	# 	if errors:
+	# 		return flask.make_response(flask.jsonify(errors), 400)
+	# 	return flask.make_response(flask.jsonify(result), 200)
+	#
+	# @octoprint.plugin.BlueprintPlugin.route("/last_flash_options", methods=["GET"])
+	# @restricted_access
+	# @admin_permission.require(403)
+	# def last_flash_options(self):
+	# 	errors = self.__validator.validate_last_flash_options()
+	# 	if errors:
+	# 		return flask.make_response(flask.jsonify(errors), 400)
+	# 	result, errors = self.__flasher.last_flash_options()
+	# 	if errors:
+	# 		return flask.make_response(flask.jsonify(errors), 400)
+	# 	return flask.make_response(flask.jsonify(result), 200)
 
 	def get_update_information(self):
 		return dict(
@@ -283,6 +297,9 @@ class MarlinFlasherPlugin(octoprint.plugin.SettingsPlugin,
 	def body_size_hook(self, current_max_body_sizes, *args, **kwargs):
 		return [("POST", r"/upload_firmware", self.__settings_wrapper.get_max_upload_size() * 1024 * 1024)]
 
+	def additional_excludes_hook(self, excludes, *args, **kwargs):
+		return ["arduino-cli", "platformio"]
+
 
 __plugin_name__ = "Marlin Flasher"
 __plugin_pythoncompat__ = ">=2.7,<4"
@@ -295,5 +312,6 @@ def __plugin_load__():
 	global __plugin_hooks__
 	__plugin_hooks__ = {
 		"octoprint.plugin.softwareupdate.check_config": __plugin_implementation__.get_update_information,
-		"octoprint.server.http.bodysize": __plugin_implementation__.body_size_hook
+		"octoprint.server.http.bodysize": __plugin_implementation__.body_size_hook,
+		"octoprint.plugin.backup.additional_excludes": __plugin_implementation__.additional_excludes_hook
 	}

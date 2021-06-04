@@ -4,6 +4,7 @@ import flask
 import requests
 import tempfile
 import os
+from threading import Thread
 
 
 class BaseFlasher:
@@ -20,6 +21,11 @@ class BaseFlasher:
 		self._firmware_author = None
 		self._firmware_upload_time = None
 		self._should_run_post_script = False
+
+	def _background_run(self, target, args=None):
+		thread = Thread(target=target, args=args)
+		thread.start()
+		return thread
 
 	def _run_pre_flash_script(self):
 		pre_flash_script = self._settings.get_pre_flash_script()

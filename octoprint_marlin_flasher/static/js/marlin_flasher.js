@@ -3,6 +3,64 @@ $(function() {
         var self = this;
         self.settingsViewModel = parameters[0];
         self.loginStateViewModel = parameters[1];
+
+        self.arduinoInstallationLogs = ko.observableArray();
+        self.installingArduino = ko.observable(false);
+
+        self.handleArduinoInstallMessage = function(message) {
+            $("#marlin_flasher_arduino_install_modal").modal("show");
+            self.installingArduino(!message.finished);
+            self.arduinoInstallationLogs.push(message.status);
+            if(message.finished) {
+                if(message.success) {
+                    self.showSuccess(gettext("Arduino installation"), gettext("The installation was successful"));
+                    self.settingsViewModel.settings.plugins.marlin_flasher.arduino.cli_path(message.path);
+                } else {
+                    self.showErrors(gettext("Arduino installation"), [gettext("The installation failed")]);
+                }
+            }
+        }
+
+        self.installArduino = function() {
+            self.arduinoInstallationLogs([]);
+            $.ajax({
+                type: "POST",
+                headers: OctoPrint.getRequestHeaders(),
+                url: "/plugin/marlin_flasher/arduino/install"
+            }).done(function(data) {
+                self.showSuccess(gettext("Arduino installation"), data.message);
+            }).fail(function(jqXHR) {
+                self.showErrors(gettext("Arduino installation"), jqXHR.responseJSON);
+            });
+        }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
         self.arduinoFirmwareFileButton = $("#arduino_firmware_file");
         self.platformioFirmwareFileButton = $("#platformio_firmware_file");
         self.arduinoFlashButton = $("#arduino_flash-button");
@@ -53,6 +111,14 @@ $(function() {
                 self.stderrModal.modal("show");
             }
         };
+
+        self.showErrors = function(title, errors) {
+            new PNotify({
+                title: title,
+                text: errors.join("\n"),
+                type: "error"
+            });
+        }
 
         self.showSuccess = function(title, text) {
             new PNotify({
@@ -364,7 +430,7 @@ $(function() {
             self.loadFirmwareInfo();
         };
         self.onDataUpdaterPluginMessage = function(plugin, message) {
-            if(plugin === "marlin_flasher") {
+            if(plugin === "marlin_flasher" && self.loginStateViewModel.isAdmin()) {
                 if(message.type === "flash_progress") {
                     self.progressStep(message.step);
                     self.flashingProgress(message.progress);
@@ -383,9 +449,12 @@ $(function() {
                     self.arduinoFlashButton.button("reset");
                     self.platformioFlashButton.button("reset");
                     self.loadFirmwareInfo();
+                } else if (message.type === "arduino_install") {
+                    self.handleArduinoInstallMessage(message);
                 }
             }
         };
+
         self.onSettingsBeforeSave = function() {
             self.settingsViewModel.settings.plugins.marlin_flasher.max_upload_size(parseInt(self.settingsViewModel.settings.plugins.marlin_flasher.max_upload_size()));
             if(self.settingsViewModel.settings.plugins.marlin_flasher.arduino.additional_urls() === "") {
@@ -424,7 +493,8 @@ $(function() {
             "#settings_plugin_marlin_flasher",
             "#wizard_plugin_marlin_flasher",
             "#tab_plugin_marlin_flasher",
-            "#marlin_flasher_modal"
+            "#marlin_flasher_modal",
+            "#marlin_flasher_arduino_install_modal"
         ]
     });
 });
