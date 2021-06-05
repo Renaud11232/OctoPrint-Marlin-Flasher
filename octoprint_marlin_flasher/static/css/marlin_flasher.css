@@ -13,6 +13,10 @@ pre.scrollable-pre {
     white-space: nowrap;
 }
 
+#marlin_flasher_platformio_install_modal pre {
+    height: 400px;
+}
+
 .modal.modal-lg {
     width: 800px;
     margin-left: -400px;

@@ -44,6 +44,3 @@ class BaseValidator:
 
 	def validate_last_flash_options(self):
 		raise ValidatorError("Unsupported function call.")
-
-	def validate_install(self):
-		raise ValidatorError("Unsupported function call.")

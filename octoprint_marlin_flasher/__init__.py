@@ -103,10 +103,16 @@ class MarlinFlasherPlugin(octoprint.plugin.SettingsPlugin,
 	@restricted_access
 	@admin_permission.require(403)
 	def arduino_install(self):
-		errors = self.__arduino_validator.validate_install()
+		result, errors = self.__arduino.start_install()
 		if errors:
 			return flask.make_response(flask.jsonify(errors), 400)
-		result, errors = self.__arduino.start_install()
+		return flask.make_response(flask.jsonify(result), 200)
+
+	@octoprint.plugin.BlueprintPlugin.route("/platformio/install", methods=["POST"])
+	@restricted_access
+	@admin_permission.require(403)
+	def platformio_install(self):
+		result, errors = self.__platformio.start_install()
 		if errors:
 			return flask.make_response(flask.jsonify(errors), 400)
 		return flask.make_response(flask.jsonify(result), 200)

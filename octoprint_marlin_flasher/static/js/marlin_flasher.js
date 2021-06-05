@@ -11,6 +11,8 @@ $(function() {
             $("#marlin_flasher_arduino_install_modal").modal("show");
             self.installingArduino(!message.finished);
             self.arduinoInstallationLogs.push(message.status);
+            var pre = $("#marlin_flasher_arduino_install_modal pre")
+            pre.scrollTop(pre.prop("scrollHeight"));
             if(message.finished) {
                 if(message.success) {
                     self.showSuccess(gettext("Arduino installation"), gettext("The installation was successful"));
@@ -34,6 +36,37 @@ $(function() {
             });
         }
 
+        self.platformioInstallationLogs = ko.observableArray();
+        self.installingPlatformio = ko.observable(false);
+
+        self.handlePlatformioInstallMessage = function(message) {
+            $("#marlin_flasher_platformio_install_modal").modal("show");
+            self.installingPlatformio(!message.finished);
+            self.platformioInstallationLogs.push(message.status);
+            var pre = $("#marlin_flasher_platformio_install_modal pre")
+            pre.scrollTop(pre.prop("scrollHeight"));
+            if(message.finished) {
+                if(message.success) {
+                    self.showSuccess(gettext("Platformio installation"), gettext("The installation was successful"));
+                    self.settingsViewModel.settings.plugins.marlin_flasher.platformio.cli_path(message.path);
+                } else {
+                    self.showErrors(gettext("Platformio installation"), [gettext("The installation failed")]);
+                }
+            }
+        }
+
+        self.installPlatformio = function() {
+            self.platformioInstallationLogs([]);
+            $.ajax({
+                type: "POST",
+                headers: OctoPrint.getRequestHeaders(),
+                url: "/plugin/marlin_flasher/platformio/install"
+            }).done(function(data) {
+                self.showSuccess(gettext("Platformio installation"), data.message);
+            }).fail(function(jqXHR) {
+                self.showErrors(gettext("Platformio installation"), jqXHR.responseJSON);
+            });
+        }
 
 
 
@@ -451,6 +484,8 @@ $(function() {
                     self.loadFirmwareInfo();
                 } else if (message.type === "arduino_install") {
                     self.handleArduinoInstallMessage(message);
+                } else if (message.type === "platformio_install") {
+                    self.handlePlatformioInstallMessage(message);
                 }
             }
         };
@@ -494,7 +529,8 @@ $(function() {
             "#wizard_plugin_marlin_flasher",
             "#tab_plugin_marlin_flasher",
             "#marlin_flasher_modal",
-            "#marlin_flasher_arduino_install_modal"
+            "#marlin_flasher_arduino_install_modal",
+            "#marlin_flasher_platformio_install_modal"
         ]
     });
 });

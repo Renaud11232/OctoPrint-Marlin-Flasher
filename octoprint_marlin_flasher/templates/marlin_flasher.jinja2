@@ -24,3 +24,14 @@
         <button class="btn" data-dismiss="modal" data-bind="disable: installingArduino">{{ _('Close') }}</button>
     </div>
 </div>
+<div id="marlin_flasher_platformio_install_modal" data-backdrop="static" class="modal modal-lg hide fade">
+    <div class="modal-header">
+        <h3>{{ _('Platformio installation') }}</h3>
+    </div>
+    <div class="modal-body">
+        <pre class="scrollable-pre" data-bind="text: platformioInstallationLogs().join('\n')"></pre>
+    </div>
+    <div class="modal-footer">
+        <button class="btn" data-dismiss="modal" data-bind="disable: installingPlatformio">{{ _('Close') }}</button>
+    </div>
+</div>

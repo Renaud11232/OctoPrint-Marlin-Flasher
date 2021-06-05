@@ -1,5 +1,10 @@
 <fieldset id="marlin_flasher_settings_general_{{field_suffix}}" data-bind="visible: settingsViewModel.settings.plugins.marlin_flasher.platform_type() === 'platform_io'">
     <legend>{{ _('PlatformIO') }}</legend>
+    <div class="control-group" title="{{ _('One-click installation') }}">
+        <div class="controls">
+            <button role="button" class="btn btn-large" data-bind="click: installPlatformio, disable: installingPlatformio"><i class="fas fa-magic"></i> Download and install</button>
+        </div>
+    </div>
     <div class="control-group" title="{{ _('Full path to the the platformio-core executable') }}">
         <label class="control-label" for="core_path_{{field_suffix}}">{{ _('Path to Platformio-Core') }}</label>
         <div class="controls">
