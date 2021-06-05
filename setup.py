@@ -10,7 +10,8 @@ plugin_license = "MIT"
 plugin_requires = [
 	"pyduinocli>=0.18.1,<0.19",
 	"requests",
-	"virtualenv"
+	"virtualenv",
+	"flask>=0.10.1"
 ]
 plugin_additional_data = []
 plugin_additional_packages = []

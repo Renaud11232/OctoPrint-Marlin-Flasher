@@ -66,7 +66,7 @@ class PlatformIOFlasher(BaseFlasher):
 				type="platformio_install",
 				finished=True,
 				success=True,
-				status=gettext("Successfully install Platformio in %s") % venv_path,
+				status=gettext("Successfully installed Platformio in %s") % venv_path,
 				path=pio_path
 			))
 		else:
@@ -88,6 +88,67 @@ class PlatformIOFlasher(BaseFlasher):
 			p.wait()
 			self._logger.debug("The command exited with status %d" % p.returncode)
 			return p.returncode == 0
+
+	def _validate_firmware_file(self, file_path):
+		self._logger.debug("Validating firmware file...")
+		try:
+			with zipfile.ZipFile(file_path, "r") as _:
+				return None
+		except zipfile.BadZipfile:
+			self._logger.debug("The firmware file does not have a valid file type")
+			return dict(
+				error=gettext("Invalid file type.")
+			)
+
+	def _handle_firmware_file(self, firmware_file_path):
+		self._firmware = None
+		self._firmware_version = None
+		self._firmware_author = None
+		self._firmware_upload_time = None
+		self._logger.debug("Trying to open firmware as zip file...")
+		with zipfile.ZipFile(firmware_file_path, "r") as zip_file:
+			firmware_dir = os.path.join(self._plugin.get_plugin_data_folder(), "firmware_platformio")
+			if os.path.exists(firmware_dir):
+				shutil.rmtree(firmware_dir)
+			os.makedirs(firmware_dir)
+			self._logger.debug("Extracting firmware archive...")
+			zip_file.extractall(firmware_dir)
+			self._logger.debug("Browsing files...")
+			for root, dirs, files in os.walk(firmware_dir):
+				for f in files:
+					if f == "platformio.ini":
+						self._logger.debug("Found platformio.ini")
+						self._firmware = root
+						self._firmware_upload_time = datetime.now()
+					elif f == "Version.h":
+						self._logger.debug("Found Version.h, opening it...")
+						with open(os.path.join(root, f), "r") as versionfile:
+							for line in versionfile:
+								if "SHORT_BUILD_VERSION" in line:
+									self._logger.debug("Found SHORT_BUILD_VERSION")
+									version = re.findall('"([^"]*)"', line)
+									if version:
+										self._firmware_version = version[0]
+										break
+					elif f == "Configuration.h":
+						self._logger.debug("Found Configuration.h, opening it...")
+						with open(os.path.join(root, f), "r") as configfile:
+							for line in configfile:
+								if "STRING_CONFIG_H_AUTHOR" in line:
+									self._logger.debug("Found STRING_CONFIG_H_AUTHOR")
+									author = re.findall('"([^"]*)"', line)
+									if author:
+										self._firmware_author = author[0]
+										break
+			if self._firmware:
+				return dict(
+					path=self._firmware,
+					file="platformio.ini"
+				), None
+			return None, dict(
+				error=gettext("No PlatformIO configuration file were found in the given file.")
+			)
+
 	# def __exec(self, args):
 	# 	command = [self._settings.get_platformio_cli_path()]
 	# 	command.extend(args)
@@ -132,66 +193,6 @@ class PlatformIOFlasher(BaseFlasher):
 	# 			error=gettext("The configured path does not point to PlatformIO-Core.")
 	# 		)
 	# 	return None
-	#
-	# def _validate_firmware_file(self, file_path):
-	# 	self._logger.debug("Validating firmware file...")
-	# 	try:
-	# 		with zipfile.ZipFile(file_path, "r") as _:
-	# 			return None
-	# 	except zipfile.BadZipfile:
-	# 		self._logger.debug("The firmware file does not have a valid file type")
-	# 		return dict(
-	# 			error=gettext("Invalid file type.")
-	# 		)
-	#
-	# def _handle_firmware_file(self, firmware_file_path):
-	# 	self._firmware = None
-	# 	self._firmware_version = None
-	# 	self._firmware_author = None
-	# 	self._firmware_upload_time = None
-	# 	self._logger.debug("Trying to open firmware as zip file...")
-	# 	with zipfile.ZipFile(firmware_file_path, "r") as zip_file:
-	# 		firmware_dir = os.path.join(self._plugin.get_plugin_data_folder(), "firmware_platformio")
-	# 		if os.path.exists(firmware_dir):
-	# 			shutil.rmtree(firmware_dir)
-	# 		os.makedirs(firmware_dir)
-	# 		self._logger.debug("Extracting firmware archive...")
-	# 		zip_file.extractall(firmware_dir)
-	# 		self._logger.debug("Browsing files...")
-	# 		for root, dirs, files in os.walk(firmware_dir):
-	# 			for f in files:
-	# 				if f == "platformio.ini":
-	# 					self._logger.debug("Found platformio.ini")
-	# 					self._firmware = root
-	# 					self._firmware_upload_time = datetime.now()
-	# 				elif f == "Version.h":
-	# 					self._logger.debug("Found Version.h, opening it...")
-	# 					with open(os.path.join(root, f), "r") as versionfile:
-	# 						for line in versionfile:
-	# 							if "SHORT_BUILD_VERSION" in line:
-	# 								self._logger.debug("Found SHORT_BUILD_VERSION")
-	# 								version = re.findall('"([^"]*)"', line)
-	# 								if version:
-	# 									self._firmware_version = version[0]
-	# 									break
-	# 				elif f == "Configuration.h":
-	# 					self._logger.debug("Found Configuration.h, opening it...")
-	# 					with open(os.path.join(root, f), "r") as configfile:
-	# 						for line in configfile:
-	# 							if "STRING_CONFIG_H_AUTHOR" in line:
-	# 								self._logger.debug("Found STRING_CONFIG_H_AUTHOR")
-	# 								author = re.findall('"([^"]*)"', line)
-	# 								if author:
-	# 									self._firmware_author = author[0]
-	# 									break
-	# 		if self._firmware:
-	# 			return dict(
-	# 				path=self._firmware,
-	# 				file="platformio.ini"
-	# 			), None
-	# 		return None, dict(
-	# 			error=gettext("No PlatformIO configuration file were found in the given file.")
-	# 		)
 	#
 	# def firmware(self):
 	# 	return dict(

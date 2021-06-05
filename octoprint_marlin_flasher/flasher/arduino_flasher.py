@@ -127,6 +127,86 @@ class ArduinoFlasher(BaseFlasher):
 				status=gettext("Failed to extract downloaded archive")
 			))
 
+	def _validate_firmware_file(self, file_path):
+		self._logger.debug("Validating firmware file, checking for zip...")
+		try:
+			with zipfile.ZipFile(file_path, "r") as _:
+				return None
+		except zipfile.BadZipfile:
+			self._logger.debug("The firmware is not a zip file, checking if it's a .hex")
+			try:
+				ih = intelhex.IntelHex()
+				ih.loadhex(file_path)
+				return None
+			except:
+				self._logger.debug("The firmware file is not valid")
+				return dict(
+					error=gettext("Invalid file type.")
+				)
+
+	def _handle_firmware_file(self, firmware_file_path):
+		self._firmware = None
+		self._firmware_version = None
+		self._firmware_author = None
+		self._firmware_upload_time = None
+		firmware_dir = os.path.join(self._plugin.get_plugin_data_folder(), "firmware_arduino")
+		if os.path.exists(firmware_dir):
+			shutil.rmtree(firmware_dir)
+		try:
+			self._logger.debug("Trying to open firmware as zip file...")
+			with zipfile.ZipFile(firmware_file_path, "r") as zip_file:
+				self.__is_ino = True
+				sketch_dir = os.path.join(firmware_dir, os.path.splitext(self._settings.get_arduino_sketch_ino())[0])
+				os.makedirs(sketch_dir)
+				self._logger.debug("Extracting firmware archive...")
+				zip_file.extractall(sketch_dir)
+				self._logger.debug("Browsing files...")
+				for root, dirs, files in os.walk(sketch_dir):
+					for f in files:
+						if f == self._settings.get_arduino_sketch_ino():
+							self._logger.debug("Found .ino file")
+							self._firmware = root
+							self._firmware_upload_time = datetime.now()
+						elif f == "Version.h":
+							self._logger.debug("Found Version.h, opening it...")
+							with open(os.path.join(root, f), "r") as versionfile:
+								for line in versionfile:
+									if "SHORT_BUILD_VERSION" in line:
+										self._logger.debug("Found SHORT_BUILD_VERSION")
+										version = re.findall('"([^"]*)"', line)
+										if version:
+											self._firmware_version = version[0]
+											break
+						elif f == "Configuration.h":
+							self._logger.debug("Found Configuration.h, opening it...")
+							with open(os.path.join(root, f), "r") as configfile:
+								for line in configfile:
+									if "STRING_CONFIG_H_AUTHOR" in line:
+										self._logger.debug("Found STRING_CONFIG_H_AUTHOR")
+										author = re.findall('"([^"]*)"', line)
+										if author:
+											self._firmware_author = author[0]
+											break
+				if self._firmware:
+					return dict(
+						path=self._firmware,
+						file=self._settings.get_arduino_sketch_ino()
+					), None
+				return None, dict(
+					error=gettext("No valid sketch were found in the given file.")
+				)
+		except zipfile.BadZipfile:
+			self._logger.debug("Trying to open firmware as hex file...")
+			self.__is_ino = False
+			os.makedirs(firmware_dir)
+			self._firmware = os.path.join(firmware_dir, "firmware.hex")
+			self._firmware_upload_time = datetime.now()
+			self._logger.debug("Copying file in plugin directory.")
+			shutil.copyfile(firmware_file_path, self._firmware)
+			return dict(
+				path=firmware_dir,
+				file="firmware.hex"
+			), None
 
 
 	# def __get_arduino(self):
@@ -176,86 +256,7 @@ class ArduinoFlasher(BaseFlasher):
 	# 		)
 	# 	return None
 	#
-	# def _validate_firmware_file(self, file_path):
-	# 	self._logger.debug("Validating firmware file, checking for zip...")
-	# 	try:
-	# 		with zipfile.ZipFile(file_path, "r") as _:
-	# 			return None
-	# 	except zipfile.BadZipfile:
-	# 		self._logger.debug("The firmware is not a zip file, checking if it's a .hex")
-	# 		try:
-	# 			ih = intelhex.IntelHex()
-	# 			ih.loadhex(file_path)
-	# 			return None
-	# 		except:
-	# 			self._logger.debug("The firmware file is not valid")
-	# 			return dict(
-	# 				error=gettext("Invalid file type.")
-	# 			)
-	#
-	# def _handle_firmware_file(self, firmware_file_path):
-	# 	self._firmware = None
-	# 	self._firmware_version = None
-	# 	self._firmware_author = None
-	# 	self._firmware_upload_time = None
-	# 	firmware_dir = os.path.join(self._plugin.get_plugin_data_folder(), "firmware_arduino")
-	# 	if os.path.exists(firmware_dir):
-	# 		shutil.rmtree(firmware_dir)
-	# 	try:
-	# 		self._logger.debug("Trying to open firmware as zip file...")
-	# 		with zipfile.ZipFile(firmware_file_path, "r") as zip_file:
-	# 			self.__is_ino = True
-	# 			sketch_dir = os.path.join(firmware_dir, os.path.splitext(self._settings.get_arduino_sketch_ino())[0])
-	# 			os.makedirs(sketch_dir)
-	# 			self._logger.debug("Extracting firmware archive...")
-	# 			zip_file.extractall(sketch_dir)
-	# 			self._logger.debug("Browsing files...")
-	# 			for root, dirs, files in os.walk(sketch_dir):
-	# 				for f in files:
-	# 					if f == self._settings.get_arduino_sketch_ino():
-	# 						self._logger.debug("Found .ino file")
-	# 						self._firmware = root
-	# 						self._firmware_upload_time = datetime.now()
-	# 					elif f == "Version.h":
-	# 						self._logger.debug("Found Version.h, opening it...")
-	# 						with open(os.path.join(root, f), "r") as versionfile:
-	# 							for line in versionfile:
-	# 								if "SHORT_BUILD_VERSION" in line:
-	# 									self._logger.debug("Found SHORT_BUILD_VERSION")
-	# 									version = re.findall('"([^"]*)"', line)
-	# 									if version:
-	# 										self._firmware_version = version[0]
-	# 										break
-	# 					elif f == "Configuration.h":
-	# 						self._logger.debug("Found Configuration.h, opening it...")
-	# 						with open(os.path.join(root, f), "r") as configfile:
-	# 							for line in configfile:
-	# 								if "STRING_CONFIG_H_AUTHOR" in line:
-	# 									self._logger.debug("Found STRING_CONFIG_H_AUTHOR")
-	# 									author = re.findall('"([^"]*)"', line)
-	# 									if author:
-	# 										self._firmware_author = author[0]
-	# 										break
-	# 			if self._firmware:
-	# 				return dict(
-	# 					path=self._firmware,
-	# 					file=self._settings.get_arduino_sketch_ino()
-	# 				), None
-	# 			return None, dict(
-	# 				error=gettext("No valid sketch were found in the given file.")
-	# 			)
-	# 	except zipfile.BadZipfile:
-	# 		self._logger.debug("Trying to open firmware as hex file...")
-	# 		self.__is_ino = False
-	# 		os.makedirs(firmware_dir)
-	# 		self._firmware = os.path.join(firmware_dir, "firmware.hex")
-	# 		self._firmware_upload_time = datetime.now()
-	# 		self._logger.debug("Copying file in plugin directory.")
-	# 		shutil.copyfile(firmware_file_path, self._firmware)
-	# 		return dict(
-	# 			path=firmware_dir,
-	# 			file="firmware.hex"
-	# 		), None
+
 	#
 	# def firmware(self):
 	# 	return dict(

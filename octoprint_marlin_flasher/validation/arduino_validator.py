@@ -6,10 +6,10 @@ from .base_validator import BaseValidator
 class ArduinoValidator(BaseValidator):
 
 	def validate_upload(self):
-		request_fields = {
-			"firmware_file." + self._settings.get_upload_path_suffix(): fields.Str(required=True)
-		}
-		return type("_ArduinoUploadSchema", (Schema,), request_fields)().validate(flask.request.values)
+		errors = []
+		if "firmware_file." + self._settings.get_upload_path_suffix() not in flask.request.values:
+			return errors.append("Uploaded file is missing")
+		return errors
 
 	def validate_download(self):
 		request_fields = {

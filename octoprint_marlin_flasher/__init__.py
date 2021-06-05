@@ -99,35 +99,41 @@ class MarlinFlasherPlugin(octoprint.plugin.SettingsPlugin,
 			elif platform == PlatformType.PLATFORM_IO:
 				self.__platformio.handle_connected_event()
 
+	def __handle_unvalidated_request(self, handler):
+		result, errors = handler()
+		if errors:
+			return flask.make_response(flask.jsonify(errors), 400)
+		return flask.make_response(flask.jsonify(result), 200)
+
+	def __handle_validated_request(self, validator, handler):
+		errors = validator()
+		if errors:
+			return flask.make_response(flask.jsonify(errors), 400)
+		return self.__handle_unvalidated_request(handler)
+
 	@octoprint.plugin.BlueprintPlugin.route("/arduino/install", methods=["POST"])
 	@restricted_access
 	@admin_permission.require(403)
 	def arduino_install(self):
-		result, errors = self.__arduino.start_install()
-		if errors:
-			return flask.make_response(flask.jsonify(errors), 400)
-		return flask.make_response(flask.jsonify(result), 200)
+		return self.__handle_unvalidated_request(self.__arduino.start_install)
+
+	@octoprint.plugin.BlueprintPlugin.route("/arduino/upload_firmware", methods=["POST"])
+	@restricted_access
+	@admin_permission.require(403)
+	def upload_arduino_firmware(self):
+		return self.__handle_validated_request(self.__arduino_validator.validate_upload, self.__arduino.upload)
 
 	@octoprint.plugin.BlueprintPlugin.route("/platformio/install", methods=["POST"])
 	@restricted_access
 	@admin_permission.require(403)
 	def platformio_install(self):
-		result, errors = self.__platformio.start_install()
-		if errors:
-			return flask.make_response(flask.jsonify(errors), 400)
-		return flask.make_response(flask.jsonify(result), 200)
+		return self.__handle_unvalidated_request(self.__platformio.start_install)
 
-	# @octoprint.plugin.BlueprintPlugin.route("/upload_firmware", methods=["POST"])
-	# @restricted_access
-	# @admin_permission.require(403)
-	# def upload_firmware(self):
-	# 	errors = self.__validator.validate_upload()
-	# 	if errors:
-	# 		return flask.make_response(flask.jsonify(errors), 400)
-	# 	result, errors = self.__flasher.upload()
-	# 	if errors:
-	# 		return flask.make_response(flask.jsonify(errors), 400)
-	# 	return flask.make_response(flask.jsonify(result), 200)
+	@octoprint.plugin.BlueprintPlugin.route("/platformio/upload_firmware", methods=["POST"])
+	@restricted_access
+	@admin_permission.require(403)
+	def upload_platformio_firmware(self):
+		return self.__handle_validated_request(self.__platformio_validator.validate_upload, self.__platformio.upload)
 	#
 	# @octoprint.plugin.BlueprintPlugin.route("/download_firmware", methods=["POST"])
 	# @restricted_access
@@ -301,10 +307,13 @@ class MarlinFlasherPlugin(octoprint.plugin.SettingsPlugin,
 		)
 
 	def body_size_hook(self, current_max_body_sizes, *args, **kwargs):
-		return [("POST", r"/upload_firmware", self.__settings_wrapper.get_max_upload_size() * 1024 * 1024)]
+		return [
+			("POST", r"/arduino/upload_firmware", self.__settings_wrapper.get_max_upload_size() * 1024 * 1024),
+			("POST", r"/platformio/upload_firmware", self.__settings_wrapper.get_max_upload_size() * 1024 * 1024)
+		]
 
 	def additional_excludes_hook(self, excludes, *args, **kwargs):
-		return ["arduino-cli", "platformio"]
+		return ["arduino-cli", "platformio", "firmware_arduino", "firmware_platformio"]
 
 
 __plugin_name__ = "Marlin Flasher"
