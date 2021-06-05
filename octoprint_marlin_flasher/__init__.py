@@ -5,9 +5,9 @@ from octoprint.server.util.flask import restricted_access
 from octoprint.server import admin_permission
 from octoprint.events import Events
 import flask
-from .flasher import MarlinFlasher, PlatformIOFlasher, ArduinoFlasher
+from .flasher import PlatformIOFlasher, ArduinoFlasher
 from .flasher.retrieving_method import RetrievingMethod
-from .validation import RequestValidator, ArduinoValidator, PlatformIOValidator
+from .validation import ArduinoValidator, PlatformIOValidator
 from .settings import SettingsWrapper
 from .flasher.platform_type import PlatformType
 
