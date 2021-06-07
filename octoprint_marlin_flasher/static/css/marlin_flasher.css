@@ -14,7 +14,7 @@ pre.scrollable-pre {
 }
 
 #marlin_flasher_platformio_install_modal pre {
-    height: 400px;
+    height: 200px;
 }
 
 .modal.modal-lg {

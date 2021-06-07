@@ -119,8 +119,6 @@ $(function() {
         self.firmwareVersion = ko.observable();
         self.firmwareAuthor = ko.observable();
         self.uploadTime = ko.observable();
-        self.firmwareURL = ko.observable();
-        self.downloadingFirmware = ko.observable(false);
         self.lastFlashOptions = null;
 
         self.showError = function(title, errorData) {
@@ -192,20 +190,23 @@ $(function() {
             }
         }
 
-        self.downloadFirmware = function() {
-            self.downloadingFirmware(true);
+        self.arduinoFirmwareURL = ko.observable();
+        self.downloadingArduinoFirmware = ko.observable(false);
+
+        self.downloadArduinoFirmware = function() {
+            self.downloadingArduinoFirmware(true);
             $.ajax({
                 type: "POST",
                 headers: OctoPrint.getRequestHeaders(),
-                url: "/plugin/marlin_flasher/download_firmware",
+                url: "/plugin/marlin_flasher/arduino/download_firmware",
                 data: {
-                    url: self.firmwareURL
+                    url: self.arduinoFirmwareURL()
                 }
             }).done(function(data) {
                 self.showSuccess(gettext("Firmware download successful"), data.file);
                 self.loadEnvList();
                 self.loadFirmwareInfo();
-                self.downloadingFirmware(false);
+                self.downloadingArduinoFirmware(false);
             }).fail(function(jqXHR) {
                 if(jqXHR.responseJSON.error === undefined) {
                     self.showError(gettext("Firmware download failed"), {
@@ -215,7 +216,37 @@ $(function() {
                     self.showError(gettext("Firmware download failed"), jqXHR.responseJSON);
                 }
                 self.loadFirmwareInfo();
-                self.downloadingFirmware(false);
+                self.downloadingArduinoFirmware(false);
+            });
+        };
+
+        self.platformioFirmwareURL = ko.observable();
+        self.downloadingPlatformioFirmware = ko.observable(false);
+
+        self.downloadPlatformioFirmware = function() {
+            self.downloadingPlatformioFirmware(true);
+            $.ajax({
+                type: "POST",
+                headers: OctoPrint.getRequestHeaders(),
+                url: "/plugin/marlin_flasher/platformio/download_firmware",
+                data: {
+                    url: self.platformioFirmwareURL()
+                }
+            }).done(function(data) {
+                self.showSuccess(gettext("Firmware download successful"), data.file);
+                self.loadEnvList();
+                self.loadFirmwareInfo();
+                self.downloadingPlatformioFirmware(false);
+            }).fail(function(jqXHR) {
+                if(jqXHR.responseJSON.error === undefined) {
+                    self.showError(gettext("Firmware download failed"), {
+                        error: gettext("The URL is not valid")
+                    });
+                } else {
+                    self.showError(gettext("Firmware download failed"), jqXHR.responseJSON);
+                }
+                self.loadFirmwareInfo();
+                self.downloadingPlatformioFirmware(false);
             });
         };
 

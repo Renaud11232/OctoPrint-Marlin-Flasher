@@ -27,11 +27,11 @@
             <form class="form-horizontal" data-bind="visible: settingsViewModel.settings.plugins.marlin_flasher.retrieving_method() === 'url'">
                 <div class="control-group row-fluid">
                     <div class="span9">
-                        <input type="text" class="input-block-level" placeholder="Enter URL..." data-bind="value: firmwareURL,
-                                                                                                           disable: downloadingFirmware">
+                        <input type="text" class="input-block-level" placeholder="Enter URL..." data-bind="value: platformioFirmwareURL,
+                                                                                                           disable: downloadingPlatformioFirmware">
                     </div>
-                    <button class="btn btn-primary span3" data-bind="click: downloadFirmware,
-                                                                     disable: downloadingFirmware">Download</button>
+                    <button class="btn btn-primary span3" data-bind="click: downloadPlatformioFirmware,
+                                                                     disable: downloadingPlatformioFirmware">Download</button>
                 </div>
             </form>
         </div>

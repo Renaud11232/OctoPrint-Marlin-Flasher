@@ -123,6 +123,25 @@ class MarlinFlasherPlugin(octoprint.plugin.SettingsPlugin,
 	def upload_arduino_firmware(self):
 		return self.__handle_validated_request(self.__arduino_validator.validate_upload, self.__arduino.upload)
 
+	@octoprint.plugin.BlueprintPlugin.route("/arduino/download_firmware", methods=["POST"])
+	@restricted_access
+	@admin_permission.require(403)
+	def download_arduino_firmware(self):
+		return self.__handle_validated_request(self.__arduino_validator.validate_download, self.__arduino.download)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 	@octoprint.plugin.BlueprintPlugin.route("/platformio/install", methods=["POST"])
 	@restricted_access
 	@admin_permission.require(403)
@@ -134,6 +153,12 @@ class MarlinFlasherPlugin(octoprint.plugin.SettingsPlugin,
 	@admin_permission.require(403)
 	def upload_platformio_firmware(self):
 		return self.__handle_validated_request(self.__platformio_validator.validate_upload, self.__platformio.upload)
+
+	@octoprint.plugin.BlueprintPlugin.route("/platformio/download_firmware", methods=["POST"])
+	@restricted_access
+	@admin_permission.require(403)
+	def download_platoformio_firmware(self):
+		return self.__handle_validated_request(self.__platformio_validator.validate_download, self.__platformio.download)
 	#
 	# @octoprint.plugin.BlueprintPlugin.route("/download_firmware", methods=["POST"])
 	# @restricted_access
