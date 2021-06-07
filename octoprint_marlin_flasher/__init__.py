@@ -160,18 +160,6 @@ class MarlinFlasherPlugin(octoprint.plugin.SettingsPlugin,
 	def download_platoformio_firmware(self):
 		return self.__handle_validated_request(self.__platformio_validator.validate_download, self.__platformio.download)
 	#
-	# @octoprint.plugin.BlueprintPlugin.route("/download_firmware", methods=["POST"])
-	# @restricted_access
-	# @admin_permission.require(403)
-	# def download_firmware(self):
-	# 	errors = self.__validator.validate_download()
-	# 	if errors:
-	# 		return flask.make_response(flask.jsonify(errors), 400)
-	# 	result, errors = self.__flasher.download()
-	# 	if errors:
-	# 		return flask.make_response(flask.jsonify(errors), 400)
-	# 	return flask.make_response(flask.jsonify(result), 200)
-	#
 	# @octoprint.plugin.BlueprintPlugin.route("/firmware", methods=["GET"])
 	# @restricted_access
 	# @admin_permission.require(403)

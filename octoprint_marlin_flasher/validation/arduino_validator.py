@@ -1,75 +1,54 @@
 import flask
-from marshmallow import Schema, fields
+from flask_babel import gettext
 from .base_validator import BaseValidator
 
 
 class ArduinoValidator(BaseValidator):
 
-	def validate_upload(self):
+	def validate_core_search(self):
 		errors = []
-		if "firmware_file." + self._settings.get_upload_path_suffix() not in flask.request.values:
-			return errors.append("Uploaded file is missing")
+		if "query" not in flask.request.values:
+			errors.append(gettext("The query field is missing"))
 		return errors
 
-	def validate_download(self):
-		request_fields = {
-			"url": fields.Url(required=True)
-		}
-		return type("_ArduinoDownloadSchema", (Schema,), request_fields)().validate(flask.request.values)
-
-	def validate_firmware(self):
-		return Schema().validate(flask.request.values)
-
-	def validate_core_search(self):
-		request_fields = {
-			"query": fields.Str(required=False)
-		}
-		return type("_ArduinoCoreSearchSchema", (Schema,), request_fields)().validate(flask.request.values)
-
 	def validate_lib_search(self):
-		request_fields = {
-			"query": fields.Str(required=False)
-		}
-		return type("_ArduinoLibSearchSchema", (Schema,), request_fields)().validate(flask.request.values)
+		errors = []
+		if "query" not in flask.request.values:
+			errors.append(gettext("The query field is missing"))
+		return errors
 
 	def validate_core_install(self):
-		request_fields = {
-			"core": fields.Str(required=True)
-		}
-		return type("_ArduinoCoreInstallSchema", (Schema,), request_fields)().validate(flask.request.values)
+		errors = []
+		if "core" not in flask.request.values:
+			errors.append(gettext("The core field is missing"))
+		return errors
 
 	def validate_lib_install(self):
-		request_fields = {
-			"lib": fields.Str(required=True)
-		}
-		return type("_ArduinoLibInstallSchema", (Schema,), request_fields)().validate(flask.request.values)
+		errors = []
+		if "lib" not in flask.request.values:
+			errors.append(gettext("The lib field is missing"))
+		return errors
 
 	def validate_core_uninstall(self):
-		request_fields = {
-			"core": fields.Str(required=True)
-		}
-		return type("_ArduinoCoreUninstallSchema", (Schema,), request_fields)().validate(flask.request.values)
+		errors = []
+		if "core" not in flask.request.values:
+			errors.append(gettext("The core field is missing"))
+		return errors
 
 	def validate_lib_uninstall(self):
-		request_fields = {
-			"lib": fields.Str(required=True)
-		}
-		return type("_ArduinoLibUninstallSchema", (Schema,), request_fields)().validate(flask.request.values)
-
-	def validate_board_listall(self):
-		return None
+		errors = []
+		if "lib" not in flask.request.values:
+			errors.append(gettext("The lib field is missing"))
+		return errors
 
 	def validate_board_details(self):
-		request_fields = {
-			"fqbn": fields.Str(required=True)
-		}
-		return type("_ArduinoBoardDetailsSchema", (Schema,), request_fields)().validate(flask.request.values)
+		errors = []
+		if "fqbn" not in flask.request.values:
+			errors.append(gettext("The fqbn field is missing"))
+		return errors
 
 	def validate_flash(self):
-		request_fields = {
-			"fqbn": fields.Str(required=True)
-		}
-		return type("_ArduinoFlashSchema", (Schema,), request_fields)().validate(flask.request.values)
-
-	def validate_last_flash_options(self):
-		return Schema().validate(flask.request.values)
+		errors = []
+		if "fqbn" not in flask.request.values:
+			errors.append(gettext("The fqbn field is missing"))
+		return errors

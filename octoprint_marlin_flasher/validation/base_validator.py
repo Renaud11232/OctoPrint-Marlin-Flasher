@@ -1,4 +1,5 @@
-from .validator_error import ValidatorError
+import flask
+from flask_babel import gettext
 
 
 class BaseValidator:
@@ -7,40 +8,13 @@ class BaseValidator:
 		self._settings = settings
 
 	def validate_upload(self):
-		raise ValidatorError("Unsupported function call.")
+		errors = []
+		if "firmware_file." + self._settings.get_upload_path_suffix() not in flask.request.values:
+			errors.append(gettext("Uploaded file is missing"))
+		return errors
 
 	def validate_download(self):
-		raise ValidatorError("Unsupported function call.")
-
-	def validate_firmware(self):
-		raise ValidatorError("Unsupported function call.")
-
-	def validate_core_search(self):
-		raise ValidatorError("Unsupported function call.")
-
-	def validate_lib_search(self):
-		raise ValidatorError("Unsupported function call.")
-
-	def validate_core_install(self):
-		raise ValidatorError("Unsupported function call.")
-
-	def validate_lib_install(self):
-		raise ValidatorError("Unsupported function call.")
-
-	def validate_core_uninstall(self):
-		raise ValidatorError("Unsupported function call.")
-
-	def validate_lib_uninstall(self):
-		raise ValidatorError("Unsupported function call.")
-
-	def validate_board_listall(self):
-		raise ValidatorError("Unsupported function call.")
-
-	def validate_board_details(self):
-		raise ValidatorError("Unsupported function call.")
-
-	def validate_flash(self):
-		raise ValidatorError("Unsupported function call.")
-
-	def validate_last_flash_options(self):
-		raise ValidatorError("Unsupported function call.")
+		errors = []
+		if "url" not in flask.request.values:
+			errors.append(gettext("The url field is missing"))
+		return errors
