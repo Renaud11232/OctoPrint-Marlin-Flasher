@@ -129,6 +129,12 @@ class MarlinFlasherPlugin(octoprint.plugin.SettingsPlugin,
 	def download_arduino_firmware(self):
 		return self.__handle_validated_request(self.__arduino_validator.validate_download, self.__arduino.download)
 
+	@octoprint.plugin.BlueprintPlugin.route("/arduino/cores/search", methods=["GET"])
+	@restricted_access
+	@admin_permission.require(403)
+	def search_arduino_cores(self):
+		return self.__handle_validated_request(self.__arduino_validator.validate_core_search, self.__arduino.core_search)
+
 
 
 

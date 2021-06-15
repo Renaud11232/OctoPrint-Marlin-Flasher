@@ -4,6 +4,11 @@ $(function() {
         self.settingsViewModel = parameters[0];
         self.loginStateViewModel = parameters[1];
 
+
+
+
+
+
         self.arduinoInstallationLogs = ko.observableArray();
         self.installingArduino = ko.observable(false);
 
@@ -36,6 +41,57 @@ $(function() {
             });
         }
 
+        self.arduinoFirmwareURL = ko.observable();
+        self.downloadingArduinoFirmware = ko.observable(false);
+
+        self.downloadArduinoFirmware = function() {
+            self.downloadingArduinoFirmware(true);
+            $.ajax({
+                type: "POST",
+                headers: OctoPrint.getRequestHeaders(),
+                url: "/plugin/marlin_flasher/arduino/download_firmware",
+                data: {
+                    url: self.arduinoFirmwareURL()
+                }
+            }).done(function(data) {
+                self.showSuccess(gettext("Firmware download successful"), data.file);
+                self.loadEnvList();
+                self.loadFirmwareInfo();
+                self.downloadingArduinoFirmware(false);
+            }).fail(function(jqXHR) {
+                if(jqXHR.responseJSON.error === undefined) {
+                    self.showError(gettext("Firmware download failed"), {
+                        error: gettext("The URL is not valid")
+                    });
+                } else {
+                    self.showError(gettext("Firmware download failed"), jqXHR.responseJSON);
+                }
+                self.loadFirmwareInfo();
+                self.downloadingArduinoFirmware(false);
+            });
+        };
+
+        self.searchCore = function(form) {
+            self.searchCoreButton.button("loading");
+            $.ajax({
+                type: "GET",
+                headers: OctoPrint.getRequestHeaders(),
+                url: "/plugin/marlin_flasher/arduino/cores/search",
+                data: $(form).serialize()
+            }).done(function (data) {
+                self.coreSearchResult(data);
+            }).fail(function(jqXHR, status, error) {
+                self.showError(gettext("Core search failed"), jqXHR.responseJSON);
+            }).always(function() {
+                self.searchCoreButton.button("reset");
+            });
+        };
+
+
+
+
+
+
         self.platformioInstallationLogs = ko.observableArray();
         self.installingPlatformio = ko.observable(false);
 
@@ -67,6 +123,36 @@ $(function() {
                 self.showErrors(gettext("Platformio installation"), jqXHR.responseJSON);
             });
         }
+
+        self.platformioFirmwareURL = ko.observable();
+        self.downloadingPlatformioFirmware = ko.observable(false);
+
+        self.downloadPlatformioFirmware = function() {
+            self.downloadingPlatformioFirmware(true);
+            $.ajax({
+                type: "POST",
+                headers: OctoPrint.getRequestHeaders(),
+                url: "/plugin/marlin_flasher/platformio/download_firmware",
+                data: {
+                    url: self.platformioFirmwareURL()
+                }
+            }).done(function(data) {
+                self.showSuccess(gettext("Firmware download successful"), data.file);
+                self.loadEnvList();
+                self.loadFirmwareInfo();
+                self.downloadingPlatformioFirmware(false);
+            }).fail(function(jqXHR) {
+                if(jqXHR.responseJSON.error === undefined) {
+                    self.showError(gettext("Firmware download failed"), {
+                        error: gettext("The URL is not valid")
+                    });
+                } else {
+                    self.showError(gettext("Firmware download failed"), jqXHR.responseJSON);
+                }
+                self.loadFirmwareInfo();
+                self.downloadingPlatformioFirmware(false);
+            });
+        };
 
 
 
@@ -190,66 +276,6 @@ $(function() {
             }
         }
 
-        self.arduinoFirmwareURL = ko.observable();
-        self.downloadingArduinoFirmware = ko.observable(false);
-
-        self.downloadArduinoFirmware = function() {
-            self.downloadingArduinoFirmware(true);
-            $.ajax({
-                type: "POST",
-                headers: OctoPrint.getRequestHeaders(),
-                url: "/plugin/marlin_flasher/arduino/download_firmware",
-                data: {
-                    url: self.arduinoFirmwareURL()
-                }
-            }).done(function(data) {
-                self.showSuccess(gettext("Firmware download successful"), data.file);
-                self.loadEnvList();
-                self.loadFirmwareInfo();
-                self.downloadingArduinoFirmware(false);
-            }).fail(function(jqXHR) {
-                if(jqXHR.responseJSON.error === undefined) {
-                    self.showError(gettext("Firmware download failed"), {
-                        error: gettext("The URL is not valid")
-                    });
-                } else {
-                    self.showError(gettext("Firmware download failed"), jqXHR.responseJSON);
-                }
-                self.loadFirmwareInfo();
-                self.downloadingArduinoFirmware(false);
-            });
-        };
-
-        self.platformioFirmwareURL = ko.observable();
-        self.downloadingPlatformioFirmware = ko.observable(false);
-
-        self.downloadPlatformioFirmware = function() {
-            self.downloadingPlatformioFirmware(true);
-            $.ajax({
-                type: "POST",
-                headers: OctoPrint.getRequestHeaders(),
-                url: "/plugin/marlin_flasher/platformio/download_firmware",
-                data: {
-                    url: self.platformioFirmwareURL()
-                }
-            }).done(function(data) {
-                self.showSuccess(gettext("Firmware download successful"), data.file);
-                self.loadEnvList();
-                self.loadFirmwareInfo();
-                self.downloadingPlatformioFirmware(false);
-            }).fail(function(jqXHR) {
-                if(jqXHR.responseJSON.error === undefined) {
-                    self.showError(gettext("Firmware download failed"), {
-                        error: gettext("The URL is not valid")
-                    });
-                } else {
-                    self.showError(gettext("Firmware download failed"), jqXHR.responseJSON);
-                }
-                self.loadFirmwareInfo();
-                self.downloadingPlatformioFirmware(false);
-            });
-        };
-
         self.arduinoFirmwareFileButton.fileupload(self.fileUploadParams);
         self.platformioFirmwareFileButton.fileupload(self.fileUploadParams);
 
@@ -267,22 +293,6 @@ $(function() {
                     self.showError(gettext("Upload time fetch failed"), jqXHR.responseJSON);
                 });
             }
-        };
-
-        self.searchCore = function(form) {
-            self.searchCoreButton.button("loading");
-            $.ajax({
-                type: "GET",
-                headers: OctoPrint.getRequestHeaders(),
-                url: "/plugin/marlin_flasher/cores/search",
-                data: $(form).serialize()
-            }).done(function (data) {
-                self.coreSearchResult(data);
-            }).fail(function(jqXHR, status, error) {
-                self.showError(gettext("Core search failed"), jqXHR.responseJSON);
-            }).always(function() {
-                self.searchCoreButton.button("reset");
-            });
         };
         self.installCore = function(data, event) {
             $(event.currentTarget).hide();

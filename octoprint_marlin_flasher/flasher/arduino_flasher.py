@@ -208,54 +208,45 @@ class ArduinoFlasher(BaseFlasher):
 				file="firmware.hex"
 			), None
 
+	def __get_arduino(self):
+		path = self._settings.get_arduino_cli_path()
+		additional_urls = self._settings.get_arduino_additional_urls()
+		if additional_urls:
+			additional_urls = additional_urls.splitlines()
+		return pyduinocli.Arduino(path, additional_urls=additional_urls)
 
-	# def __get_arduino(self):
-	# 	path = self._settings.get_arduino_cli_path()
-	# 	additional_urls = self._settings.get_arduino_additional_urls()
-	# 	if additional_urls:
-	# 		additional_urls = additional_urls.splitlines()
-	# 	return pyduinocli.Arduino(path, additional_urls=additional_urls)
-	#
-	# @staticmethod
-	# def __error_to_dict(error):
-	# 	return dict(
-	# 		error=error.message,
-	# 		cause=error.cause,
-	# 		stderr=error.stderr
-	# 	)
-	#
-	# def check_setup_errors(self):
-	# 	self._logger.debug("Checking arduino-cli configuration...")
-	# 	no_arduino_path = self._settings.get_arduino_cli_path() is None
-	# 	if no_arduino_path:
-	# 		self._logger.info("No arduino-cli path was configured")
-	# 		return dict(
-	# 			error=gettext("No path has been configured, check the plugin settings.")
-	# 		)
-	# 	not_arduino = False
-	# 	bad_version = False
-	# 	try:
-	# 		version = self.__get_arduino().version()
-	# 		if isinstance(version, dict):
-	# 			bad_version = re.match(r"0\.(?:15|16|17)\..+?\Z", version["VersionString"]) is None
-	# 		else:
-	# 			not_arduino = True
-	# 	except pyduinocli.ArduinoError:
-	# 		not_arduino = True
-	# 	except KeyError:
-	# 		bad_version = True
-	# 	if not_arduino:
-	# 		self._logger.info("The configured path is not an arduino-cli executable")
-	# 		return dict(
-	# 			error=gettext("The configured path does not point to an arduino-cli executable.")
-	# 		)
-	# 	if bad_version:
-	# 		self._logger.info("Unsupported arduino-cli version")
-	# 		return dict(
-	# 			error=gettext("The arduino-cli version you are using is not supported.")
-	# 		)
-	# 	return None
-	#
+	def check_setup_errors(self):
+		self._logger.debug("Checking arduino-cli configuration...")
+		no_arduino_path = self._settings.get_arduino_cli_path() is None
+		if no_arduino_path:
+			self._logger.info("No arduino-cli path was configured")
+			return dict(
+				error=gettext("No path has been configured, check the plugin settings.")
+			)
+		not_arduino = False
+		bad_version = False
+		try:
+			version = self.__get_arduino().version()
+			if isinstance(version, dict):
+				bad_version = re.match(r"0\.(?:15|16|17)\..+?\Z", version["VersionString"]) is None
+			else:
+				not_arduino = True
+		except pyduinocli.ArduinoError:
+			not_arduino = True
+		except KeyError:
+			bad_version = True
+		if not_arduino:
+			self._logger.info("The configured path is not an arduino-cli executable")
+			return dict(
+				error=gettext("The configured path does not point to an arduino-cli executable.")
+			)
+		if bad_version:
+			self._logger.info("Unsupported arduino-cli version")
+			return dict(
+				error=gettext("The arduino-cli version you are using is not supported.")
+			)
+		return None
+
 
 	#
 	# def firmware(self):
@@ -266,18 +257,20 @@ class ArduinoFlasher(BaseFlasher):
 	# 		upload_time=self._firmware_upload_time
 	# 	), None
 	#
-	# def core_search(self):
-	# 	try:
-	# 		arduino = self.__get_arduino()
-	# 		self._logger.debug("Updating core index...")
-	# 		arduino.core.update_index()
-	# 		self._logger.debug("Searching for cores...")
-	# 		result = arduino.core.search(flask.request.values["query"].split(" "))
-	# 		self._logger.debug("Done")
-	# 		return result, None
-	# 	except pyduinocli.ArduinoError as e:
-	# 		self._logger.debug("Failed !")
-	# 		return None, self.__error_to_dict(e)
+
+	def core_search(self):
+		try:
+			arduino = self.__get_arduino()
+			self._logger.debug("Updating core index...")
+			arduino.core.update_index()
+			self._logger.debug("Searching for cores...")
+			result = arduino.core.search(flask.request.values["query"].split(" "))["result"]
+			self._logger.debug("Done")
+			return result, None
+		except pyduinocli.ArduinoError as e:
+			self._logger.debug("Failed !")
+			return None, self.__error_to_dict(e)
+
 	#
 	# def lib_search(self):
 	# 	try:

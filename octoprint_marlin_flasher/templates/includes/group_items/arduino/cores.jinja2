@@ -25,10 +25,10 @@
                 <!-- ko if: coreSearchResult().length > 0 -->
                     <tbody data-bind="foreach: coreSearchResult">
                         <tr>
-                            <!-- ko if: $data.Name && $data.Latest -->
-                                <td data-bind="text: ID"></td>
-                                <td data-bind="text: Latest"></td>
-                                <td data-bind="text: Name"></td>
+                            <td data-bind="text: id"></td>
+                            <!-- ko if: $data.name && $data.latest -->
+                                <td data-bind="text: latest"></td>
+                                <td data-bind="text: name"></td>
                                 <td>
                                     <button type="button" class="btn btn-primary" data-loading-text="<i class='icon-download-alt'></i>" data-bind="click: $parent.installCore">
                                         <i class="icon-download-alt"></i>
@@ -39,8 +39,7 @@
                                     </button>
                                 </td>
                             <!-- /ko -->
-                            <!-- ko ifnot: $data.Name && $data.Latest -->
-                                <td data-bind="text: ID"></td>
+                            <!-- ko ifnot: $data.name && $data.latest -->
                                 <td colspan="2">{{ _('Manually installed') }}</td>
                                 <td>
                                     <button type="button" class="btn btn-primary" disabled>

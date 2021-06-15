@@ -96,9 +96,6 @@ class BaseFlasher:
 	def firmware(self):
 		raise FlasherError("Unsupported function call.")
 
-	def core_search(self):
-		raise FlasherError("Unsupported function call.")
-
 	def lib_search(self):
 		raise FlasherError("Unsupported function call.")
 
@@ -118,9 +115,6 @@ class BaseFlasher:
 		raise FlasherError("Unsupported function call.")
 
 	def board_details(self):
-		raise FlasherError("Unsupported function call.")
-
-	def flash(self):
 		raise FlasherError("Unsupported function call.")
 
 	def last_flash_options(self):
