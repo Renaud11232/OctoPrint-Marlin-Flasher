@@ -264,6 +264,7 @@ class ArduinoFlasher(BaseFlasher):
 			self._logger.debug("Installing core...")
 			arduino.core.install([flask.request.values["core"]])
 			self._logger.debug("Done")
+			self.__push_installed_boards()
 			return dict(
 				core=flask.request.values["core"]
 			), None
@@ -277,6 +278,7 @@ class ArduinoFlasher(BaseFlasher):
 			self._logger.debug("Uninstalling core...")
 			arduino.core.uninstall([flask.request.values["core"]])
 			self._logger.debug("Done")
+			self.__push_installed_boards()
 			return dict(
 				core=flask.request.values["core"]
 			), None
@@ -320,19 +322,6 @@ class ArduinoFlasher(BaseFlasher):
 		except pyduinocli.ArduinoError as e:
 			self._logger.debug("Failed !")
 			return None, self.__error_to_dict(e)
-	#
-	# def board_listall(self):
-	# 	try:
-	# 		arduino = self.__get_arduino()
-	# 		self._logger.debug("Updating core index...")
-	# 		arduino.core.update_index()
-	# 		self._logger.debug("Listing installed boards...")
-	# 		result = arduino.board.listall()
-	# 		self._logger.debug("Done")
-	# 		return result, None
-	# 	except pyduinocli.ArduinoError as e:
-	# 		self._logger.debug("Failed !")
-	# 		return None, self.__error_to_dict(e)
 	#
 	# def board_details(self):
 	# 	try:
@@ -477,3 +466,18 @@ class ArduinoFlasher(BaseFlasher):
 	# 			return json.load(jsonfile), None
 	# 	except (OSError, IOError) as _:
 	# 		return dict(), None
+
+	def __push_installed_boards(self):
+		arduino = self.__get_arduino()
+		self._logger.debug("Listing installed boards...")
+		result = arduino.board.listall()["result"]
+		self._logger.debug("Done")
+		self._logger.debug("Pushing installed boards through websocket ")
+		self._plugin_manager.send_plugin_message(self._identifier, dict(
+			type="arduino_boards",
+			result=result
+		))
+
+	def handle_user_logged_in(self):
+		BaseFlasher.handle_user_logged_in(self)
+		self.__push_installed_boards()

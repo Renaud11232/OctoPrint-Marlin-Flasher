@@ -4,10 +4,19 @@ $(function() {
         self.settingsViewModel = parameters[0];
         self.loginStateViewModel = parameters[1];
 
+        //////////////////////////////////////////////////////////////////////////////
+        // Arduino
+        //////////////////////////////////////////////////////////////////////////////
 
+        self.boardList = ko.observableArray();
 
-
-
+        self.handleArduinoBoards = function(message) {
+            if(message.result.boards) {
+                self.boardList(message.result.boards);
+            } else {
+                self.boardList([]);
+            }
+        };
 
         self.arduinoInstallationLogs = ko.observableArray();
         self.installingArduino = ko.observable(false);
@@ -84,6 +93,7 @@ $(function() {
                 self.searchCoreButton.button("reset");
             });
         };
+
         self.installCore = function(data, event) {
             $(event.currentTarget).hide();
             var loader = $("<div>").addClass("loader").addClass("loader-centered").addClass("loader-install");
@@ -96,7 +106,6 @@ $(function() {
                     core: data.id
                 }
             }).done(function(data) {
-                //self.loadBoardList();
                 self.showSuccess(gettext("Core install successful"), gettext("Successfully installed {core}").replace("{core}", data.core));
             }).fail(function(jqXHR, status, error) {
                 self.showError(gettext("Core install failed"), jqXHR.responseJSON);
@@ -105,6 +114,7 @@ $(function() {
                 $(event.currentTarget).show();
             });
         };
+
         self.uninstallCore = function(data, event) {
             $(event.currentTarget).hide();
             var loader = $("<div>").addClass("loader").addClass("loader-centered").addClass("loader-uninstall");
@@ -117,7 +127,6 @@ $(function() {
                     core: data.id
                 }
             }).done(function(data) {
-                //self.loadBoardList();
                 self.showSuccess(gettext("Core uninstall successful"), gettext("Successfully uninstalled {core}").replace("{core}", data.core));
             }).fail(function(jqXHR, status, error) {
                 self.showError(gettext("Core uninstall failed"), jqXHR.responseJSON);
@@ -146,6 +155,7 @@ $(function() {
                 self.searchLibButton.button("reset");
             });
         };
+
         self.installLib = function(data, event) {
             $(event.currentTarget).hide();
             var loader = $("<div>").addClass("loader").addClass("loader-centered").addClass("loader-install");
@@ -166,6 +176,7 @@ $(function() {
                 $(event.currentTarget).show();
             });
         };
+
         self.uninstallLib =  function(data, event) {
             $(event.currentTarget).hide();
             var loader = $("<div>").addClass("loader").addClass("loader-centered").addClass("loader-uninstall");
@@ -187,10 +198,9 @@ $(function() {
             });
         };
 
-
-
-
-
+        //////////////////////////////////////////////////////////////////////////////
+        // PlatformIO
+        //////////////////////////////////////////////////////////////////////////////
 
         self.platformioInstallationLogs = ko.observableArray();
         self.installingPlatformio = ko.observable(false);
@@ -252,23 +262,9 @@ $(function() {
             });
         };
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+        //////////////////////////////////////////////////////////////////////////////
+        // Common
+        //////////////////////////////////////////////////////////////////////////////
 
         self.firmwareVersion = ko.observable();
         self.firmwareAuthor = ko.observable();
@@ -295,7 +291,6 @@ $(function() {
 
         self.coreSearchResult = ko.observableArray();
         self.libSearchResult = ko.observableArray();
-        self.boardList = ko.observableArray();
         self.selectedBoard = ko.observable();
         self.envList = ko.observableArray([]);
         self.selectedEnv = ko.observable();
@@ -381,33 +376,6 @@ $(function() {
 
         self.arduinoFirmwareFileButton.fileupload(self.fileUploadParams);
         self.platformioFirmwareFileButton.fileupload(self.fileUploadParams);
-        self.loadBoardList = function() {
-            if(self.loginStateViewModel.isAdmin() && self.settingsViewModel.settings.plugins.marlin_flasher.platform_type() === "arduino") {
-                $.ajax({
-                    type: "GET",
-                    headers: OctoPrint.getRequestHeaders(),
-                    url: "/plugin/marlin_flasher/board/listall",
-                }).done(function (data) {
-                    if(data.boards) {
-                        self.boardList(data.boards);
-                    } else {
-                        self.boardList([]);
-                    }
-                    $.ajax({
-                        type: "GET",
-                        headers: OctoPrint.getRequestHeaders(),
-                        url: "/plugin/marlin_flasher/last_flash_options",
-                    }).done(function (data) {
-                        if(data) {
-                            self.lastFlashOptions = data;
-                            self.selectedBoard(data.fqbn);
-                        }
-                    });
-                }).fail(function(jqXHR, status, error) {
-                    self.showError(gettext("Board list fetch failed"), jqXHR.responseJSON);
-                });
-            }
-        };
         self.loadEnvList = function() {
             if(self.loginStateViewModel.isAdmin() && self.settingsViewModel.settings.plugins.marlin_flasher.platform_type() === "platform_io") {
                 self.envList([]);
@@ -485,7 +453,6 @@ $(function() {
             }
         });
         self.onAllBound = function(viewModels) {
-            self.loadBoardList();
             self.loadEnvList();
         };
         self.onDataUpdaterPluginMessage = function(plugin, message) {
@@ -494,7 +461,6 @@ $(function() {
                     self.progressStep(message.step);
                     self.flashingProgress(message.progress);
                 } else if(message.type === "settings_saved") {
-                    self.loadBoardList();
                     self.loadEnvList();
                 } else if(message.type === "flash_result") {
                     if(message.success) {
@@ -512,6 +478,8 @@ $(function() {
                     self.handlePlatformioInstallMessage(message);
                 } else if (message.type === "firmware_info") {
                     self.handleFirmwareInfo(message);
+                } else if (message.type === "arduino_boards") {
+                    self.handleArduinoBoards(message);
                 }
             }
         };
