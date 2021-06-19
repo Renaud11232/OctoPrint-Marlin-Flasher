@@ -5,6 +5,20 @@ $(function() {
         self.loginStateViewModel = parameters[1];
 
         //////////////////////////////////////////////////////////////////////////////
+        // Common
+        //////////////////////////////////////////////////////////////////////////////
+
+        self.firmwareVersion = ko.observable();
+        self.firmwareAuthor = ko.observable();
+        self.uploadTime = ko.observable();
+
+        self.handleFirmwareInfo = function(message) {
+            self.firmwareVersion(message.version);
+            self.firmwareAuthor(message.author);
+            self.uploadTime(message.upload_time);
+        };
+
+        //////////////////////////////////////////////////////////////////////////////
         // Arduino
         //////////////////////////////////////////////////////////////////////////////
 
@@ -260,20 +274,6 @@ $(function() {
                 }
                 self.downloadingPlatformioFirmware(false);
             });
-        };
-
-        //////////////////////////////////////////////////////////////////////////////
-        // Common
-        //////////////////////////////////////////////////////////////////////////////
-
-        self.firmwareVersion = ko.observable();
-        self.firmwareAuthor = ko.observable();
-        self.uploadTime = ko.observable();
-
-        self.handleFirmwareInfo = function(message) {
-            self.firmwareVersion(message.version);
-            self.firmwareAuthor(message.author);
-            self.uploadTime(message.upload_time);
         };
 
 
