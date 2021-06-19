@@ -117,7 +117,6 @@ $(function() {
             }).done(function(data) {
                 self.showSuccess(gettext("Firmware download successful"), data.file);
                 self.loadEnvList();
-                self.downloadingArduinoFirmware(false);
             }).fail(function(jqXHR) {
                 if(jqXHR.responseJSON.error === undefined) {
                     self.showError(gettext("Firmware download failed"), {
@@ -126,6 +125,7 @@ $(function() {
                 } else {
                     self.showError(gettext("Firmware download failed"), jqXHR.responseJSON);
                 }
+            }).always(function() {
                 self.downloadingArduinoFirmware(false);
             });
         };
@@ -301,7 +301,6 @@ $(function() {
             }).done(function(data) {
                 self.showSuccess(gettext("Firmware download successful"), data.file);
                 self.loadEnvList();
-                self.downloadingPlatformioFirmware(false);
             }).fail(function(jqXHR) {
                 if(jqXHR.responseJSON.error === undefined) {
                     self.showError(gettext("Firmware download failed"), {
@@ -310,6 +309,7 @@ $(function() {
                 } else {
                     self.showError(gettext("Firmware download failed"), jqXHR.responseJSON);
                 }
+            }).always(function() {
                 self.downloadingPlatformioFirmware(false);
             });
         };

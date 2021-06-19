@@ -19,7 +19,7 @@
                 <div class="control-group">
                     <div class="controls">
                         <button id="platformio_flash-button" class="btn btn-warning" type="submit" data-loading-text="{{ _('Flashing...') }}" data-bind="visible: !envListLoading()" ><i class="icon-warning-sign"></i> {{ _('Flash') }}</button>
-                        <div class="loader loader-options" data-bind="visible: envListLoading"></div>
+                        <i class="fas fa-spinner fa-spin fa-2x" data-bind="visible: boardOptionsLoading"></i>
                     </div>
                 </div>
                 <span data-bind="text: progressStep"></span>

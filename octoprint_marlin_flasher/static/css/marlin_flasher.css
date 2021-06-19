@@ -23,18 +23,6 @@ pre.scrollable-pre {
     margin-left: -400px;
 }
 
-.loader {
-    border: 3px solid #f3f3f3;
-    border-radius: 50%;
-    width: 24px;
-    height: 24px;
-    animation: spin-loader 2s linear infinite;
-}
-
-.loader-options {
-    border-top-color: #555;
-}
-
 .un-install-col {
     text-align: center !important;
 }
@@ -45,13 +33,4 @@ pre.scrollable-pre {
 
 .uninstall-col > i {
     color: #d34843;
-}
-
-@keyframes spin-loader {
-    0% {
-        transform: rotate(0deg);
-    }
-    100% {
-        transform: rotate(360deg);
-    }
 }
