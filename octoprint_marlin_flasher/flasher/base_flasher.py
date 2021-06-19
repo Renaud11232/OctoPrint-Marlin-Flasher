@@ -92,30 +92,3 @@ class BaseFlasher:
 
 	def _handle_firmware_file(self, firmware_file_path):
 		raise FlasherError("Unsupported function call.")
-
-	def firmware(self):
-		raise FlasherError("Unsupported function call.")
-
-	def lib_search(self):
-		raise FlasherError("Unsupported function call.")
-
-	def core_install(self):
-		raise FlasherError("Unsupported function call.")
-
-	def lib_install(self):
-		raise FlasherError("Unsupported function call.")
-
-	def core_uninstall(self):
-		raise FlasherError("Unsupported function call.")
-
-	def lib_uninstall(self):
-		raise FlasherError("Unsupported function call.")
-
-	def board_listall(self):
-		raise FlasherError("Unsupported function call.")
-
-	def board_details(self):
-		raise FlasherError("Unsupported function call.")
-
-	def last_flash_options(self):
-		raise FlasherError("Unsupported function call.")

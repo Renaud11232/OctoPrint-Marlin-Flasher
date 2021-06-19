@@ -247,7 +247,6 @@ class ArduinoFlasher(BaseFlasher):
 			)
 		return None
 
-
 	#
 	# def firmware(self):
 	# 	return dict(
@@ -261,8 +260,6 @@ class ArduinoFlasher(BaseFlasher):
 	def core_search(self):
 		try:
 			arduino = self.__get_arduino()
-			self._logger.debug("Updating core index...")
-			arduino.core.update_index()
 			self._logger.debug("Searching for cores...")
 			result = arduino.core.search(flask.request.values["query"].split(" "))["result"]
 			self._logger.debug("Done")
@@ -271,32 +268,42 @@ class ArduinoFlasher(BaseFlasher):
 			self._logger.debug("Failed !")
 			return None, self.__error_to_dict(e)
 
-	#
-	# def lib_search(self):
-	# 	try:
-	# 		arduino = self.__get_arduino()
-	# 		self._logger.debug("Updating lib index...")
-	# 		arduino.lib.update_index()
-	# 		self._logger.debug("Searching for libraries...")
-	# 		result = arduino.lib.search(flask.request.values["query"].split(" "))
-	# 		self._logger.debug("Done")
-	# 		return result, None
-	# 	except pyduinocli.ArduinoError as e:
-	# 		self._logger.debug("Failed !")
-	# 		return None, self.__error_to_dict(e)
-	#
-	# def core_install(self):
-	# 	try:
-	# 		arduino = self.__get_arduino()
-	# 		self._logger.debug("Installing core...")
-	# 		arduino.core.install([flask.request.values["core"]])
-	# 		self._logger.debug("Done")
-	# 		return dict(
-	# 			core=flask.request.values["core"]
-	# 		), None
-	# 	except pyduinocli.ArduinoError as e:
-	# 		self._logger.debug("Failed !")
-	# 		return None, self.__error_to_dict(e)
+	def core_install(self):
+		try:
+			arduino = self.__get_arduino()
+			self._logger.debug("Installing core...")
+			arduino.core.install([flask.request.values["core"]])
+			self._logger.debug("Done")
+			return dict(
+				core=flask.request.values["core"]
+			), None
+		except pyduinocli.ArduinoError as e:
+			self._logger.debug("Failed !")
+			return None, self.__error_to_dict(e)
+
+	def core_uninstall(self):
+		try:
+			arduino = self.__get_arduino()
+			self._logger.debug("Uninstalling core...")
+			arduino.core.uninstall([flask.request.values["core"]])
+			self._logger.debug("Done")
+			return dict(
+				core=flask.request.values["core"]
+			), None
+		except pyduinocli.ArduinoError as e:
+			self._logger.debug("Failed !")
+			return None, self.__error_to_dict(e)
+
+	def lib_search(self):
+		try:
+			arduino = self.__get_arduino()
+			self._logger.debug("Searching for libraries...")
+			result = arduino.lib.search(flask.request.values["query"].split(" "))["result"]
+			self._logger.debug("Done")
+			return result, None
+		except pyduinocli.ArduinoError as e:
+			self._logger.debug("Failed !")
+			return None, self.__error_to_dict(e)
 	#
 	# def lib_install(self):
 	# 	try:
@@ -306,19 +313,6 @@ class ArduinoFlasher(BaseFlasher):
 	# 		self._logger.debug("Done")
 	# 		return dict(
 	# 			lib=flask.request.values["lib"]
-	# 		), None
-	# 	except pyduinocli.ArduinoError as e:
-	# 		self._logger.debug("Failed !")
-	# 		return None, self.__error_to_dict(e)
-	#
-	# def core_uninstall(self):
-	# 	try:
-	# 		arduino = self.__get_arduino()
-	# 		self._logger.debug("Uninstalling core...")
-	# 		arduino.core.uninstall([flask.request.values["core"]])
-	# 		self._logger.debug("Done")
-	# 		return dict(
-	# 			core=flask.request.values["core"]
 	# 		), None
 	# 	except pyduinocli.ArduinoError as e:
 	# 		self._logger.debug("Failed !")

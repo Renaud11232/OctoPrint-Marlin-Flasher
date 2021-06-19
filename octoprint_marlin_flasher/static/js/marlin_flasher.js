@@ -86,6 +86,68 @@ $(function() {
                 self.searchCoreButton.button("reset");
             });
         };
+        self.installCore = function(data, event) {
+            $(event.currentTarget).hide();
+            var loader = $("<div>").addClass("loader").addClass("loader-centered").addClass("loader-install");
+            $(event.currentTarget).after(loader);
+            $.ajax({
+                type: "POST",
+                headers: OctoPrint.getRequestHeaders(),
+                url: "/plugin/marlin_flasher/arduino/cores/install",
+                data: {
+                    core: data.id
+                }
+            }).done(function(data) {
+                //self.loadBoardList();
+                self.showSuccess(gettext("Core install successful"), gettext("Successfully installed {core}").replace("{core}", data.core));
+            }).fail(function(jqXHR, status, error) {
+                self.showError(gettext("Core install failed"), jqXHR.responseJSON);
+            }).always(function() {
+                loader.remove();
+                $(event.currentTarget).show();
+            });
+        };
+        self.uninstallCore = function(data, event) {
+            $(event.currentTarget).hide();
+            var loader = $("<div>").addClass("loader").addClass("loader-centered").addClass("loader-uninstall");
+            $(event.currentTarget).after(loader);
+            $.ajax({
+                type: "POST",
+                headers: OctoPrint.getRequestHeaders(),
+                url: "/plugin/marlin_flasher/arduino/cores/uninstall",
+                data: {
+                    core: data.id
+                }
+            }).done(function(data) {
+                //self.loadBoardList();
+                self.showSuccess(gettext("Core uninstall successful"), gettext("Successfully uninstalled {core}").replace("{core}", data.core));
+            }).fail(function(jqXHR, status, error) {
+                self.showError(gettext("Core uninstall failed"), jqXHR.responseJSON);
+            }).always(function() {
+                loader.remove();
+                $(event.currentTarget).show();
+            });
+        };
+
+        self.searchLib = function(form) {
+            self.searchLibButton.button("loading");
+            $.ajax({
+                type: "GET",
+                headers: OctoPrint.getRequestHeaders(),
+                url: "/plugin/marlin_flasher/arduino/libs/search",
+                data: $(form).serialize()
+            }).done(function (data) {
+                if(data.hasOwnProperty("libraries")) {
+                    self.libSearchResult(data.libraries);
+                } else {
+                    self.libSearchResult([]);
+                }
+            }).fail(function(jqXHR, status, error) {
+                self.showError(gettext("Lib search failed"), jqXHR.responseJSON);
+            }).always(function() {
+                self.searchLibButton.button("reset");
+            });
+        };
 
 
 
@@ -293,67 +355,6 @@ $(function() {
                     self.showError(gettext("Upload time fetch failed"), jqXHR.responseJSON);
                 });
             }
-        };
-        self.installCore = function(data, event) {
-            $(event.currentTarget).hide();
-            var loader = $("<div>").addClass("loader").addClass("loader-centered").addClass("loader-install");
-            $(event.currentTarget).after(loader);
-            $.ajax({
-                type: "POST",
-                headers: OctoPrint.getRequestHeaders(),
-                url: "/plugin/marlin_flasher/cores/install",
-                data: {
-                    core: data.ID
-                }
-            }).done(function(data) {
-                self.loadBoardList();
-                self.showSuccess(gettext("Core install successful"), gettext("Successfully installed {core}").replace("{core}", data.core));
-            }).fail(function(jqXHR, status, error) {
-                self.showError(gettext("Core install failed"), jqXHR.responseJSON);
-            }).always(function() {
-                loader.remove();
-                $(event.currentTarget).show();
-            });
-        };
-        self.uninstallCore = function(data, event) {
-            $(event.currentTarget).hide();
-            var loader = $("<div>").addClass("loader").addClass("loader-centered").addClass("loader-uninstall");
-            $(event.currentTarget).after(loader);
-            $.ajax({
-                type: "POST",
-                headers: OctoPrint.getRequestHeaders(),
-                url: "/plugin/marlin_flasher/cores/uninstall",
-                data: {
-                    core: data.ID
-                }
-            }).done(function(data) {
-                self.loadBoardList();
-                self.showSuccess(gettext("Core uninstall successful"), gettext("Successfully uninstalled {core}").replace("{core}", data.core));
-            }).fail(function(jqXHR, status, error) {
-                self.showError(gettext("Core uninstall failed"), jqXHR.responseJSON);
-            }).always(function() {
-                loader.remove();
-                $(event.currentTarget).show();
-            });
-        };
-        self.searchLib = function(form) {
-            self.searchLibButton.button("loading");
-            $.ajax({
-                type: "GET",
-                headers: OctoPrint.getRequestHeaders(),
-                url: "/plugin/marlin_flasher/libs/search",
-                data: $(form).serialize()
-            }).done(function (data) {
-                if(data.hasOwnProperty("libraries")) {
-                    self.libSearchResult(data.libraries);
-                } else {
-                    self.libSearchResult([]);
-                }
-            }).fail(function(jqXHR, status, error) {
-                self.showError(gettext("Lib search failed"), jqXHR.responseJSON);
-            }).always(function() {
-                self.searchLibButton.button("reset");
-            });
         };
         self.installLib = function(data, event) {
             $(event.currentTarget).hide();
