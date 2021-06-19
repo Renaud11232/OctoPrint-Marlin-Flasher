@@ -148,7 +148,7 @@ $(function() {
 
         self.installCore = function(data, event) {
             $(event.currentTarget).hide();
-            var loader = $("<div>").addClass("loader").addClass("loader-centered").addClass("loader-install");
+            var loader = $("<i>").addClass("fas").addClass("fa-spin").addClass("fa-spinner").addClass("fa-2x");
             $(event.currentTarget).after(loader);
             $.ajax({
                 type: "POST",
@@ -169,7 +169,7 @@ $(function() {
 
         self.uninstallCore = function(data, event) {
             $(event.currentTarget).hide();
-            var loader = $("<div>").addClass("loader").addClass("loader-centered").addClass("loader-uninstall");
+            var loader = $("<i>").addClass("fas").addClass("fa-spin").addClass("fa-spinner").addClass("fa-2x");
             $(event.currentTarget).after(loader);
             $.ajax({
                 type: "POST",
@@ -210,7 +210,7 @@ $(function() {
 
         self.installLib = function(data, event) {
             $(event.currentTarget).hide();
-            var loader = $("<div>").addClass("loader").addClass("loader-centered").addClass("loader-install");
+            var loader = $("<i>").addClass("fas").addClass("fa-spin").addClass("fa-spinner").addClass("fa-2x");
             $(event.currentTarget).after(loader);
             $.ajax({
                 type: "POST",
@@ -231,7 +231,7 @@ $(function() {
 
         self.uninstallLib =  function(data, event) {
             $(event.currentTarget).hide();
-            var loader = $("<div>").addClass("loader").addClass("loader-centered").addClass("loader-uninstall");
+            var loader = $("<i>").addClass("fas").addClass("fa-spin").addClass("fa-spinner").addClass("fa-2x");
             $(event.currentTarget).after(loader);
             $.ajax({
                 type: "POST",

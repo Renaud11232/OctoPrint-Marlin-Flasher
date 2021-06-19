@@ -29,11 +29,11 @@
                             <!-- ko if: $data.name && $data.latest -->
                                 <td data-bind="text: latest"></td>
                                 <td data-bind="text: name"></td>
-                                <td>
+                                <td class="install-col un-install-col">
                                     <button type="button" class="btn btn-primary" data-loading-text="<i class='icon-download-alt'></i>" data-bind="click: $parent.installCore">
                                         <i class="icon-download-alt"></i>
                                     </button></td>
-                                <td>
+                                <td class="uninstall-col un-install-col">
                                     <button type="button" class="btn btn-danger" data-loading-text="<i class='icon-trash'></i>" data-bind="click: $parent.uninstallCore">
                                         <i class="icon-trash"></i>
                                     </button>
@@ -41,11 +41,11 @@
                             <!-- /ko -->
                             <!-- ko ifnot: $data.name && $data.latest -->
                                 <td colspan="2">{{ _('Manually installed') }}</td>
-                                <td>
+                                <td class="install-col un-install-col">
                                     <button type="button" class="btn btn-primary" disabled>
                                         <i class="icon-download-alt"></i>
                                     </button></td>
-                                <td>
+                                <td class="uninstall-col un-install-col">
                                     <button type="button" class="btn btn-danger" disabled>
                                         <i class="icon-trash"></i>
                                     </button>

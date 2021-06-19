@@ -24,11 +24,11 @@
                     <tbody data-bind="foreach: libSearchResult">
                         <tr>
                             <td data-bind="text: name"></td>
-                            <td>
+                            <td class="install-col un-install-col">
                                 <button type="button" class="btn btn-primary" data-loading-text="<i class='icon-download-alt'></i>" data-bind="click: $parent.installLib">
                                     <i class="icon-download-alt"></i>
                                 </button></td>
-                            <td>
+                            <td class="uninstall-col un-install-col">
                                 <button type="button" class="btn btn-danger" data-loading-text="<i class='icon-trash'></i>" data-bind="click: $parent.uninstallLib">
                                     <i class="icon-trash"></i>
                                 </button>

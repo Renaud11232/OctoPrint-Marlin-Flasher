@@ -9,8 +9,9 @@ pre.scrollable-pre {
     white-space: pre;
 }
 
-#marlin_flasher_settings_general_wizard textarea, #marlin_flasher_settings_general_settings textarea {
+#marlin_flasher_settings_general_wizard textarea, #marlin_flasher_settings_general_settings textarea, #marlin_flasher_settings_arduino_wizard textarea, #marlin_flasher_settings_arduino_settings textarea, #marlin_flasher_settings_platformio_wizard textarea, #marlin_flasher_settings_platformio_settings textarea {
     white-space: nowrap;
+    resize: none;
 }
 
 #marlin_flasher_platformio_install_modal pre {
@@ -30,20 +31,20 @@ pre.scrollable-pre {
     animation: spin-loader 2s linear infinite;
 }
 
-.loader-centered {
-    margin: 0 auto;
-}
-
-.loader-install {
-    border-top-color: #0065cc;
-}
-
-.loader-uninstall {
-    border-top-color: #d34843;
-}
-
 .loader-options {
     border-top-color: #555;
+}
+
+.un-install-col {
+    text-align: center !important;
+}
+
+.install-col > i {
+    color: #0065cc;
+}
+
+.uninstall-col > i {
+    color: #d34843;
 }
 
 @keyframes spin-loader {
