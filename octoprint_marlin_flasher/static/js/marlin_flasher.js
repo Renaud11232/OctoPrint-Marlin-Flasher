@@ -148,6 +148,46 @@ $(function() {
                 self.searchLibButton.button("reset");
             });
         };
+        self.installLib = function(data, event) {
+            $(event.currentTarget).hide();
+            var loader = $("<div>").addClass("loader").addClass("loader-centered").addClass("loader-install");
+            $(event.currentTarget).after(loader);
+            $.ajax({
+                type: "POST",
+                headers: OctoPrint.getRequestHeaders(),
+                url: "/plugin/marlin_flasher/arduino/libs/install",
+                data: {
+                    lib: data.name
+                }
+            }).done(function(data) {
+                self.showSuccess(gettext("Lib install successful"), gettext("Successfully installed {lib}").replace("{lib}", data.lib));
+            }).fail(function(jqXHR, status, error) {
+                self.showError(gettext("Lib install failed"), jqXHR.responseJSON);
+            }).always(function() {
+                loader.remove();
+                $(event.currentTarget).show();
+            });
+        };
+        self.uninstallLib =  function(data, event) {
+            $(event.currentTarget).hide();
+            var loader = $("<div>").addClass("loader").addClass("loader-centered").addClass("loader-uninstall");
+            $(event.currentTarget).after(loader);
+            $.ajax({
+                type: "POST",
+                headers: OctoPrint.getRequestHeaders(),
+                url: "/plugin/marlin_flasher/arduino/libs/uninstall",
+                data: {
+                    lib: data.name
+                }
+            }).done(function(data) {
+                self.showSuccess(gettext("Lib uninstall successful"), gettext("Successfully uninstalled {lib}").replace("{lib}", data.lib));
+            }).fail(function(jqXHR, status, error) {
+                self.showError(gettext("Lib uninstall failed"), jqXHR.responseJSON);
+            }).always(function() {
+                loader.remove();
+                $(event.currentTarget).show();
+            });
+        };
 
 
 
@@ -355,46 +395,6 @@ $(function() {
                     self.showError(gettext("Upload time fetch failed"), jqXHR.responseJSON);
                 });
             }
-        };
-        self.installLib = function(data, event) {
-            $(event.currentTarget).hide();
-            var loader = $("<div>").addClass("loader").addClass("loader-centered").addClass("loader-install");
-            $(event.currentTarget).after(loader);
-            $.ajax({
-                type: "POST",
-                headers: OctoPrint.getRequestHeaders(),
-                url: "/plugin/marlin_flasher/libs/install",
-                data: {
-                    lib: data.name
-                }
-            }).done(function(data) {
-                self.showSuccess(gettext("Lib install successful"), gettext("Successfully installed {lib}").replace("{lib}", data.lib));
-            }).fail(function(jqXHR, status, error) {
-                self.showError(gettext("Lib install failed"), jqXHR.responseJSON);
-            }).always(function() {
-                loader.remove();
-                $(event.currentTarget).show();
-            });
-        };
-        self.uninstallLib =  function(data, event) {
-            $(event.currentTarget).hide();
-            var loader = $("<div>").addClass("loader").addClass("loader-centered").addClass("loader-uninstall");
-            $(event.currentTarget).after(loader);
-            $.ajax({
-                type: "POST",
-                headers: OctoPrint.getRequestHeaders(),
-                url: "/plugin/marlin_flasher/libs/uninstall",
-                data: {
-                    lib: data.name
-                }
-            }).done(function(data) {
-                self.showSuccess(gettext("Lib uninstall successful"), gettext("Successfully uninstalled {lib}").replace("{lib}", data.lib));
-            }).fail(function(jqXHR, status, error) {
-                self.showError(gettext("Lib uninstall failed"), jqXHR.responseJSON);
-            }).always(function() {
-                loader.remove();
-                $(event.currentTarget).show();
-            });
         };
         self.loadBoardList = function() {
             if(self.loginStateViewModel.isAdmin() && self.settingsViewModel.settings.plugins.marlin_flasher.platform_type() === "arduino") {

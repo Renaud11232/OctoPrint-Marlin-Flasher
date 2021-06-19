@@ -138,20 +138,32 @@ class MarlinFlasherPlugin(octoprint.plugin.SettingsPlugin,
 	@octoprint.plugin.BlueprintPlugin.route("/arduino/cores/install", methods=["POST"])
 	@restricted_access
 	@admin_permission.require(403)
-	def install_core(self):
+	def install_arduino_core(self):
 		return self.__handle_validated_request(self.__arduino_validator.validate_core_install, self.__arduino.core_install)
 
 	@octoprint.plugin.BlueprintPlugin.route("/arduino/cores/uninstall", methods=["POST"])
 	@restricted_access
 	@admin_permission.require(403)
-	def uninstall_core(self):
+	def uninstall_arduino_core(self):
 		return self.__handle_validated_request(self.__arduino_validator.validate_core_uninstall, self.__arduino.core_uninstall)
 
 	@octoprint.plugin.BlueprintPlugin.route("/arduino/libs/search", methods=["GET"])
 	@restricted_access
 	@admin_permission.require(403)
-	def arduino_search_libs(self):
+	def search_arduino_libs(self):
 		return self.__handle_validated_request(self.__arduino_validator.validate_lib_search, self.__arduino.lib_search)
+
+	@octoprint.plugin.BlueprintPlugin.route("/arduino/libs/install", methods=["POST"])
+	@restricted_access
+	@admin_permission.require(403)
+	def install_arduino_lib(self):
+		return self.__handle_validated_request(self.__arduino_validator.validate_lib_install, self.__arduino.lib_install)
+
+	@octoprint.plugin.BlueprintPlugin.route("/arduino/libs/uninstall", methods=["POST"])
+	@restricted_access
+	@admin_permission.require(403)
+	def uninstall_arduino_lib(self):
+		return self.__handle_validated_request(self.__arduino_validator.validate_lib_uninstall, self.__arduino.lib_uninstall)
 
 
 
@@ -192,30 +204,6 @@ class MarlinFlasherPlugin(octoprint.plugin.SettingsPlugin,
 	# 	if errors:
 	# 		return flask.make_response(flask.jsonify(errors), 400)
 	# 	result, errors = self.__flasher.firmware()
-	# 	if errors:
-	# 		return flask.make_response(flask.jsonify(errors), 400)
-	# 	return flask.make_response(flask.jsonify(result), 200)
-	#
-	# @octoprint.plugin.BlueprintPlugin.route("/libs/install", methods=["POST"])
-	# @restricted_access
-	# @admin_permission.require(403)
-	# def install_lib(self):
-	# 	errors = self.__validator.validate_lib_install()
-	# 	if errors:
-	# 		return flask.make_response(flask.jsonify(errors), 400)
-	# 	result, errors = self.__flasher.lib_install()
-	# 	if errors:
-	# 		return flask.make_response(flask.jsonify(errors), 400)
-	# 	return flask.make_response(flask.jsonify(result), 200)
-	#
-	# @octoprint.plugin.BlueprintPlugin.route("/libs/uninstall", methods=["POST"])
-	# @restricted_access
-	# @admin_permission.require(403)
-	# def uninstall_lib(self):
-	# 	errors = self.__validator.validate_lib_uninstall()
-	# 	if errors:
-	# 		return flask.make_response(flask.jsonify(errors), 400)
-	# 	result, errors = self.__flasher.lib_uninstall()
 	# 	if errors:
 	# 		return flask.make_response(flask.jsonify(errors), 400)
 	# 	return flask.make_response(flask.jsonify(result), 200)

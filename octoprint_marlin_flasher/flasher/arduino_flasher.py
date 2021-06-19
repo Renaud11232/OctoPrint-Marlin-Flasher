@@ -304,32 +304,32 @@ class ArduinoFlasher(BaseFlasher):
 		except pyduinocli.ArduinoError as e:
 			self._logger.debug("Failed !")
 			return None, self.__error_to_dict(e)
-	#
-	# def lib_install(self):
-	# 	try:
-	# 		arduino = self.__get_arduino()
-	# 		self._logger.debug("Installing lib...")
-	# 		arduino.lib.install([flask.request.values["lib"]])
-	# 		self._logger.debug("Done")
-	# 		return dict(
-	# 			lib=flask.request.values["lib"]
-	# 		), None
-	# 	except pyduinocli.ArduinoError as e:
-	# 		self._logger.debug("Failed !")
-	# 		return None, self.__error_to_dict(e)
-	#
-	# def lib_uninstall(self):
-	# 	try:
-	# 		arduino = self.__get_arduino()
-	# 		self._logger.debug("Uninstalling lib...")
-	# 		arduino.lib.uninstall([flask.request.values["lib"]])
-	# 		self._logger.debug("Done")
-	# 		return dict(
-	# 			lib=flask.request.values["lib"]
-	# 		), None
-	# 	except pyduinocli.ArduinoError as e:
-	# 		self._logger.debug("Failed !")
-	# 		return None, self.__error_to_dict(e)
+
+	def lib_install(self):
+		try:
+			arduino = self.__get_arduino()
+			self._logger.debug("Installing lib...")
+			arduino.lib.install([flask.request.values["lib"]])
+			self._logger.debug("Done")
+			return dict(
+				lib=flask.request.values["lib"]
+			), None
+		except pyduinocli.ArduinoError as e:
+			self._logger.debug("Failed !")
+			return None, self.__error_to_dict(e)
+
+	def lib_uninstall(self):
+		try:
+			arduino = self.__get_arduino()
+			self._logger.debug("Uninstalling lib...")
+			arduino.lib.uninstall([flask.request.values["lib"]])
+			self._logger.debug("Done")
+			return dict(
+				lib=flask.request.values["lib"]
+			), None
+		except pyduinocli.ArduinoError as e:
+			self._logger.debug("Failed !")
+			return None, self.__error_to_dict(e)
 	#
 	# def board_listall(self):
 	# 	try:
