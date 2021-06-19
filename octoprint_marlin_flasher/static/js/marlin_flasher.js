@@ -333,7 +333,6 @@ $(function() {
         self.uploadProgress = ko.observable(0);
         self.flashingProgress = ko.observable(0);
         self.progressStep = ko.observable();
-        self.flashButtonEnabled = ko.observable(false);
         self.firmwareVersion = ko.observable();
         self.firmwareAuthor = ko.observable();
         self.uploadTime = ko.observable();

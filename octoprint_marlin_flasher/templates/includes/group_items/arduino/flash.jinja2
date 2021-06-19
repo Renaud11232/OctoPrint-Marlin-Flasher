@@ -32,7 +32,7 @@
                 </div>
                 <div class="control-group">
                     <div class="controls">
-                        <button id="arduino_flash-button" class="btn btn-warning" type="submit" data-loading-text="{{ _('Flashing...') }}" data-bind="enable: flashButtonEnabled,
+                        <button id="arduino_flash-button" class="btn btn-warning" type="submit" data-loading-text="{{ _('Flashing...') }}" data-bind="enable: selectedBoard,
                                                                                                                                                       visible: !boardOptionsLoading()"><i class="icon-warning-sign"></i> {{ _('Flash') }}</button>
                         <i class="fas fa-spinner fa-spin fa-2x" data-bind="visible: boardOptionsLoading"></i>
                     </div>
