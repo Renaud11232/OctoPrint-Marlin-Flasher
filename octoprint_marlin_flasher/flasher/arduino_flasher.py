@@ -247,16 +247,6 @@ class ArduinoFlasher(BaseFlasher):
 			)
 		return None
 
-	#
-	# def firmware(self):
-	# 	return dict(
-	# 		firmware=self._firmware,
-	# 		version=self._firmware_version,
-	# 		author=self._firmware_author,
-	# 		upload_time=self._firmware_upload_time
-	# 	), None
-	#
-
 	def core_search(self):
 		try:
 			arduino = self.__get_arduino()
@@ -455,6 +445,7 @@ class ArduinoFlasher(BaseFlasher):
 	# 		self._firmware_version = None
 	# 		self._firmware_author = None
 	# 		self._firmware_upload_time = None
+	# 		self._push_firmware_info()
 	# 		self._plugin_manager.send_plugin_message(self._identifier, dict(
 	# 			type="flash_progress",
 	# 			step=gettext("Done"),

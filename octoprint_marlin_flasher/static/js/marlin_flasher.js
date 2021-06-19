@@ -56,7 +56,6 @@ $(function() {
             }).done(function(data) {
                 self.showSuccess(gettext("Firmware download successful"), data.file);
                 self.loadEnvList();
-                self.loadFirmwareInfo();
                 self.downloadingArduinoFirmware(false);
             }).fail(function(jqXHR) {
                 if(jqXHR.responseJSON.error === undefined) {
@@ -66,7 +65,6 @@ $(function() {
                 } else {
                     self.showError(gettext("Firmware download failed"), jqXHR.responseJSON);
                 }
-                self.loadFirmwareInfo();
                 self.downloadingArduinoFirmware(false);
             });
         };
@@ -241,7 +239,6 @@ $(function() {
             }).done(function(data) {
                 self.showSuccess(gettext("Firmware download successful"), data.file);
                 self.loadEnvList();
-                self.loadFirmwareInfo();
                 self.downloadingPlatformioFirmware(false);
             }).fail(function(jqXHR) {
                 if(jqXHR.responseJSON.error === undefined) {
@@ -251,7 +248,6 @@ $(function() {
                 } else {
                     self.showError(gettext("Firmware download failed"), jqXHR.responseJSON);
                 }
-                self.loadFirmwareInfo();
                 self.downloadingPlatformioFirmware(false);
             });
         };
@@ -274,8 +270,15 @@ $(function() {
 
 
 
+        self.firmwareVersion = ko.observable();
+        self.firmwareAuthor = ko.observable();
+        self.uploadTime = ko.observable();
 
-
+        self.handleFirmwareInfo = function(message) {
+            self.firmwareVersion(message.version);
+            self.firmwareAuthor(message.author);
+            self.uploadTime(message.upload_time);
+        };
 
 
 
@@ -354,7 +357,6 @@ $(function() {
                 self.showSuccess(gettext("Firmware upload successful"), data.result.file);
                 self.uploadProgress(0);
                 self.loadEnvList();
-                self.loadFirmwareInfo();
             },
             error: function(jqXHR, status, error) {
                 if(error === "") {
@@ -371,7 +373,6 @@ $(function() {
                     }
                 }
                 self.uploadProgress(0);
-                self.loadFirmwareInfo();
             },
             progress: function(e, data) {
                 self.uploadProgress((data.loaded / data.total) * 100);
@@ -380,22 +381,6 @@ $(function() {
 
         self.arduinoFirmwareFileButton.fileupload(self.fileUploadParams);
         self.platformioFirmwareFileButton.fileupload(self.fileUploadParams);
-
-        self.loadFirmwareInfo = function() {
-            if(self.loginStateViewModel.isAdmin()) {
-                $.ajax({
-                    type: "GET",
-                    headers: OctoPrint.getRequestHeaders(),
-                    url: "/plugin/marlin_flasher/firmware"
-                }).done(function(data) {
-                    self.firmwareVersion(data.version);
-                    self.firmwareAuthor(data.author);
-                    self.uploadTime(data.upload_time);
-                }).fail(function(jqXHR, status, error) {
-                    self.showError(gettext("Upload time fetch failed"), jqXHR.responseJSON);
-                });
-            }
-        };
         self.loadBoardList = function() {
             if(self.loginStateViewModel.isAdmin() && self.settingsViewModel.settings.plugins.marlin_flasher.platform_type() === "arduino") {
                 $.ajax({
@@ -502,7 +487,6 @@ $(function() {
         self.onAllBound = function(viewModels) {
             self.loadBoardList();
             self.loadEnvList();
-            self.loadFirmwareInfo();
         };
         self.onDataUpdaterPluginMessage = function(plugin, message) {
             if(plugin === "marlin_flasher" && self.loginStateViewModel.isAdmin()) {
@@ -512,7 +496,6 @@ $(function() {
                 } else if(message.type === "settings_saved") {
                     self.loadBoardList();
                     self.loadEnvList();
-                    self.loadFirmwareInfo();
                 } else if(message.type === "flash_result") {
                     if(message.success) {
                         self.showSuccess(gettext("Flashing successful"), message.message);
@@ -523,11 +506,12 @@ $(function() {
                     }
                     self.arduinoFlashButton.button("reset");
                     self.platformioFlashButton.button("reset");
-                    self.loadFirmwareInfo();
                 } else if (message.type === "arduino_install") {
                     self.handleArduinoInstallMessage(message);
                 } else if (message.type === "platformio_install") {
                     self.handlePlatformioInstallMessage(message);
+                } else if (message.type === "firmware_info") {
+                    self.handleFirmwareInfo(message);
                 }
             }
         };

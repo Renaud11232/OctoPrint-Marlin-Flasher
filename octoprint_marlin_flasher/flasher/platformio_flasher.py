@@ -301,6 +301,7 @@ class PlatformIOFlasher(BaseFlasher):
 	# 		self._firmware_version = None
 	# 		self._firmware_author = None
 	# 		self._firmware_upload_time = None
+	# 		self._push_firmware_info()
 	# 		self._plugin_manager.send_plugin_message(self._identifier, dict(
 	# 			type="flash_progress",
 	# 			step=gettext("Done"),

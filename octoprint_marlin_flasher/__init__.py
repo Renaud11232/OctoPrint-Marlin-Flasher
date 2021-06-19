@@ -92,12 +92,17 @@ class MarlinFlasherPlugin(octoprint.plugin.SettingsPlugin,
 		return True
 
 	def on_event(self, event, payload):
+		platform = self.__settings_wrapper.get_platform_type()
+		if platform == PlatformType.ARDUINO:
+			flasher = self.__arduino
+		else:
+			flasher = self.__platformio
 		if event == Events.CONNECTED:
-			platform = self.__settings_wrapper.get_platform_type()
-			if platform == PlatformType.ARDUINO:
-				self.__arduino.handle_connected_event()
-			elif platform == PlatformType.PLATFORM_IO:
-				self.__platformio.handle_connected_event()
+			self._logger.debug("Intercepted CONNECTED event")
+			flasher.handle_connected_event()
+		elif event == Events.USER_LOGGED_IN:
+			self._logger.debug("Intercepted USER_LOGGED_IN event")
+			flasher.handle_user_logged_in()
 
 	def __handle_unvalidated_request(self, handler):
 		result, errors = handler()
@@ -195,18 +200,6 @@ class MarlinFlasherPlugin(octoprint.plugin.SettingsPlugin,
 	@admin_permission.require(403)
 	def download_platoformio_firmware(self):
 		return self.__handle_validated_request(self.__platformio_validator.validate_download, self.__platformio.download)
-	#
-	# @octoprint.plugin.BlueprintPlugin.route("/firmware", methods=["GET"])
-	# @restricted_access
-	# @admin_permission.require(403)
-	# def firmware(self):
-	# 	errors = self.__validator.validate_firmware()
-	# 	if errors:
-	# 		return flask.make_response(flask.jsonify(errors), 400)
-	# 	result, errors = self.__flasher.firmware()
-	# 	if errors:
-	# 		return flask.make_response(flask.jsonify(errors), 400)
-	# 	return flask.make_response(flask.jsonify(result), 200)
 	#
 	# @octoprint.plugin.BlueprintPlugin.route("/board/listall", methods=["GET"])
 	# @restricted_access

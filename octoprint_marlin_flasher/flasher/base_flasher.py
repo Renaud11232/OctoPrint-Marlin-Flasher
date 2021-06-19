@@ -71,8 +71,11 @@ class BaseFlasher:
 		uploaded_file_path = flask.request.values["firmware_file." + self._settings.get_upload_path_suffix()]
 		errors = self._validate_firmware_file(uploaded_file_path)
 		if errors:
+			self._push_firmware_info()
 			return None, errors
-		return self._handle_firmware_file(uploaded_file_path)
+		result = self._handle_firmware_file(uploaded_file_path)
+		self._push_firmware_info()
+		return result
 
 	def download(self):
 		self._logger.debug("Downloading firmware...")
@@ -92,3 +95,16 @@ class BaseFlasher:
 
 	def _handle_firmware_file(self, firmware_file_path):
 		raise FlasherError("Unsupported function call.")
+
+	def _push_firmware_info(self):
+		self._logger.debug("Sending firmware info through websocket")
+		self._plugin_manager.send_plugin_message(self._identifier, dict(
+			type="firmware_info",
+			version=self._firmware_version,
+			author=self._firmware_author,
+			upload_time=self._firmware_upload_time.strftime("%d/%m/%Y, %H:%M:%S") if self._firmware_upload_time is not None else None,
+			firmware=self._firmware
+		))
+
+	def handle_user_logged_in(self):
+		self._push_firmware_info()
