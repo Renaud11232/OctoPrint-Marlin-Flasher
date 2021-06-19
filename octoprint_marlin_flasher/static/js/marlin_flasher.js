@@ -56,8 +56,8 @@ $(function() {
                     if(data) {
                         self.boardOptions(data.config_options);
                     }
-                }).fail(function(jqXHR, status, error) {
-                    self.showError(gettext("Board option fetch failed"), jqXHR.responseJSON);
+                }).fail(function(jqXHR) {
+                    self.showErrors(gettext("Board option fetch failed"), jqXHR.responseJSON);
                 }).always(function() {
                     self.boardOptionsLoading(false);
                 });
@@ -69,7 +69,7 @@ $(function() {
                 for (var option = 0; option < newValue.length; option++) {
                     for (var value = 0; value < newValue[option].values.length; value++) {
                         if(newValue[option].values[value].selected) {
-                            $('select[name="' + newValue[option].values[value].option + '"]').val(newValue[option].values[value].value);
+                            $('select[name="' + newValue[option].option + '"]').val(newValue[option].values[value].value);
                         }
                     }
                 }
