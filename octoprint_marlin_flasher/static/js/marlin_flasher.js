@@ -64,6 +64,18 @@ $(function() {
             }
         });
 
+        self.boardOptions.subscribe(function(newValue) {
+            if(newValue) {
+                for (var option = 0; option < newValue.length; option++) {
+                    for (var value = 0; value < newValue[option].values.length; value++) {
+                        if(newValue[option].values[value].selected) {
+                            $('select[name="' + newValue[option].values[value].option + '"]').val(newValue[option].values[value].value);
+                        }
+                    }
+                }
+            }
+        });
+
         self.handleArduinoInstallMessage = function(message) {
             $("#marlin_flasher_arduino_install_modal").modal("show");
             self.installingArduino(!message.finished);
