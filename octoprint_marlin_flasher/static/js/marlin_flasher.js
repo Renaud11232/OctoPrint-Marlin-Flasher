@@ -23,6 +23,15 @@ $(function() {
         //////////////////////////////////////////////////////////////////////////////
 
         self.boardList = ko.observableArray();
+        self.arduinoInstallationLogs = ko.observableArray();
+        self.installingArduino = ko.observable(false);
+        self.arduinoFirmwareURL = ko.observable();
+        self.downloadingArduinoFirmware = ko.observable(false);
+        self.coreSearchResult = ko.observableArray();
+        self.libSearchResult = ko.observableArray();
+        self.selectedBoard = ko.observable();
+        self.boardOptions = ko.observableArray();
+        self.boardOptionsLoading = ko.observable(false);
 
         self.handleArduinoBoards = function(message) {
             if(message.result.boards) {
@@ -32,8 +41,28 @@ $(function() {
             }
         };
 
-        self.arduinoInstallationLogs = ko.observableArray();
-        self.installingArduino = ko.observable(false);
+        self.selectedBoard.subscribe(function(newValue) {
+            self.boardOptions([]);
+            if (newValue) {
+                self.boardOptionsLoading(true);
+                $.ajax({
+                    type: "GET",
+                    headers: OctoPrint.getRequestHeaders(),
+                    url: "/plugin/marlin_flasher/arduino/board/details",
+                    data: {
+                        fqbn: newValue
+                    }
+                }).done(function (data) {
+                    if(data) {
+                        self.boardOptions(data.config_options);
+                    }
+                }).fail(function(jqXHR, status, error) {
+                    self.showError(gettext("Board option fetch failed"), jqXHR.responseJSON);
+                }).always(function() {
+                    self.boardOptionsLoading(false);
+                });
+            }
+        });
 
         self.handleArduinoInstallMessage = function(message) {
             $("#marlin_flasher_arduino_install_modal").modal("show");
@@ -63,9 +92,6 @@ $(function() {
                 self.showErrors(gettext("Arduino installation"), jqXHR.responseJSON);
             });
         }
-
-        self.arduinoFirmwareURL = ko.observable();
-        self.downloadingArduinoFirmware = ko.observable(false);
 
         self.downloadArduinoFirmware = function() {
             self.downloadingArduinoFirmware(true);
@@ -288,20 +314,14 @@ $(function() {
         self.searchCoreButton = $("#search-core-btn");
         self.searchLibButton = $("#search-lib-btn");
         self.stderrModal = $("#marlin_flasher_modal");
-
-        self.coreSearchResult = ko.observableArray();
-        self.libSearchResult = ko.observableArray();
-        self.selectedBoard = ko.observable();
         self.envList = ko.observableArray([]);
         self.selectedEnv = ko.observable();
         self.envListLoading = ko.observable(false);
-        self.boardOptions = ko.observableArray();
         self.stderr = ko.observable();
         self.uploadProgress = ko.observable(0);
         self.flashingProgress = ko.observable(0);
         self.progressStep = ko.observable();
         self.flashButtonEnabled = ko.observable(false);
-        self.boardOptionsLoading = ko.observable(false);
         self.firmwareVersion = ko.observable();
         self.firmwareAuthor = ko.observable();
         self.uploadTime = ko.observable();
@@ -420,38 +440,7 @@ $(function() {
                 self.platformioFlashButton.button("reset");
             });
         };
-        self.selectedBoard.subscribe(function(newValue) {
-            self.boardOptions([]);
-            self.flashButtonEnabled(false);
-            if (newValue) {
-                self.boardOptionsLoading(true);
-                $.ajax({
-                    type: "GET",
-                    headers: OctoPrint.getRequestHeaders(),
-                    url: "/plugin/marlin_flasher/board/details",
-                    data: {
-                        fqbn: newValue
-                    }
-                }).done(function (data) {
-                    if(data) {
-                        self.boardOptions(data.config_options);
-                    }
-                    if(self.lastFlashOptions) {
-                        for(var key in self.lastFlashOptions) {
-                            if(key !== "fqbn") {
-                                $("#flash form select[name=" + key + "]").val(self.lastFlashOptions[key]);
-                            }
-                        }
-                        self.lastFlashOptions = null;
-                    }
-                    self.flashButtonEnabled(true);
-                }).fail(function(jqXHR, status, error) {
-                    self.showError(gettext("Board option fetch failed"), jqXHR.responseJSON);
-                }).always(function() {
-                    self.boardOptionsLoading(false);
-                });
-            }
-        });
+
         self.onAllBound = function(viewModels) {
             self.loadEnvList();
         };

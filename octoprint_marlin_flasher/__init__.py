@@ -116,6 +116,10 @@ class MarlinFlasherPlugin(octoprint.plugin.SettingsPlugin,
 			return flask.make_response(flask.jsonify(errors), 400)
 		return self.__handle_unvalidated_request(handler)
 
+	####################################################################
+	# Arduino
+	####################################################################
+
 	@octoprint.plugin.BlueprintPlugin.route("/arduino/install", methods=["POST"])
 	@restricted_access
 	@admin_permission.require(403)
@@ -170,18 +174,15 @@ class MarlinFlasherPlugin(octoprint.plugin.SettingsPlugin,
 	def uninstall_arduino_lib(self):
 		return self.__handle_validated_request(self.__arduino_validator.validate_lib_uninstall, self.__arduino.lib_uninstall)
 
+	@octoprint.plugin.BlueprintPlugin.route("/arduino/board/details", methods=["GET"])
+	@restricted_access
+	@admin_permission.require(403)
+	def board_detail(self):
+		return self.__handle_validated_request(self.__arduino_validator.validate_board_details, self.__arduino.board_details)
 
-
-
-
-
-
-
-
-
-
-
-
+	####################################################################
+	# PlatformIO
+	####################################################################
 
 	@octoprint.plugin.BlueprintPlugin.route("/platformio/install", methods=["POST"])
 	@restricted_access
@@ -200,30 +201,6 @@ class MarlinFlasherPlugin(octoprint.plugin.SettingsPlugin,
 	@admin_permission.require(403)
 	def download_platoformio_firmware(self):
 		return self.__handle_validated_request(self.__platformio_validator.validate_download, self.__platformio.download)
-	#
-	# @octoprint.plugin.BlueprintPlugin.route("/board/listall", methods=["GET"])
-	# @restricted_access
-	# @admin_permission.require(403)
-	# def board_listall(self):
-	# 	errors = self.__validator.validate_board_listall()
-	# 	if errors:
-	# 		return flask.make_response(flask.jsonify(errors), 400)
-	# 	result, errors = self.__flasher.board_listall()
-	# 	if errors:
-	# 		return flask.make_response(flask.jsonify(errors), 400)
-	# 	return flask.make_response(flask.jsonify(result), 200)
-	#
-	# @octoprint.plugin.BlueprintPlugin.route("/board/details", methods=["GET"])
-	# @restricted_access
-	# @admin_permission.require(403)
-	# def board_detail(self):
-	# 	errors = self.__validator.validate_board_details()
-	# 	if errors:
-	# 		return flask.make_response(flask.jsonify(errors), 400)
-	# 	result, errors = self.__flasher.board_details()
-	# 	if errors:
-	# 		return flask.make_response(flask.jsonify(errors), 400)
-	# 	return flask.make_response(flask.jsonify(result), 200)
 	#
 	# @octoprint.plugin.BlueprintPlugin.route("/flash", methods=["POST"])
 	# @restricted_access

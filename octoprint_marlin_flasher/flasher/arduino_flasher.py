@@ -322,17 +322,17 @@ class ArduinoFlasher(BaseFlasher):
 		except pyduinocli.ArduinoError as e:
 			self._logger.debug("Failed !")
 			return None, self.__error_to_dict(e)
-	#
-	# def board_details(self):
-	# 	try:
-	# 		arduino = self.__get_arduino()
-	# 		self._logger.debug("Getting board details...")
-	# 		result = arduino.board.details(flask.request.values["fqbn"])
-	# 		self._logger.debug("Done")
-	# 		return result, None
-	# 	except pyduinocli.ArduinoError as e:
-	# 		self._logger.debug("Failed !")
-	# 		return None, self.__error_to_dict(e)
+
+	def board_details(self):
+		try:
+			arduino = self.__get_arduino()
+			self._logger.debug("Getting board details...")
+			result = arduino.board.details(flask.request.values["fqbn"])["result"]
+			self._logger.debug("Done")
+			return result, None
+		except pyduinocli.ArduinoError as e:
+			self._logger.debug("Failed !")
+			return None, self.__error_to_dict(e)
 	#
 	# def flash(self):
 	# 	if self._firmware is None:
