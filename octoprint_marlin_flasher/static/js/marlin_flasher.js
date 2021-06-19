@@ -139,8 +139,8 @@ $(function() {
                 data: $(form).serialize()
             }).done(function (data) {
                 self.coreSearchResult(data);
-            }).fail(function(jqXHR, status, error) {
-                self.showError(gettext("Core search failed"), jqXHR.responseJSON);
+            }).fail(function(jqXHR) {
+                self.showErrors(gettext("Core search failed"), jqXHR.responseJSON);
             }).always(function() {
                 self.searchCoreButton.button("reset");
             });
@@ -159,8 +159,8 @@ $(function() {
                 }
             }).done(function(data) {
                 self.showSuccess(gettext("Core install successful"), gettext("Successfully installed {core}").replace("{core}", data.core));
-            }).fail(function(jqXHR, status, error) {
-                self.showError(gettext("Core install failed"), jqXHR.responseJSON);
+            }).fail(function(jqXHR) {
+                self.showErrors(gettext("Core install failed"), jqXHR.responseJSON);
             }).always(function() {
                 loader.remove();
                 $(event.currentTarget).show();
@@ -180,8 +180,8 @@ $(function() {
                 }
             }).done(function(data) {
                 self.showSuccess(gettext("Core uninstall successful"), gettext("Successfully uninstalled {core}").replace("{core}", data.core));
-            }).fail(function(jqXHR, status, error) {
-                self.showError(gettext("Core uninstall failed"), jqXHR.responseJSON);
+            }).fail(function(jqXHR) {
+                self.showErrors(gettext("Core uninstall failed"), jqXHR.responseJSON);
             }).always(function() {
                 loader.remove();
                 $(event.currentTarget).show();
@@ -201,8 +201,8 @@ $(function() {
                 } else {
                     self.libSearchResult([]);
                 }
-            }).fail(function(jqXHR, status, error) {
-                self.showError(gettext("Lib search failed"), jqXHR.responseJSON);
+            }).fail(function(jqXHR) {
+                self.showErrors(gettext("Lib search failed"), jqXHR.responseJSON);
             }).always(function() {
                 self.searchLibButton.button("reset");
             });
@@ -221,8 +221,8 @@ $(function() {
                 }
             }).done(function(data) {
                 self.showSuccess(gettext("Lib install successful"), gettext("Successfully installed {lib}").replace("{lib}", data.lib));
-            }).fail(function(jqXHR, status, error) {
-                self.showError(gettext("Lib install failed"), jqXHR.responseJSON);
+            }).fail(function(jqXHR) {
+                self.showErrors(gettext("Lib install failed"), jqXHR.responseJSON);
             }).always(function() {
                 loader.remove();
                 $(event.currentTarget).show();
@@ -242,8 +242,8 @@ $(function() {
                 }
             }).done(function(data) {
                 self.showSuccess(gettext("Lib uninstall successful"), gettext("Successfully uninstalled {lib}").replace("{lib}", data.lib));
-            }).fail(function(jqXHR, status, error) {
-                self.showError(gettext("Lib uninstall failed"), jqXHR.responseJSON);
+            }).fail(function(jqXHR) {
+                self.showErrors(gettext("Lib uninstall failed"), jqXHR.responseJSON);
             }).always(function() {
                 loader.remove();
                 $(event.currentTarget).show();

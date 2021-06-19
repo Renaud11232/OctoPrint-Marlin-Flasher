@@ -180,6 +180,13 @@ class MarlinFlasherPlugin(octoprint.plugin.SettingsPlugin,
 	def board_detail(self):
 		return self.__handle_validated_request(self.__arduino_validator.validate_board_details, self.__arduino.board_details)
 
+	@octoprint.plugin.BlueprintPlugin.route("/arduino/flash", methods=["POST"])
+	@restricted_access
+	@admin_permission.require(403)
+	def flash(self):
+		pass
+		# return self.__handle_validated_request(self.__arduino_validator.validate_flash, self.__arduino.flash)
+
 	####################################################################
 	# PlatformIO
 	####################################################################

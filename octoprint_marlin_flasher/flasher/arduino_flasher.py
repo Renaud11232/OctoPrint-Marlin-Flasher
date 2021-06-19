@@ -228,7 +228,7 @@ class ArduinoFlasher(BaseFlasher):
 		try:
 			version = self.__get_arduino().version()
 			if isinstance(version, dict):
-				bad_version = re.match(r"0\.(?:15|16|17)\..+?\Z", version["VersionString"]) is None
+				bad_version = re.match(r"0\.18\..+?\Z", version["VersionString"]) is None
 			else:
 				not_arduino = True
 		except pyduinocli.ArduinoError:
@@ -256,7 +256,7 @@ class ArduinoFlasher(BaseFlasher):
 			return result, None
 		except pyduinocli.ArduinoError as e:
 			self._logger.debug("Failed !")
-			return None, self.__error_to_dict(e)
+			return None, [e.result["__stderr"]]
 
 	def core_install(self):
 		try:
@@ -270,7 +270,7 @@ class ArduinoFlasher(BaseFlasher):
 			), None
 		except pyduinocli.ArduinoError as e:
 			self._logger.debug("Failed !")
-			return None, self.__error_to_dict(e)
+			return None, [e.result["__stderr"]]
 
 	def core_uninstall(self):
 		try:
@@ -284,7 +284,7 @@ class ArduinoFlasher(BaseFlasher):
 			), None
 		except pyduinocli.ArduinoError as e:
 			self._logger.debug("Failed !")
-			return None, self.__error_to_dict(e)
+			return None, [e.result["__stderr"]]
 
 	def lib_search(self):
 		try:
@@ -295,7 +295,7 @@ class ArduinoFlasher(BaseFlasher):
 			return result, None
 		except pyduinocli.ArduinoError as e:
 			self._logger.debug("Failed !")
-			return None, self.__error_to_dict(e)
+			return None, [e.result["__stderr"]]
 
 	def lib_install(self):
 		try:
@@ -308,7 +308,7 @@ class ArduinoFlasher(BaseFlasher):
 			), None
 		except pyduinocli.ArduinoError as e:
 			self._logger.debug("Failed !")
-			return None, self.__error_to_dict(e)
+			return None, [e.result["__stderr"]]
 
 	def lib_uninstall(self):
 		try:
@@ -321,7 +321,7 @@ class ArduinoFlasher(BaseFlasher):
 			), None
 		except pyduinocli.ArduinoError as e:
 			self._logger.debug("Failed !")
-			return None, self.__error_to_dict(e)
+			return None, [e.result["__stderr"]]
 
 	def board_details(self):
 		try:
@@ -332,7 +332,7 @@ class ArduinoFlasher(BaseFlasher):
 			return result, None
 		except pyduinocli.ArduinoError as e:
 			self._logger.debug("Failed !")
-			return None, self.__error_to_dict(e)
+			return None, [e.result["__stderr"]]
 	#
 	# def flash(self):
 	# 	if self._firmware is None:
@@ -468,15 +468,19 @@ class ArduinoFlasher(BaseFlasher):
 	# 		return dict(), None
 
 	def __push_installed_boards(self):
-		arduino = self.__get_arduino()
-		self._logger.debug("Listing installed boards...")
-		result = arduino.board.listall()["result"]
-		self._logger.debug("Done")
-		self._logger.debug("Pushing installed boards through websocket ")
-		self._plugin_manager.send_plugin_message(self._identifier, dict(
-			type="arduino_boards",
-			result=result
-		))
+		try:
+			arduino = self.__get_arduino()
+			self._logger.debug("Listing installed boards...")
+			result = arduino.board.listall()["result"]
+			self._logger.debug("Done")
+			self._logger.debug("Pushing installed boards through websocket ")
+			self._plugin_manager.send_plugin_message(self._identifier, dict(
+				type="arduino_boards",
+				result=result
+			))
+		except pyduinocli.ArduinoError as e:
+			self._logger.debug("Failed !")
+			return None, [e.result["__stderr"]]
 
 	def handle_user_logged_in(self):
 		BaseFlasher.handle_user_logged_in(self)
