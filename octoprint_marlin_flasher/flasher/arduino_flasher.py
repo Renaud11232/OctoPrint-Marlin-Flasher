@@ -164,27 +164,8 @@ class ArduinoFlasher(BaseFlasher):
 							self._logger.debug("Found .ino file")
 							self._firmware = root
 							self._firmware_upload_time = datetime.now()
-						elif f == "Version.h":
-							self._logger.debug("Found Version.h, opening it...")
-							with open(os.path.join(root, f), "r") as versionfile:
-								for line in versionfile:
-									if "SHORT_BUILD_VERSION" in line:
-										self._logger.debug("Found SHORT_BUILD_VERSION")
-										version = re.findall('"([^"]*)"', line)
-										if version:
-											self._firmware_version = version[0]
-											break
-						elif f == "Configuration.h":
-							self._logger.debug("Found Configuration.h, opening it...")
-							with open(os.path.join(root, f), "r") as configfile:
-								for line in configfile:
-									if "STRING_CONFIG_H_AUTHOR" in line:
-										self._logger.debug("Found STRING_CONFIG_H_AUTHOR")
-										author = re.findall('"([^"]*)"', line)
-										if author:
-											self._firmware_author = author[0]
-											break
 				if self._firmware:
+					self._find_firmware_info()
 					return dict(
 						path=self._firmware,
 						file=self._settings.get_arduino_sketch_ino()

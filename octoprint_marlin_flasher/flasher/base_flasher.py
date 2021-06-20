@@ -4,6 +4,7 @@ import flask
 import requests
 import tempfile
 import os
+import re
 from threading import Thread
 
 
@@ -95,6 +96,28 @@ class BaseFlasher:
 
 	def _handle_firmware_file(self, firmware_file_path):
 		raise FlasherError("Unsupported function call.")
+
+	def _find_firmware_info(self):
+		for root, dirs, files in os.walk(self._firmware):
+			for f in files:
+				if f == "Version.h":
+					self._logger.debug("Found Version.h, opening it...")
+					with open(os.path.join(root, f), "r") as versionfile:
+						for line in versionfile:
+							version = re.findall(r'#define +SHORT_BUILD_VERSION +"([^"]*)"', line)
+							if version:
+								self._firmware_version = version[0]
+								self._logger.debug("Found SHORT_BUILD_VERSION : %s" % self._firmware_version)
+								break
+				elif f == "Configuration.h":
+					self._logger.debug("Found Configuration.h, opening it...")
+					with open(os.path.join(root, f), "r") as configfile:
+						for line in configfile:
+							author = re.findall(r'#define +STRING_CONFIG_H_AUTHOR +"([^"]*)"', line)
+							if author:
+								self._firmware_author = author[0]
+								self._logger.debug("Found STRING_CONFIG_H_AUTHOR : %s" % self._firmware_author)
+								break
 
 	def _push_firmware_info(self):
 		self._logger.debug("Sending firmware info through websocket")
