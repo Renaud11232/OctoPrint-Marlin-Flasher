@@ -21,7 +21,8 @@
                     </div>
                 </div>
                 <div class="progress">
-                    <div class="bar" data-bind="style: {width: uploadProgress() + '%'}"></div>
+                    <div class="bar" data-bind="style: {width: uploadProgress() + '%'},
+                                                css: {'bar-success': uploadProgress() >= 100}"></div>
                 </div>
             </form>
             <form class="form-horizontal" data-bind="visible: settingsViewModel.settings.plugins.marlin_flasher.retrieving_method() === 'url'">

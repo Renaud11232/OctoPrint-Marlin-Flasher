@@ -18,7 +18,7 @@
                 </div>
                 <div class="control-group">
                     <div class="controls">
-                        <button id="platformio_flash-button" class="btn btn-warning" type="submit" data-loading-text="{{ _('Flashing...') }}" data-bind="visible: !envListLoading()" ><i class="icon-warning-sign"></i> {{ _('Flash') }}</button>
+                        <button id="platformio_flash-button" class="btn btn-warning" type="submit" data-loading-text='<i class="fas fa-spinner fa-spin"></i> {{ _("Flashing...") }}' data-bind="visible: !envListLoading()" ><i class="icon-warning-sign"></i> {{ _('Flash') }}</button>
                         <i class="fas fa-spinner fa-spin fa-2x" data-bind="visible: boardOptionsLoading"></i>
                     </div>
                 </div>
