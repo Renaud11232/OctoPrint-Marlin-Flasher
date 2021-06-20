@@ -177,8 +177,7 @@ class MarlinFlasherPlugin(octoprint.plugin.SettingsPlugin,
 	@restricted_access
 	@admin_permission.require(403)
 	def flash(self):
-		pass
-		# return self.__handle_validated_request(self.__arduino_validator.validate_flash, self.__arduino.flash)
+		return self.__handle_validated_request(self.__arduino_validator.validate_flash, self.__arduino.flash)
 
 	####################################################################
 	# PlatformIO

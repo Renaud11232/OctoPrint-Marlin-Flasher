@@ -7,7 +7,7 @@
     </div>
     <div id="flash" class="accordion-body collapse">
         <div class="accordion-inner">
-            <form class="form-horizontal" data-bind="submit: flash">
+            <form class="form-horizontal" data-bind="submit: flashArduino">
                 <div class="control-group">
                     <label class="control-label" for="fqbn">{{ _('Board') }}</label>
                     <div class="controls">
@@ -37,10 +37,10 @@
                         <i class="fas fa-spinner fa-spin fa-2x" data-bind="visible: boardOptionsLoading"></i>
                     </div>
                 </div>
-                <span data-bind="text: progressStep"></span>
+                <span data-bind="text: arduinoFlashStep"></span>
                 <div class="progress progress-text-centered">
-                    <div class="bar" data-bind="style: {width: flashingProgress() + '%'},
-                                                css: {'bar-success': flashingProgress() >= 100}"></div>
+                    <div class="bar" data-bind="style: {width: arduinoFlashProgress() + '%'},
+                                                css: {'bar-success': arduinoFlashFinished() && arduinoFlashSucess(), 'bar-danger': arduinoFlashFinished() && !arduinoFlashSucess()}"></div>
                 </div>
             </form>
         </div>

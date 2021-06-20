@@ -14,7 +14,6 @@ from flask_babel import gettext
 import pyduinocli
 import intelhex
 import requests
-import zipfile
 import tarfile
 import io
 
@@ -329,139 +328,147 @@ class ArduinoFlasher(BaseFlasher):
 		except pyduinocli.ArduinoError as e:
 			self._logger.debug("Failed !")
 			return None, [e.result["__stderr"]]
-	#
-	# def flash(self):
-	# 	if self._firmware is None:
-	# 		self._logger.debug("No firmware uploaded")
-	# 		return None, dict(
-	# 			error=gettext("You did not upload the firmware or it got reset by the previous flash process.")
-	# 		)
-	# 	if not self._printer.is_ready():
-	# 		self._logger.debug("Printer not ready")
-	# 		return None, dict(
-	# 			error=gettext("The printer may not be connected or it may be busy.")
-	# 		)
-	# 	options = []
-	# 	for param in flask.request.values:
-	# 		if param != "fqbn":
-	# 			options.append("%s=%s" % (param, flask.request.values[param]))
-	# 	options = ",".join(options)
-	# 	fqbn = flask.request.values["fqbn"]
-	# 	if options:
-	# 		fqbn = "%s:%s" % (fqbn, options)
-	# 	thread = Thread(target=self.__background_flash, args=(fqbn,))
-	# 	thread.start()
-	# 	self._logger.debug("Saving options")
-	# 	try:
-	# 		with open(os.path.join(self._plugin.get_plugin_data_folder(), "last_options_arduino.json"), "w") as output:
-	# 			json.dump(flask.request.values, output)
-	# 	except (OSError, IOError) as _:
-	# 		pass
-	# 	return dict(
-	# 		message=gettext("Flash process started.")
-	# 	), None
-	#
-	# def __background_flash(self, fqbn):
-	# 	self._logger.info("Starting flashing process...")
-	# 	disconnected = False
-	# 	try:
-	# 		arduino = self.__get_arduino()
-	# 		if self.__is_ino:
-	# 			self._plugin_manager.send_plugin_message(self._identifier, dict(
-	# 				type="flash_progress",
-	# 				step=gettext("Compiling"),
-	# 				progress=0
-	# 			))
-	# 			self._logger.info("Compiling...")
-	# 			result = arduino.compile(self._firmware, fqbn=fqbn)
-	# 			if not result["success"]:
-	# 				self._logger.warning("Compilation failed")
-	# 				self._logger.warning("Standard output :")
-	# 				for log_line in result["compiler_out"].splitlines():
-	# 					self._logger.warning(log_line)
-	# 				self._logger.warning("Error output :")
-	# 				for log_line in result["compiler_err"].splitlines():
-	# 					self._logger.warning(log_line)
-	# 				self._plugin_manager.send_plugin_message(self._identifier, dict(
-	# 					type="flash_result",
-	# 					success=False,
-	# 					stderr=result["compiler_err"],
-	# 					error=result["compiler_out"]
-	# 				))
-	# 				return
-	# 			self._logger.info("Compilation success")
-	# 			self._plugin_manager.send_plugin_message(self._identifier, dict(
-	# 				type="flash_progress",
-	# 				step=gettext("Uploading"),
-	# 				progress=50
-	# 			))
-	# 		else:
-	# 			self._plugin_manager.send_plugin_message(self._identifier, dict(
-	# 				type="flash_progress",
-	# 				step=gettext("Uploading"),
-	# 				progress=0
-	# 			))
-	# 		transport = self._printer.get_transport()
-	# 		if not isinstance(transport, serial.Serial):
-	# 			self._logger.warning("The printer is not connected via a serial port")
-	# 			self._plugin_manager.send_plugin_message(self._identifier, dict(
-	# 				type="flash_result",
-	# 				success=False,
-	# 				error=gettext("The printer is not connected through a Serial port and thus, cannot be flashed.")
-	# 			))
-	# 			return
-	# 		self._run_pre_flash_script()
-	# 		self._wait_pre_flash_delay()
-	# 		flash_port = transport.port
-	# 		_, port, baudrate, profile = self._printer.get_current_connection()
-	# 		self._logger.info("Disconnecting printer...")
-	# 		self._printer.disconnect()
-	# 		disconnected = True
-	# 		self._logger.info("Uploading to the board...")
-	# 		if self.__is_ino:
-	# 			arduino.upload(sketch=self._firmware, fqbn=fqbn, port=flash_port)
-	# 		else:
-	# 			arduino.upload(fqbn=fqbn, port=flash_port, input_file=self._firmware)
-	# 		self._logger.info("Uploading success")
-	# 		self._wait_post_flash_delay()
-	# 		self._should_run_post_script = True
-	# 		self._printer.connect(port, baudrate, profile)
-	# 		self._firmware = None
-	# 		self._firmware_version = None
-	# 		self._firmware_author = None
-	# 		self._firmware_upload_time = None
-	# 		self._push_firmware_info()
-	# 		self._plugin_manager.send_plugin_message(self._identifier, dict(
-	# 			type="flash_progress",
-	# 			step=gettext("Done"),
-	# 			progress=100
-	# 		))
-	# 		self._plugin_manager.send_plugin_message(self._identifier, dict(
-	# 			type="flash_result",
-	# 			success=True,
-	# 			message=gettext("Board successfully flashed.")
-	# 		))
-	# 	except pyduinocli.ArduinoError as e:
-	# 		self._logger.warning(e.message)
-	# 		self._logger.warning("Cause : %s" % e.cause)
-	# 		self._logger.warning("Error output : ")
-	# 		for log_line in e.stderr.splitlines():
-	# 			self._logger.warning(log_line)
-	# 		if disconnected:
-	# 			self._printer.connect(port, baudrate, profile)
-	# 		error = self.__error_to_dict(e)
-	# 		error.update(dict(
-	# 			type="flash_result",
-	# 			success=False
-	# 		))
-	# 		self._plugin_manager.send_plugin_message(self._identifier, error)
-	#
-	# def last_flash_options(self):
-	# 	try:
-	# 		with open(os.path.join(self._plugin.get_plugin_data_folder(), "last_options_arduino.json"), "r") as jsonfile:
-	# 			return json.load(jsonfile), None
-	# 	except (OSError, IOError) as _:
-	# 		return dict(), None
+
+	def flash(self):
+		if self._firmware is None:
+			self._logger.debug("No firmware uploaded")
+			return None, [gettext("You did not upload the firmware or it got reset by the previous flash process.")]
+		if not self._printer.is_ready():
+			self._logger.debug("Printer not ready")
+			return None, [gettext("The printer may not be connected or it may be busy.")]
+		options = []
+		for param in flask.request.values:
+			if param != "fqbn":
+				options.append("%s=%s" % (param, flask.request.values[param]))
+		options = ",".join(options)
+		fqbn = flask.request.values["fqbn"]
+		if options:
+			fqbn = "%s:%s" % (fqbn, options)
+		thread = Thread(target=self.__background_flash, args=(fqbn,))
+		thread.start()
+		self._logger.debug("Saving options")
+		# TODO use settings instead
+		try:
+			with open(os.path.join(self._plugin.get_plugin_data_folder(), "last_options_arduino.json"), "w") as output:
+				json.dump(flask.request.values, output)
+		except (OSError, IOError) as _:
+			pass
+		return dict(
+			message=gettext("Flash process started.")
+		), None
+
+	def __background_flash(self, fqbn):
+		self._logger.info("Starting flashing process...")
+		disconnected = False
+		try:
+			arduino = self.__get_arduino()
+			if self.__is_ino:
+				self._plugin_manager.send_plugin_message(self._identifier, dict(
+					type="arduino_flash_status",
+					step_name=gettext("Compiling"),
+					progress=0,
+					finished=False
+				))
+				self._logger.info("Compiling...")
+				result = arduino.compile(self._firmware, fqbn=fqbn)
+				if not result["result"]["success"]:
+					self._logger.warning("Compilation failed")
+					self._logger.warning("Standard output :")
+					for log_line in result["result"]["compiler_out"].splitlines():
+						self._logger.warning(log_line)
+					self._logger.warning("Error output :")
+					# TODO fix the error output when arduino-cli will be fixed...
+					error = result["result"]["compiler_err"] if result["result"]["compiler_err"] else result["__stderr"]
+					for log_line in error.splitlines():
+						self._logger.warning(log_line)
+					self._plugin_manager.send_plugin_message(self._identifier, dict(
+						type="arduino_flash_status",
+						step_name=None,
+						progress=100,
+						finished=True,
+						success=False,
+						error_output=error,
+						message=result["result"]["compiler_out"]
+					))
+					return
+				self._logger.info("Compilation success")
+				self._plugin_manager.send_plugin_message(self._identifier, dict(
+					type="arduino_flash_status",
+					step_name=gettext("Uploading"),
+					progress=50,
+					finished=False
+				))
+			else:
+				self._plugin_manager.send_plugin_message(self._identifier, dict(
+					type="arduino_flash_status",
+					step_name=gettext("Uploading"),
+					progress=0,
+					finished=False
+				))
+			transport = self._printer.get_transport()
+			if not isinstance(transport, serial.Serial):
+				self._logger.warning("The printer is not connected via a serial port")
+				self._plugin_manager.send_plugin_message(self._identifier, dict(
+					type="arduino_flash_status",
+					step_name=None,
+					progress=100,
+					finished=True,
+					success=False,
+					message=gettext("The printer is not connected through a Serial port and thus, cannot be flashed.")
+				))
+				return
+			self._run_pre_flash_script()
+			self._wait_pre_flash_delay()
+			flash_port = transport.port
+			_, port, baudrate, profile = self._printer.get_current_connection()
+			self._logger.info("Disconnecting printer...")
+			self._printer.disconnect()
+			disconnected = True
+			self._logger.info("Uploading to the board...")
+			if self.__is_ino:
+				arduino.upload(sketch=self._firmware, fqbn=fqbn, port=flash_port)
+			else:
+				arduino.upload(fqbn=fqbn, port=flash_port, input_file=self._firmware)
+			self._logger.info("Uploading success")
+			self._wait_post_flash_delay()
+			self._should_run_post_script = True
+			self._printer.connect(port, baudrate, profile)
+			self._firmware = None
+			self._firmware_version = None
+			self._firmware_author = None
+			self._firmware_upload_time = None
+			self._push_firmware_info()
+			self._plugin_manager.send_plugin_message(self._identifier, dict(
+				type="arduino_flash_status",
+				step_name=gettext("Done"),
+				progress=100,
+				finished=True,
+				success=True,
+				message=gettext("Board successfully flashed.")
+			))
+		except pyduinocli.ArduinoError as e:
+			self._logger.warning("Error : %s" % e.result["result"])
+			self._logger.warning("Error output : ")
+			for log_line in e.result["__stderr"].splitlines():
+				self._logger.warning(log_line)
+			if disconnected:
+				self._printer.connect(port, baudrate, profile)
+			self._plugin_manager.send_plugin_message(self._identifier, dict(
+				type="arduino_flash_status",
+				step_name=None,
+				progress=100,
+				finished=True,
+				success=False,
+				message=e.result["result"],
+				error_output=e.result["__stderr"]
+			))
+
+	def last_flash_options(self):
+		try:
+			with open(os.path.join(self._plugin.get_plugin_data_folder(), "last_options_arduino.json"), "r") as jsonfile:
+				return json.load(jsonfile), None
+		except (OSError, IOError) as _:
+			return dict(), None
 
 	def __push_installed_boards(self):
 		try:

@@ -34,6 +34,8 @@ $(function() {
             });
         }
 
+        self.uploadProgress = ko.observable(0);
+
         self.fileUploadParams = {
             maxNumberOfFiles: 1,
             headers: OctoPrint.getRequestHeaders(),
@@ -44,7 +46,7 @@ $(function() {
                 if(error === "") {
                     self.showErrors(gettext("Firmware upload failed"), [gettext("Check the maximum firmware size")]);
                 } else {
-                    self.showErrors(gettext("Firmware upload failed"), [jqXHR.responseJSON]);
+                    self.showErrors(gettext("Firmware upload failed"), jqXHR.responseJSON);
                 }
                 self.uploadProgress(0);
             },
@@ -60,20 +62,7 @@ $(function() {
 
         self.onDataUpdaterPluginMessage = function(plugin, message) {
             if(plugin === "marlin_flasher" && self.loginStateViewModel.isAdmin()) {
-                if(message.type === "flash_progress") {
-                    self.progressStep(message.step);
-                    self.flashingProgress(message.progress);
-                } else if(message.type === "flash_result") {
-                    if(message.success) {
-                        self.showSuccess(gettext("Flashing successful"), message.message);
-                    } else {
-                        self.showErrors(gettext("Flashing failed"), [message]);
-                        self.progressStep(null);
-                        self.flashingProgress(0);
-                    }
-                    self.arduinoFlashButton.button("reset");
-                    self.platformioFlashButton.button("reset");
-                } else if (message.type === "arduino_install") {
+                if (message.type === "arduino_install") {
                     self.handleArduinoInstallMessage(message);
                 } else if (message.type === "platformio_install") {
                     self.handlePlatformioInstallMessage(message);
@@ -81,8 +70,44 @@ $(function() {
                     self.handleFirmwareInfo(message);
                 } else if (message.type === "arduino_boards") {
                     self.handleArduinoBoards(message);
+                } else if (message.type === "arduino_flash_status") {
+                    self.handleArduinoFlashStatus(message);
                 }
             }
+        };
+
+        self.stderr = ko.observable();
+
+        self.showCompilationError = function(stderr) {
+            self.stderr(stderr);
+            $("#marlin_flasher_modal").modal("show");
+        };
+
+        self.onSettingsBeforeSave = function() {
+            self.settingsViewModel.settings.plugins.marlin_flasher.max_upload_size(parseInt(self.settingsViewModel.settings.plugins.marlin_flasher.max_upload_size()));
+            if(self.settingsViewModel.settings.plugins.marlin_flasher.arduino.additional_urls() === "") {
+                self.settingsViewModel.settings.plugins.marlin_flasher.arduino.additional_urls(null);
+            }
+            if(self.settingsViewModel.settings.plugins.marlin_flasher.arduino.cli_path() === "") {
+                self.settingsViewModel.settings.plugins.marlin_flasher.arduino.cli_path(null);
+            }
+            if(self.settingsViewModel.settings.plugins.marlin_flasher.platformio.cli_path() === "") {
+                self.settingsViewModel.settings.plugins.marlin_flasher.platformio.cli_path(null);
+            }
+            if(self.settingsViewModel.settings.plugins.marlin_flasher.pre_flash_script() === "") {
+                self.settingsViewModel.settings.plugins.marlin_flasher.pre_flash_script(null);
+            }
+            if(self.settingsViewModel.settings.plugins.marlin_flasher.post_flash_script() === "") {
+                self.settingsViewModel.settings.plugins.marlin_flasher.post_flash_script(null);
+            }
+            if(self.settingsViewModel.settings.plugins.marlin_flasher.pre_flash_delay() === "") {
+                self.settingsViewModel.settings.plugins.marlin_flasher.pre_flash_delay("0");
+            }
+            self.settingsViewModel.settings.plugins.marlin_flasher.pre_flash_delay(parseInt(self.settingsViewModel.settings.plugins.marlin_flasher.pre_flash_delay()));
+            if(self.settingsViewModel.settings.plugins.marlin_flasher.post_flash_delay() === "") {
+                self.settingsViewModel.settings.plugins.marlin_flasher.post_flash_delay("0");
+            }
+            self.settingsViewModel.settings.plugins.marlin_flasher.post_flash_delay(parseInt(self.settingsViewModel.settings.plugins.marlin_flasher.post_flash_delay()));
         };
 
         //////////////////////////////////////////////////////////////////////////////
@@ -191,7 +216,7 @@ $(function() {
         };
 
         self.searchCore = function(form) {
-            self.searchCoreButton.button("loading");
+            $("#search-core-btn").button("loading");
             $.ajax({
                 type: "GET",
                 headers: OctoPrint.getRequestHeaders(),
@@ -202,7 +227,7 @@ $(function() {
             }).fail(function(jqXHR) {
                 self.showErrors(gettext("Core search failed"), jqXHR.responseJSON);
             }).always(function() {
-                self.searchCoreButton.button("reset");
+                $("#search-core-btn").button("reset");
             });
         };
 
@@ -249,7 +274,7 @@ $(function() {
         };
 
         self.searchLib = function(form) {
-            self.searchLibButton.button("loading");
+            $("#search-lib-btn").button("loading");
             $.ajax({
                 type: "GET",
                 headers: OctoPrint.getRequestHeaders(),
@@ -264,7 +289,7 @@ $(function() {
             }).fail(function(jqXHR) {
                 self.showErrors(gettext("Lib search failed"), jqXHR.responseJSON);
             }).always(function() {
-                self.searchLibButton.button("reset");
+                $("#search-lib-btn").button("reset");
             });
         };
 
@@ -308,6 +333,38 @@ $(function() {
                 loader.remove();
                 $(event.currentTarget).show();
             });
+        };
+
+        self.flashArduino = function(form) {
+            $("#arduino_flash-button").button("loading");
+            $.ajax({
+                type: "POST",
+                headers: OctoPrint.getRequestHeaders(),
+                url: "/plugin/marlin_flasher/arduino/flash",
+                data: $(form).serialize()
+            }).fail(function(jqXHR) {
+                self.showErrors(gettext("Flashing failed to start"), jqXHR.responseJSON);
+                $("#arduino_flash-button").button("reset");
+            });
+        };
+
+        self.arduinoFlashStep = ko.observable();
+        self.arduinoFlashProgress = ko.observable();
+        self.arduinoFlashFinished = ko.observable();
+        self.arduinoFlashSucess = ko.observable();
+
+        self.handleArduinoFlashStatus = function(message) {
+            this.arduinoFlashStep(message.step_name);
+            this.arduinoFlashProgress(message.progress);
+            this.arduinoFlashFinished(message.finished);
+            this.arduinoFlashSucess(message.success);
+            if(message.finished) {
+                $("#arduino_flash-button").button("reset");
+                if(!message.success) {
+                    self.showErrors(gettext("Flashing failed"), [message.message]);
+                    self.showCompilationError(message.error_output);
+                }
+            }
         };
 
         //////////////////////////////////////////////////////////////////////////////
@@ -361,9 +418,22 @@ $(function() {
             }).done(function(data) {
                 self.showSuccess(gettext("Firmware download successful"), data.file);
             }).fail(function(jqXHR) {
-                self.showErrors(gettext("Firmware download failed"), [jqXHR.responseJSON]);
+                self.showErrors(gettext("Firmware download failed"), jqXHR.responseJSON);
             }).always(function() {
                 self.downloadingPlatformioFirmware(false);
+            });
+        };
+
+        self.flashPlatformIO = function(form) {
+            $("#platformio_flash-button").button("loading");
+            $.ajax({
+                type: "POST",
+                headers: OctoPrint.getRequestHeaders(),
+                url: "/plugin/marlin_flasher/flash",
+                data: $(form).serialize()
+            }).fail(function(jqXHR) {
+                self.showErrors(gettext("Flashing failed to start"), jqXHR.responseJSON);
+                $("#platformio_flash-button").button("reset");
             });
         };
 
@@ -371,22 +441,9 @@ $(function() {
 
 
 
-
-        self.arduinoFlashButton = $("#arduino_flash-button");
-        self.platformioFlashButton = $("#platformio_flash-button");
-        self.searchCoreButton = $("#search-core-btn");
-        self.searchLibButton = $("#search-lib-btn");
-        self.stderrModal = $("#marlin_flasher_modal");
         self.envList = ko.observableArray([]);
         self.selectedEnv = ko.observable();
         self.envListLoading = ko.observable(false);
-        self.stderr = ko.observable();
-        self.uploadProgress = ko.observable(0);
-        self.flashingProgress = ko.observable(0);
-        self.progressStep = ko.observable();
-        self.firmwareVersion = ko.observable();
-        self.firmwareAuthor = ko.observable();
-        self.uploadTime = ko.observable();
         self.lastFlashOptions = null;
 
         self.loadEnvList = function() {
@@ -418,47 +475,6 @@ $(function() {
                     self.envListLoading(false);
                 });
             }
-        };
-        self.flash = function(form) {
-            self.arduinoFlashButton.button("loading");
-            self.platformioFlashButton.button("loading");
-            $.ajax({
-                type: "POST",
-                headers: OctoPrint.getRequestHeaders(),
-                url: "/plugin/marlin_flasher/flash",
-                data: $(form).serialize()
-            }).fail(function(jqXHR) {
-                self.showErrors(gettext("Flashing failed to start"), [jqXHR.responseJSON]);
-                self.arduinoFlashButton.button("reset");
-                self.platformioFlashButton.button("reset");
-            });
-        };
-
-        self.onSettingsBeforeSave = function() {
-            self.settingsViewModel.settings.plugins.marlin_flasher.max_upload_size(parseInt(self.settingsViewModel.settings.plugins.marlin_flasher.max_upload_size()));
-            if(self.settingsViewModel.settings.plugins.marlin_flasher.arduino.additional_urls() === "") {
-                self.settingsViewModel.settings.plugins.marlin_flasher.arduino.additional_urls(null);
-            }
-            if(self.settingsViewModel.settings.plugins.marlin_flasher.arduino.cli_path() === "") {
-                self.settingsViewModel.settings.plugins.marlin_flasher.arduino.cli_path(null);
-            }
-            if(self.settingsViewModel.settings.plugins.marlin_flasher.platformio.cli_path() === "") {
-                self.settingsViewModel.settings.plugins.marlin_flasher.platformio.cli_path(null);
-            }
-            if(self.settingsViewModel.settings.plugins.marlin_flasher.pre_flash_script() === "") {
-                self.settingsViewModel.settings.plugins.marlin_flasher.pre_flash_script(null);
-            }
-            if(self.settingsViewModel.settings.plugins.marlin_flasher.post_flash_script() === "") {
-                self.settingsViewModel.settings.plugins.marlin_flasher.post_flash_script(null);
-            }
-            if(self.settingsViewModel.settings.plugins.marlin_flasher.pre_flash_delay() === "") {
-                self.settingsViewModel.settings.plugins.marlin_flasher.pre_flash_delay("0");
-            }
-            self.settingsViewModel.settings.plugins.marlin_flasher.pre_flash_delay(parseInt(self.settingsViewModel.settings.plugins.marlin_flasher.pre_flash_delay()));
-            if(self.settingsViewModel.settings.plugins.marlin_flasher.post_flash_delay() === "") {
-                self.settingsViewModel.settings.plugins.marlin_flasher.post_flash_delay("0");
-            }
-            self.settingsViewModel.settings.plugins.marlin_flasher.post_flash_delay(parseInt(self.settingsViewModel.settings.plugins.marlin_flasher.post_flash_delay()));
         };
     }
 
