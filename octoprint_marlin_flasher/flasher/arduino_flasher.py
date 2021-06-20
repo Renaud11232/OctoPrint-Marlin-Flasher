@@ -383,7 +383,7 @@ class ArduinoFlasher(BaseFlasher):
 						self._logger.warning(log_line)
 					self._plugin_manager.send_plugin_message(self._identifier, dict(
 						type="arduino_flash_status",
-						step_name=None,
+						step_name=gettext("Compilation failed"),
 						progress=100,
 						finished=True,
 						success=False,
@@ -410,7 +410,7 @@ class ArduinoFlasher(BaseFlasher):
 				self._logger.warning("The printer is not connected via a serial port")
 				self._plugin_manager.send_plugin_message(self._identifier, dict(
 					type="arduino_flash_status",
-					step_name=None,
+					step_name=gettext("Upload failed"),
 					progress=100,
 					finished=True,
 					success=False,
@@ -455,7 +455,7 @@ class ArduinoFlasher(BaseFlasher):
 				self._printer.connect(port, baudrate, profile)
 			self._plugin_manager.send_plugin_message(self._identifier, dict(
 				type="arduino_flash_status",
-				step_name=None,
+				step_name=gettext("Upload failed"),
 				progress=100,
 				finished=True,
 				success=False,

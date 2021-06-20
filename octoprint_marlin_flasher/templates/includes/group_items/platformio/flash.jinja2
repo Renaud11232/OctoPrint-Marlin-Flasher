@@ -22,10 +22,10 @@
                         <i class="fas fa-spinner fa-spin fa-2x" data-bind="visible: boardOptionsLoading"></i>
                     </div>
                 </div>
-                <span data-bind="text: progressStep"></span>
+                <span data-bind="text: platformioFlashStep"></span>
                 <div class="progress progress-text-centered">
-                    <div class="bar" data-bind="style: {width: flashingProgress() + '%'},
-                                                css: {'bar-success': flashingProgress() >= 100}"></div>
+                    <div class="bar" data-bind="style: {width: platformioFlashProgress() + '%'},
+                                                css: {'bar-success': platformioFlashFinished() && platformioFlashSucess(), 'bar-danger': platformioFlashFinished() && !platformioFlashSucess()}"></div>
                 </div>
             </form>
         </div>

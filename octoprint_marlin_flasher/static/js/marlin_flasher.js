@@ -424,6 +424,11 @@ $(function() {
             });
         };
 
+        self.platformioFlashStep = ko.observable();
+        self.platformioFlashProgress = ko.observable();
+        self.platformioFlashFinished = ko.observable();
+        self.platformioFlashSucess = ko.observable();
+
         self.flashPlatformIO = function(form) {
             $("#platformio_flash-button").button("loading");
             $.ajax({
