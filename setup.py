@@ -9,6 +9,7 @@ plugin_url = "https://github.com/Renaud11232/Octoprint-Marlin-Flasher"
 plugin_license = "MIT"
 plugin_requires = [
 	"pyduinocli>=0.18.2rc1,<0.19",
+	"intelhex",
 	"requests",
 	"virtualenv",
 	"flask>=0.10.1"
