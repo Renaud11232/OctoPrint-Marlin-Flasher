@@ -72,6 +72,8 @@ $(function() {
                     self.handleArduinoBoards(message);
                 } else if (message.type === "arduino_flash_status") {
                     self.handleArduinoFlashStatus(message);
+                } else if (message.type === "platformio_environments") {
+                    self.handlePlatformioEnvironments(message);
                 }
             }
         };
@@ -442,45 +444,13 @@ $(function() {
             });
         };
 
-
-
-
-
         self.envList = ko.observableArray([]);
-        self.selectedEnv = ko.observable();
-        self.envListLoading = ko.observable(false);
-        self.lastFlashOptions = null;
 
-        self.loadEnvList = function() {
-            if(self.loginStateViewModel.isAdmin() && self.settingsViewModel.settings.plugins.marlin_flasher.platform_type() === "platform_io") {
-                self.envList([]);
-                self.envListLoading(true);
-                $.ajax({
-                    type: "GET",
-                    headers: OctoPrint.getRequestHeaders(),
-                    url: "/plugin/marlin_flasher/board/details",
-                }).done(function (data) {
-                    if(data) {
-                        self.envList(data);
-                        if(data.length === 1) {
-                            self.selectedEnv(data[0]);
-                        }
-                    }
-                    $.ajax({
-                        type: "GET",
-                        headers: OctoPrint.getRequestHeaders(),
-                        url: "/plugin/marlin_flasher/last_flash_options",
-                    }).done(function (data) {
-                        if(data && data.env) {
-                            self.lastFlashOptions = data;
-                            self.selectedEnv(data.env);
-                        }
-                    });
-                }).always(function() {
-                    self.envListLoading(false);
-                });
-            }
+        self.handlePlatformioEnvironments = function(message) {
+            self.envList(message.result);
         };
+
+        self.lastFlashOptions = null;
     }
 
     OCTOPRINT_VIEWMODELS.push({

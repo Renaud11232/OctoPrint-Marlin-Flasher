@@ -87,9 +87,11 @@ class BaseFlasher:
 			temp_path = temp.name
 		errors = self._validate_firmware_file(temp_path)
 		if errors:
+			self._push_firmware_info()
 			os.remove(temp_path)
 			return None, errors
 		result = self._handle_firmware_file(temp_path)
+		self._push_firmware_info()
 		self._logger.debug("Clearing downloaded firmware...")
 		os.remove(temp_path)
 		return result

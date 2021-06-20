@@ -12,14 +12,12 @@
                     <label class="control-label" for="env">{{ _('Environment') }}</label>
                     <div class="controls">
                         <select id="env" name="env" data-bind="options: envList,
-                                                               optionsCaption: gettext('PlatformIO default'),
-                                                               value: selectedEnv"></select>
+                                                               optionsCaption: gettext('PlatformIO default')"></select>
                     </div>
                 </div>
                 <div class="control-group">
                     <div class="controls">
-                        <button id="platformio_flash-button" class="btn btn-warning" type="submit" data-loading-text='<i class="fas fa-spinner fa-spin"></i> {{ _("Flashing...") }}' data-bind="visible: !envListLoading()" ><i class="icon-warning-sign"></i> {{ _('Flash') }}</button>
-                        <i class="fas fa-spinner fa-spin fa-2x" data-bind="visible: boardOptionsLoading"></i>
+                        <button id="platformio_flash-button" class="btn btn-warning" type="submit" data-loading-text='<i class="fas fa-spinner fa-spin"></i> {{ _("Flashing...") }}'><i class="icon-warning-sign"></i> {{ _('Flash') }}</button>
                     </div>
                 </div>
                 <span data-bind="text: platformioFlashStep"></span>

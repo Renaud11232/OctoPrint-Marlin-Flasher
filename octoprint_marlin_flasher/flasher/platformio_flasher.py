@@ -174,41 +174,6 @@ class PlatformIOFlasher(BaseFlasher):
 	# 		)
 	# 	return None
 	#
-	# def firmware(self):
-	# 	return dict(
-	# 		firmware=self._firmware,
-	# 		version=self._firmware_version,
-	# 		author=self._firmware_author,
-	# 		upload_time=self._firmware_upload_time
-	# 	), None
-	#
-	# def board_details(self):
-	# 	if self._firmware is None:
-	# 		return [], None
-	# 	try:
-	# 		self._logger.debug("Trying to open Configuration.h")
-	# 		with open(os.path.join(self._firmware, "Marlin", "Configuration.h"), "r") as configuration_h:
-	# 			configuration_h_content = configuration_h.read()
-	# 			match = re.search(r"^[ \t]*#define[ \t]+MOTHERBOARD[ \t]+(\S*?)[ \t]*\r?$", configuration_h_content, re.MULTILINE)
-	# 			if not match:
-	# 				return [], None
-	# 			# Removes the BOARD_ part of the name
-	# 			self._logger.debug("Found motherboard %s" % match.group(1))
-	# 			motherboard = match.group(1)[6:]
-	# 			self._logger.debug("Trying to open pins.h")
-	# 			with open(os.path.join(self._firmware, "Marlin", "src", "pins", "pins.h"), "r") as pins_h:
-	# 				pins_h_content = pins_h.read()
-	# 				match = re.search(r"^[ \t]*#(el)?if[ \t]+MB\(%s\)[ \t]*\r?\n.*?(env:.*?)[ \t]*\r?$" % re.escape(motherboard), pins_h_content, re.MULTILINE)
-	# 				if not match:
-	# 					return [], None
-	# 				self._logger.debug("Found environments %s" % match.group(2))
-	# 				envs = [env.split(":")[1] for env in match.group(2).split(" ") if env.startswith("env:")]
-	# 				return envs, None
-	# 	except (OSError, IOError) as _:
-	# 		# Files are not where they should, maybe it's not Marlin... No env found, the user will select the default one
-	# 		self._logger.debug("Could not open file")
-	# 		return [], None
-	#
 	# def flash(self):
 	# 	if self._firmware is None:
 	# 		self._logger.debug("No firmware uploaded")
@@ -311,3 +276,40 @@ class PlatformIOFlasher(BaseFlasher):
 	# 			return json.load(jsonfile), None
 	# 	except (OSError, IOError) as _:
 	# 		return dict(), None
+
+	def __get_available_environments(self):
+		if self._firmware is None:
+			return []
+		try:
+			self._logger.debug("Trying to open Configuration.h")
+			with open(os.path.join(self._firmware, "Marlin", "Configuration.h"), "r") as configuration_h:
+				configuration_h_content = configuration_h.read()
+				match = re.search(r"^\s*?#define\s+?MOTHERBOARD\s+?(\S*?)\s*?$", configuration_h_content, re.MULTILINE)
+				if not match:
+					return []
+				# Removes the BOARD_ part of the name
+				self._logger.debug("Found motherboard %s" % match.group(1))
+				motherboard = match.group(1)[6:]
+				self._logger.debug("Trying to open pins.h")
+				with open(os.path.join(self._firmware, "Marlin", "src", "pins", "pins.h"), "r") as pins_h:
+					pins_h_content = pins_h.read()
+					match = re.search(r"^\s*?#(el)?if\s+?MB\([^)]*?%s[^)]*?\)\s*?\n.*?(env:.*?)\s*?$" % re.escape(motherboard), pins_h_content, re.MULTILINE)
+					if not match:
+						return []
+					self._logger.debug("Found environments %s" % match.group(2))
+					envs = [env[4:] for env in match.group(2).strip().split(" ") if env.startswith("env:")]
+					return envs
+		except (OSError, IOError) as _:
+			# Files are not where they should, maybe it's not Marlin... No env found, the user will select the default one
+			self._logger.debug("Could not open file")
+			return []
+
+	def __push_available_environments(self):
+		self._plugin_manager.send_plugin_message(self._identifier, dict(
+			type="platformio_environments",
+			result=self.__get_available_environments()
+		))
+
+	def _push_firmware_info(self):
+		BaseFlasher._push_firmware_info(self)
+		self.__push_available_environments()
