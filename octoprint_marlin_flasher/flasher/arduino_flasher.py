@@ -140,9 +140,7 @@ class ArduinoFlasher(BaseFlasher):
 				return None
 			except:
 				self._logger.debug("The firmware file is not valid")
-				return dict(
-					error=gettext("Invalid file type.")
-				)
+				return [gettext("Invalid file type.")]
 
 	def _handle_firmware_file(self, firmware_file_path):
 		self._firmware = None
@@ -192,9 +190,7 @@ class ArduinoFlasher(BaseFlasher):
 						path=self._firmware,
 						file=self._settings.get_arduino_sketch_ino()
 					), None
-				return None, dict(
-					error=gettext("No valid sketch were found in the given file.")
-				)
+				return None, [gettext("No valid sketch were found in the given file.")]
 		except zipfile.BadZipfile:
 			self._logger.debug("Trying to open firmware as hex file...")
 			self.__is_ino = False

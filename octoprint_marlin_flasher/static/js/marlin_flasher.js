@@ -18,6 +18,78 @@ $(function() {
             self.uploadTime(message.upload_time);
         };
 
+        self.showErrors = function(title, errors) {
+            new PNotify({
+                title: title,
+                text: errors.join("\n"),
+                type: "error"
+            });
+        }
+
+        self.showSuccess = function(title, text) {
+            new PNotify({
+                title: title,
+                text: text,
+                type: "success"
+            });
+        }
+
+        self.fileUploadParams = {
+            maxNumberOfFiles: 1,
+            headers: OctoPrint.getRequestHeaders(),
+            done: function(e, data) {
+                self.showSuccess(gettext("Firmware upload successful"), data.result.file);
+                self.uploadProgress(0);
+                self.loadEnvList();
+            },
+            error: function(jqXHR, status, error) {
+                if(error === "") {
+                    self.showErrors(gettext("Firmware upload failed"), [gettext("Check the maximum firmware size")]);
+                } else {
+                    self.showErrors(gettext("Firmware upload failed"), [jqXHR.responseJSON]);
+                }
+                self.uploadProgress(0);
+            },
+            progress: function(e, data) {
+                self.uploadProgress((data.loaded / data.total) * 100);
+            }
+        };
+
+        self.onAllBound = function() {
+            self.loadEnvList();
+            $("#arduino_firmware_file").fileupload(self.fileUploadParams);
+            $("#platformio_firmware_file").fileupload(self.fileUploadParams);
+        };
+
+        self.onDataUpdaterPluginMessage = function(plugin, message) {
+            if(plugin === "marlin_flasher" && self.loginStateViewModel.isAdmin()) {
+                if(message.type === "flash_progress") {
+                    self.progressStep(message.step);
+                    self.flashingProgress(message.progress);
+                } else if(message.type === "settings_saved") {
+                    self.loadEnvList();
+                } else if(message.type === "flash_result") {
+                    if(message.success) {
+                        self.showSuccess(gettext("Flashing successful"), message.message);
+                    } else {
+                        self.showErrors(gettext("Flashing failed"), [message]);
+                        self.progressStep(null);
+                        self.flashingProgress(0);
+                    }
+                    self.arduinoFlashButton.button("reset");
+                    self.platformioFlashButton.button("reset");
+                } else if (message.type === "arduino_install") {
+                    self.handleArduinoInstallMessage(message);
+                } else if (message.type === "platformio_install") {
+                    self.handlePlatformioInstallMessage(message);
+                } else if (message.type === "firmware_info") {
+                    self.handleFirmwareInfo(message);
+                } else if (message.type === "arduino_boards") {
+                    self.handleArduinoBoards(message);
+                }
+            }
+        };
+
         //////////////////////////////////////////////////////////////////////////////
         // Arduino
         //////////////////////////////////////////////////////////////////////////////
@@ -118,13 +190,7 @@ $(function() {
                 self.showSuccess(gettext("Firmware download successful"), data.file);
                 self.loadEnvList();
             }).fail(function(jqXHR) {
-                if(jqXHR.responseJSON.error === undefined) {
-                    self.showError(gettext("Firmware download failed"), {
-                        error: gettext("The URL is not valid")
-                    });
-                } else {
-                    self.showError(gettext("Firmware download failed"), jqXHR.responseJSON);
-                }
+                self.showErrors(gettext("Firmware download failed"), jqXHR.responseJSON);
             }).always(function() {
                 self.downloadingArduinoFirmware(false);
             });
@@ -302,13 +368,7 @@ $(function() {
                 self.showSuccess(gettext("Firmware download successful"), data.file);
                 self.loadEnvList();
             }).fail(function(jqXHR) {
-                if(jqXHR.responseJSON.error === undefined) {
-                    self.showError(gettext("Firmware download failed"), {
-                        error: gettext("The URL is not valid")
-                    });
-                } else {
-                    self.showError(gettext("Firmware download failed"), jqXHR.responseJSON);
-                }
+                self.showErrors(gettext("Firmware download failed"), [jqXHR.responseJSON]);
             }).always(function() {
                 self.downloadingPlatformioFirmware(false);
             });
@@ -319,8 +379,6 @@ $(function() {
 
 
 
-        self.arduinoFirmwareFileButton = $("#arduino_firmware_file");
-        self.platformioFirmwareFileButton = $("#platformio_firmware_file");
         self.arduinoFlashButton = $("#arduino_flash-button");
         self.platformioFlashButton = $("#platformio_flash-button");
         self.searchCoreButton = $("#search-core-btn");
@@ -338,75 +396,6 @@ $(function() {
         self.uploadTime = ko.observable();
         self.lastFlashOptions = null;
 
-        self.showError = function(title, errorData) {
-            var text = "";
-            if(errorData.error) {
-                text = errorData.error;
-            }
-            if(errorData.cause) {
-                if(text) {
-                    text += "\n";
-                }
-                text += gettext("Cause : ") + errorData.cause;
-            }
-            new PNotify({
-                title: title,
-                text: text,
-                type: "error"
-            });
-            if(errorData.stderr) {
-                self.stderr(errorData.stderr);
-                self.stderrModal.modal("show");
-            }
-        };
-
-        self.showErrors = function(title, errors) {
-            new PNotify({
-                title: title,
-                text: errors.join("\n"),
-                type: "error"
-            });
-        }
-
-        self.showSuccess = function(title, text) {
-            new PNotify({
-                title: title,
-                text: text,
-                type: "success"
-            });
-        }
-
-        self.fileUploadParams = {
-            maxNumberOfFiles: 1,
-            headers: OctoPrint.getRequestHeaders(),
-            done: function(e, data) {
-                self.showSuccess(gettext("Firmware upload successful"), data.result.file);
-                self.uploadProgress(0);
-                self.loadEnvList();
-            },
-            error: function(jqXHR, status, error) {
-                if(error === "") {
-                    self.showError(gettext("Firmware upload failed"), {
-                        error: gettext("Check the maximum firmware size")
-                    });
-                } else {
-                    if(jqXHR.responseJSON.error === undefined) {
-                        self.showError(gettext("Firmware upload failed"), {
-                            error: gettext("The given file was not valid")
-                        });
-                    } else {
-                        self.showError(gettext("Firmware upload failed"), jqXHR.responseJSON);
-                    }
-                }
-                self.uploadProgress(0);
-            },
-            progress: function(e, data) {
-                self.uploadProgress((data.loaded / data.total) * 100);
-            }
-        }
-
-        self.arduinoFirmwareFileButton.fileupload(self.fileUploadParams);
-        self.platformioFirmwareFileButton.fileupload(self.fileUploadParams);
         self.loadEnvList = function() {
             if(self.loginStateViewModel.isAdmin() && self.settingsViewModel.settings.plugins.marlin_flasher.platform_type() === "platform_io") {
                 self.envList([]);
@@ -446,42 +435,10 @@ $(function() {
                 url: "/plugin/marlin_flasher/flash",
                 data: $(form).serialize()
             }).fail(function(jqXHR, status, error) {
-                self.showError(gettext("Flashing failed to start"), jqXHR.responseJSON);
+                self.showErrors(gettext("Flashing failed to start"), [jqXHR.responseJSON]);
                 self.arduinoFlashButton.button("reset");
                 self.platformioFlashButton.button("reset");
             });
-        };
-
-        self.onAllBound = function(viewModels) {
-            self.loadEnvList();
-        };
-        self.onDataUpdaterPluginMessage = function(plugin, message) {
-            if(plugin === "marlin_flasher" && self.loginStateViewModel.isAdmin()) {
-                if(message.type === "flash_progress") {
-                    self.progressStep(message.step);
-                    self.flashingProgress(message.progress);
-                } else if(message.type === "settings_saved") {
-                    self.loadEnvList();
-                } else if(message.type === "flash_result") {
-                    if(message.success) {
-                        self.showSuccess(gettext("Flashing successful"), message.message);
-                    } else {
-                        self.showError(gettext("Flashing failed"), message);
-                        self.progressStep(null);
-                        self.flashingProgress(0);
-                    }
-                    self.arduinoFlashButton.button("reset");
-                    self.platformioFlashButton.button("reset");
-                } else if (message.type === "arduino_install") {
-                    self.handleArduinoInstallMessage(message);
-                } else if (message.type === "platformio_install") {
-                    self.handlePlatformioInstallMessage(message);
-                } else if (message.type === "firmware_info") {
-                    self.handleFirmwareInfo(message);
-                } else if (message.type === "arduino_boards") {
-                    self.handleArduinoBoards(message);
-                }
-            }
         };
 
         self.onSettingsBeforeSave = function() {
