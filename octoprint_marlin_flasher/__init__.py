@@ -68,13 +68,6 @@ class MarlinFlasherPlugin(octoprint.plugin.SettingsPlugin,
 			self._settings.set(["additional_urls"], None)
 			self._settings.set(["arduino", "additional_urls"], additional_urls)
 
-	def on_settings_save(self, data):
-		result = super(MarlinFlasherPlugin, self).on_settings_save(data)
-		self._plugin_manager.send_plugin_message(self._identifier, dict(
-				type="settings_saved"
-			))
-		return result
-
 	def get_assets(self):
 		return dict(
 			js=[

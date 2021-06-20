@@ -39,8 +39,6 @@ $(function() {
             headers: OctoPrint.getRequestHeaders(),
             done: function(e, data) {
                 self.showSuccess(gettext("Firmware upload successful"), data.result.file);
-                self.uploadProgress(0);
-                self.loadEnvList();
             },
             error: function(jqXHR, status, error) {
                 if(error === "") {
@@ -56,7 +54,6 @@ $(function() {
         };
 
         self.onAllBound = function() {
-            self.loadEnvList();
             $("#arduino_firmware_file").fileupload(self.fileUploadParams);
             $("#platformio_firmware_file").fileupload(self.fileUploadParams);
         };
@@ -66,8 +63,6 @@ $(function() {
                 if(message.type === "flash_progress") {
                     self.progressStep(message.step);
                     self.flashingProgress(message.progress);
-                } else if(message.type === "settings_saved") {
-                    self.loadEnvList();
                 } else if(message.type === "flash_result") {
                     if(message.success) {
                         self.showSuccess(gettext("Flashing successful"), message.message);
@@ -188,7 +183,6 @@ $(function() {
                 }
             }).done(function(data) {
                 self.showSuccess(gettext("Firmware download successful"), data.file);
-                self.loadEnvList();
             }).fail(function(jqXHR) {
                 self.showErrors(gettext("Firmware download failed"), jqXHR.responseJSON);
             }).always(function() {
@@ -366,7 +360,6 @@ $(function() {
                 }
             }).done(function(data) {
                 self.showSuccess(gettext("Firmware download successful"), data.file);
-                self.loadEnvList();
             }).fail(function(jqXHR) {
                 self.showErrors(gettext("Firmware download failed"), [jqXHR.responseJSON]);
             }).always(function() {
@@ -434,7 +427,7 @@ $(function() {
                 headers: OctoPrint.getRequestHeaders(),
                 url: "/plugin/marlin_flasher/flash",
                 data: $(form).serialize()
-            }).fail(function(jqXHR, status, error) {
+            }).fail(function(jqXHR) {
                 self.showErrors(gettext("Flashing failed to start"), [jqXHR.responseJSON]);
                 self.arduinoFlashButton.button("reset");
                 self.platformioFlashButton.button("reset");
