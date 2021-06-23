@@ -38,3 +38,18 @@ class SettingsWrapper:
 
 	def get_post_flash_delay(self):
 		return self.__settings.get(["post_flash_delay"])
+
+	def get_arduino_last_flash_options(self):
+		return self.__settings.get(["arduino", "last_flash_options"])
+
+	def get_platformio_last_flash_options(self):
+		return self.__settings.get(["platformio", "last_flash_options"])
+
+	def set_arduino_last_flash_options(self, value):
+		return self.__settings.set(["arduino", "last_flash_options"], value)
+
+	def set_platformio_last_flash_options(self, value):
+		return self.__settings.set(["platformio", "last_flash_options"], value)
+
+	def save(self, force=False, trigger_event=False):
+		return self.__settings.save(force=force, trigger_event=trigger_event)

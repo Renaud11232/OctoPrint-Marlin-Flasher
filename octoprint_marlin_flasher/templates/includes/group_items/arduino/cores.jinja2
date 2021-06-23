@@ -23,7 +23,7 @@
                     </tr>
                 </thead>
                 <!-- ko if: coreSearchResult().length > 0 -->
-                    <tbody data-bind="foreach: coreSearchResult">
+                    <tbody data-bind="foreach: coreSearchResult.sorted(function(left, right) {return left.id > right.id ? 1 : -1;})">
                         <tr>
                             <td data-bind="text: id"></td>
                             <!-- ko if: $data.name && $data.latest -->

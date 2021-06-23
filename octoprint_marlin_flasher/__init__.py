@@ -31,10 +31,12 @@ class MarlinFlasherPlugin(octoprint.plugin.SettingsPlugin,
 			arduino=dict(
 				sketch_ino="Marlin.ino",
 				cli_path=None,
-				additional_urls=None
+				additional_urls=None,
+				last_flash_options=None
 			),
 			platformio=dict(
-				cli_path=None
+				cli_path=None,
+				last_flash_options=None
 			),
 			max_upload_size=20,
 			platform_type=PlatformType.ARDUINO,
@@ -68,6 +70,16 @@ class MarlinFlasherPlugin(octoprint.plugin.SettingsPlugin,
 			self._settings.set(["additional_urls"], None)
 			self._settings.set(["arduino", "additional_urls"], additional_urls)
 
+	def on_settings_save(self, data):
+		if "platform_type" in data:
+			platform = data["platform_type"]
+			if platform == PlatformType.ARDUINO:
+				flasher = self.__arduino
+			else:
+				flasher = self.__platformio
+			flasher.send_initial_state()
+		return super(MarlinFlasherPlugin, self).on_settings_save(data)
+
 	def get_assets(self):
 		return dict(
 			js=[
@@ -95,7 +107,7 @@ class MarlinFlasherPlugin(octoprint.plugin.SettingsPlugin,
 			flasher.handle_connected_event()
 		elif event == Events.USER_LOGGED_IN:
 			self._logger.debug("Intercepted USER_LOGGED_IN event")
-			flasher.handle_user_logged_in()
+			flasher.send_initial_state()
 
 	def __handle_unvalidated_request(self, handler):
 		result, errors = handler()
@@ -209,18 +221,6 @@ class MarlinFlasherPlugin(octoprint.plugin.SettingsPlugin,
 	# 	if errors:
 	# 		return flask.make_response(flask.jsonify(errors), 400)
 	# 	result, errors = self.__flasher.flash()
-	# 	if errors:
-	# 		return flask.make_response(flask.jsonify(errors), 400)
-	# 	return flask.make_response(flask.jsonify(result), 200)
-	#
-	# @octoprint.plugin.BlueprintPlugin.route("/last_flash_options", methods=["GET"])
-	# @restricted_access
-	# @admin_permission.require(403)
-	# def last_flash_options(self):
-	# 	errors = self.__validator.validate_last_flash_options()
-	# 	if errors:
-	# 		return flask.make_response(flask.jsonify(errors), 400)
-	# 	result, errors = self.__flasher.last_flash_options()
 	# 	if errors:
 	# 		return flask.make_response(flask.jsonify(errors), 400)
 	# 	return flask.make_response(flask.jsonify(result), 200)

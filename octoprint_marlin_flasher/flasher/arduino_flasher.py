@@ -5,7 +5,6 @@ import zipfile
 import re
 import os
 import shutil
-import json
 from threading import Thread
 from datetime import datetime
 import serial
@@ -328,12 +327,9 @@ class ArduinoFlasher(BaseFlasher):
 		thread = Thread(target=self.__background_flash, args=(fqbn,))
 		thread.start()
 		self._logger.debug("Saving options")
-		# TODO use settings instead
-		try:
-			with open(os.path.join(self._plugin.get_plugin_data_folder(), "last_options_arduino.json"), "w") as output:
-				json.dump(flask.request.values, output)
-		except (OSError, IOError) as _:
-			pass
+		self._settings.set_arduino_last_flash_options(flask.request.values.to_dict())
+		self._settings.save()
+		self.__push_last_flash_option()
 		return dict(
 			message=gettext("Flash process started.")
 		), None
@@ -444,13 +440,6 @@ class ArduinoFlasher(BaseFlasher):
 				error_output=e.result["__stderr"]
 			))
 
-	def last_flash_options(self):
-		try:
-			with open(os.path.join(self._plugin.get_plugin_data_folder(), "last_options_arduino.json"), "r") as jsonfile:
-				return json.load(jsonfile), None
-		except (OSError, IOError) as _:
-			return dict(), None
-
 	def __push_installed_boards(self):
 		try:
 			arduino = self.__get_arduino()
@@ -466,6 +455,13 @@ class ArduinoFlasher(BaseFlasher):
 			self._logger.debug("Failed !")
 			return None, [e.result["__stderr"]]
 
-	def handle_user_logged_in(self):
-		BaseFlasher.handle_user_logged_in(self)
+	def __push_last_flash_option(self):
+		self._plugin_manager.send_plugin_message(self._identifier, dict(
+			type="arduino_last_flash_options",
+			options=self._settings.get_arduino_last_flash_options()
+		))
+
+	def send_initial_state(self):
+		BaseFlasher.send_initial_state(self)
 		self.__push_installed_boards()
+		self.__push_last_flash_option()

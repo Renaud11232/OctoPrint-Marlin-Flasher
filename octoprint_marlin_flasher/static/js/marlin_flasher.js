@@ -74,6 +74,8 @@ $(function() {
                     self.handleArduinoFlashStatus(message);
                 } else if (message.type === "platformio_environments") {
                     self.handlePlatformioEnvironments(message);
+                } else if (message.type === "arduino_last_flash_options") {
+                    self.handleArduinoLastFlashOptions(message);
                 }
             }
         };
@@ -149,24 +151,23 @@ $(function() {
                 }).done(function (data) {
                     if(data) {
                         self.boardOptions(data.config_options);
+                        for (var configOption of data.config_options) {
+                            var optionSelect = $('select[name="' + configOption.option + '"]');
+                            for (var configValue of configOption.values) {
+                                if(configValue.selected) {
+                                    optionSelect.val(configValue.value);
+                                }
+                            }
+                            if(self.arduinoLastFlashOptions && self.arduinoLastFlashOptions.fqbn === self.selectedBoard()) {
+                                optionSelect.val(self.arduinoLastFlashOptions[configOption.option]);
+                            }
+                        }
                     }
                 }).fail(function(jqXHR) {
                     self.showErrors(gettext("Board option fetch failed"), jqXHR.responseJSON);
                 }).always(function() {
                     self.boardOptionsLoading(false);
                 });
-            }
-        });
-
-        self.boardOptions.subscribe(function(newValue) {
-            if(newValue) {
-                for (var option = 0; option < newValue.length; option++) {
-                    for (var value = 0; value < newValue[option].values.length; value++) {
-                        if(newValue[option].values[value].selected) {
-                            $('select[name="' + newValue[option].option + '"]').val(newValue[option].values[value].value);
-                        }
-                    }
-                }
             }
         });
 
@@ -369,6 +370,15 @@ $(function() {
             }
         };
 
+        self.arduinoLastFlashOptions = null;
+
+        self.handleArduinoLastFlashOptions = function(message) {
+            self.arduinoLastFlashOptions = message.options;
+            if(!self.selectedBoard() && self.arduinoLastFlashOptions && self.boardList().some(function(board){return board.fqbn === self.arduinoLastFlashOptions.fqbn})) {
+                self.selectedBoard(self.arduinoLastFlashOptions.fqbn);
+            }
+        };
+
         //////////////////////////////////////////////////////////////////////////////
         // PlatformIO
         //////////////////////////////////////////////////////////////////////////////
@@ -449,8 +459,6 @@ $(function() {
         self.handlePlatformioEnvironments = function(message) {
             self.envList(message.result);
         };
-
-        self.lastFlashOptions = null;
     }
 
     OCTOPRINT_VIEWMODELS.push({

@@ -11,7 +11,7 @@
                 <div class="control-group">
                     <label class="control-label" for="fqbn">{{ _('Board') }}</label>
                     <div class="controls">
-                        <select id="fqbn" name="fqbn" required="required" data-bind="options:boardList,
+                        <select id="fqbn" name="fqbn" required="required" data-bind="options: boardList.sorted(function(left, right) {return left.name > right.name ? 1 : -1;}),
                                                                                      optionsCaption: gettext('Please select one'),
                                                                                      optionsText: 'name',
                                                                                      optionsValue: 'fqbn',
@@ -32,7 +32,7 @@
                 </div>
                 <div class="control-group">
                     <div class="controls">
-                        <button id="arduino_flash-button" class="btn btn-warning" type="submit" data-loading-text='<i class="fas fa-spinner fa-spin"></i> {{ _("Flashing...") }}' data-bind="enable: selectedBoard,
+                        <button id="arduino_flash-button" class="btn btn-warning" type="submit" data-loading-text='<i class="fas fa-spinner fa-spin"></i> {{ _("Flashing") }}' data-bind="enable: selectedBoard,
                                                                                                                                                       visible: !boardOptionsLoading()"><i class="icon-warning-sign"></i> {{ _('Flash') }}</button>
                         <i class="fas fa-spinner fa-spin fa-2x" data-bind="visible: boardOptionsLoading"></i>
                     </div>

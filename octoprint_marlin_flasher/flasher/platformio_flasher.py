@@ -191,11 +191,8 @@ class PlatformIOFlasher(BaseFlasher):
 	# 	thread = Thread(target=self.__background_flash, args=(env,))
 	# 	thread.start()
 	# 	self._logger.debug("Saving options")
-	# 	try:
-	# 		with open(os.path.join(self._plugin.get_plugin_data_folder(), "last_options_platformio.json"), "w") as output:
-	# 			json.dump(flask.request.values, output)
-	# 	except (OSError, IOError) as _:
-	# 		pass
+	# 	self._settings.set_platformio_last_flash_options(flask.request.values.to_dict())
+	# 	self._settings.save()
 	# 	return dict(
 	# 		message=gettext("Flash process started.")
 	# 	), None

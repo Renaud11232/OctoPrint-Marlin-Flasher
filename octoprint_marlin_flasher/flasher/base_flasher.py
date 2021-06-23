@@ -131,5 +131,5 @@ class BaseFlasher:
 			firmware=self._firmware
 		))
 
-	def handle_user_logged_in(self):
+	def send_initial_state(self):
 		self._push_firmware_info()

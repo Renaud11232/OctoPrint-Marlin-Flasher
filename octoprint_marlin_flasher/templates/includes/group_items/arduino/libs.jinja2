@@ -21,7 +21,7 @@
                     </tr>
                 </thead>
                 <!-- ko if: libSearchResult().length > 0 -->
-                    <tbody data-bind="foreach: libSearchResult">
+                    <tbody data-bind="foreach: libSearchResult.sorted(function(left, right) {return left.name > right.name ? 1 : -1;})">
                         <tr>
                             <td data-bind="text: name"></td>
                             <td class="install-col un-install-col">
