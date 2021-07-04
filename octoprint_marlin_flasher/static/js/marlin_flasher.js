@@ -78,6 +78,8 @@ $(function() {
                     self.handleArduinoLastFlashOptions(message);
                 } else if (message.type === "platformio_last_flash_options") {
                     self.handlePlatformioLastFlashOptions(message);
+                } else if (message.type === "platformio_flash_status") {
+                    self.handlePlatformioFlashStatus(message);
                 }
             }
         };
@@ -360,13 +362,13 @@ $(function() {
         self.arduinoFlashStep = ko.observable();
         self.arduinoFlashProgress = ko.observable();
         self.arduinoFlashFinished = ko.observable();
-        self.arduinoFlashSucess = ko.observable();
+        self.arduinoFlashSuccess = ko.observable();
 
         self.handleArduinoFlashStatus = function(message) {
             this.arduinoFlashStep(message.step_name);
             this.arduinoFlashProgress(message.progress);
             this.arduinoFlashFinished(message.finished);
-            this.arduinoFlashSucess(message.success);
+            this.arduinoFlashSuccess(message.success);
             if(message.finished) {
                 $("#arduino_flash-button").button("reset");
                 if(!message.success) {
@@ -442,11 +444,6 @@ $(function() {
             });
         };
 
-        self.platformioFlashStep = ko.observable();
-        self.platformioFlashProgress = ko.observable();
-        self.platformioFlashFinished = ko.observable();
-        self.platformioFlashSucess = ko.observable();
-
         self.flashPlatformIO = function(form) {
             $("#platformio_flash-button").button("loading");
             $.ajax({
@@ -464,15 +461,39 @@ $(function() {
 
         self.handlePlatformioEnvironments = function(message) {
             self.envList(message.result);
+            self.preselectPlaformioOptions();
         };
 
         self.platformioLastFlashOptions = null;
         self.selectedEnv = ko.observable();
 
+        self.preselectPlaformioOptions = function() {
+            if(!self.selectedEnv() && self.platformioLastFlashOptions && self.envList().includes(self.platformioLastFlashOptions.env)) {
+                self.selectedEnv(self.platformioLastFlashOptions.env);
+            }
+        };
+
         self.handlePlatformioLastFlashOptions = function(message) {
             self.platformioLastFlashOptions = message.options;
-            if(!self.selectedEnv() && self.platformioLastFlashOptions && self.envList().includes(self.platformioLastFlashOptions.env)) {
-                self.selectedBoard(self.platformioLastFlashOptions.env);
+            self.preselectPlaformioOptions();
+        };
+
+        self.platformioFlashStep = ko.observable();
+        self.platformioFlashProgress = ko.observable();
+        self.platformioFlashFinished = ko.observable();
+        self.platformioFlashSuccess = ko.observable();
+
+        self.handlePlatformioFlashStatus = function(message) {
+            this.platformioFlashStep(message.step_name);
+            this.platformioFlashProgress(message.progress);
+            this.platformioFlashFinished(message.finished);
+            this.platformioFlashSuccess(message.success);
+            if(message.finished) {
+                $("#platformio_flash-button").button("reset");
+                if(!message.success) {
+                    self.showErrors(gettext("Flashing failed"), [message.message]);
+                    self.showCompilationError(message.error_output);
+                }
             }
         };
     }

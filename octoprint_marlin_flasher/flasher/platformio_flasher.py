@@ -2,14 +2,12 @@ import subprocess
 import sys
 
 from .base_flasher import BaseFlasher
-from .flasher_error import FlasherError
 from collections import deque
 from subprocess import Popen, PIPE
 import zipfile
 import os
 import shutil
 import re
-import json
 from threading import Thread
 from datetime import datetime
 import serial
@@ -125,32 +123,6 @@ class PlatformIOFlasher(BaseFlasher):
 				), None
 			return None, [gettext("No PlatformIO configuration file were found in the given file.")]
 
-	# def __exec(self, args):
-	# 	command = [self._settings.get_platformio_cli_path()]
-	# 	command.extend(args)
-	# 	try:
-	# 		self._logger.debug("Executing command : %s" % " ".join(command))
-	# 		logs = deque()
-	# 		with Popen(command, stdout=PIPE, stderr=PIPE, universal_newlines=True) as p:
-	# 			def log_output(stream):
-	# 				for line in stream:
-	# 					self._logger.debug(line.rstrip())
-	# 					logs.append(line)
-	# 			stdout_thread = Thread(target=log_output, args=(p.stdout,))
-	# 			stderr_thread = Thread(target=log_output, args=(p.stderr,))
-	# 			stdout_thread.start()
-	# 			stderr_thread.start()
-	# 			stdout_thread.join()
-	# 			stderr_thread.join()
-	# 		self._logger.debug("Return code : %d" % p.returncode)
-	# 		output = "".join(logs)
-	# 		if p.returncode != 0:
-	# 			raise FlasherError(output)
-	# 		return output
-	# 	except OSError:
-	# 		self._logger.debug("The executable does not exist")
-	# 		raise FlasherError(gettext("The given executable does not exist."))
-	#
 	# def check_setup_errors(self):
 	# 	self._logger.debug("Checking PlatformIO configuration...")
 	# 	no_platformio_path = self._settings.get_platformio_cli_path() is None
@@ -165,95 +137,116 @@ class PlatformIOFlasher(BaseFlasher):
 	# 		self._logger.info("The configured path does not point to PlatformIO-Core")
 	# 		return [gettext("The configured path does not point to PlatformIO-Core.")]
 	# 	return None
-	#
-	# def flash(self):
-	# 	if self._firmware is None:
-	# 		self._logger.debug("No firmware uploaded")
-	# 		return None, [gettext("You did not upload the firmware or it got reset by the previous flash process.")]
-	# 	if not self._printer.is_ready():
-	# 		self._logger.debug("Printer not ready")
-	# 		return None, [gettext("The printer may not be connected or it may be busy.")]
-	# 	env = None
-	# 	if "env" in flask.request.values and flask.request.values["env"]:
-	# 		env = flask.request.values["env"]
-	# 	thread = Thread(target=self.__background_flash, args=(env,))
-	# 	thread.start()
-	# 	self._logger.debug("Saving options")
-	# 	self._settings.set_platformio_last_flash_options(flask.request.values.to_dict())
-	# 	self._settings.save()
-	# 	return dict(
-	# 		message=gettext("Flash process started.")
-	# 	), None
-	#
-	# def __background_flash(self, env):
-	# 	self._logger.info("Starting flashing process...")
-	# 	disconnected = False
-	# 	try:
-	# 		self._plugin_manager.send_plugin_message(self._identifier, dict(
-	# 			type="flash_progress",
-	# 			step=gettext("Compiling"),
-	# 			progress=0
-	# 		))
-	# 		pio_args = ["run", "-d", self._firmware]
-	# 		if env:
-	# 			pio_args.extend(["-e", env])
-	# 		self._logger.info("Compiling...")
-	# 		self.__exec(pio_args)
-	# 		self._logger.info("Compilation success")
-	# 		self._plugin_manager.send_plugin_message(self._identifier, dict(
-	# 			type="flash_progress",
-	# 			step=gettext("Uploading"),
-	# 			progress=50
-	# 		))
-	# 		transport = self._printer.get_transport()
-	# 		if not isinstance(transport, serial.Serial):
-	# 			self._logger.warning("The printer is not connected via a serial port")
-	# 			self._plugin_manager.send_plugin_message(self._identifier, dict(
-	# 				type="flash_result",
-	# 				success=False,
-	# 				error=gettext("The printer is not connected through a Serial port and thus, cannot be flashed.")
-	# 			))
-	# 			return
-	# 		self._run_pre_flash_script()
-	# 		self._wait_pre_flash_delay()
-	# 		_, port, baudrate, profile = self._printer.get_current_connection()
-	# 		self._logger.info("Disconnecting printer...")
-	# 		self._printer.disconnect()
-	# 		disconnected = True
-	# 		self._logger.info("Uploading to the board...")
-	# 		pio_args.extend(["-t", "upload"])
-	# 		self.__exec(pio_args)
-	# 		self._logger.info("Uploading success")
-	# 		self._wait_post_flash_delay()
-	# 		self._should_run_post_script = True
-	# 		self._printer.connect(port, baudrate, profile)
-	# 		self._firmware = None
-	# 		self._firmware_version = None
-	# 		self._firmware_author = None
-	# 		self._firmware_upload_time = None
-	# 		self._push_firmware_info()
-	# 		self._plugin_manager.send_plugin_message(self._identifier, dict(
-	# 			type="flash_progress",
-	# 			step=gettext("Done"),
-	# 			progress=100
-	# 		))
-	# 		self._plugin_manager.send_plugin_message(self._identifier, dict(
-	# 			type="flash_result",
-	# 			success=True,
-	# 			message=gettext("Board successfully flashed.")
-	# 		))
-	# 	except FlasherError as e:
-	# 		self._logger.warning("The flashing process failed!")
-	# 		for log_line in e.message.splitlines():
-	# 			self._logger.warning(log_line)
-	# 		if disconnected:
-	# 			self._printer.connect(port, baudrate, profile)
-	# 		self._plugin_manager.send_plugin_message(self._identifier, dict(
-	# 			type="flash_result",
-	# 			success=False,
-	# 			error=gettext("The flashing process failed"),
-	# 			stderr=e.message
-	# 		))
+
+	def flash(self):
+		if self._firmware is None:
+			self._logger.debug("No firmware uploaded")
+			return None, [gettext("You did not upload the firmware or it got reset by the previous flash process.")]
+		if not self._printer.is_ready():
+			self._logger.debug("Printer not ready")
+			return None, [gettext("The printer may not be connected or it may be busy.")]
+		env = None
+		if "env" in flask.request.values and flask.request.values["env"]:
+			env = flask.request.values["env"]
+		thread = Thread(target=self.__background_flash, args=(env,))
+		thread.start()
+		self._logger.debug("Saving options")
+		self._settings.set_platformio_last_flash_options(flask.request.values.to_dict())
+		self._settings.save()
+		self.__push_last_flash_option()
+		return dict(
+			message=gettext("Flash process started.")
+		), None
+
+	def __background_flash(self, env):
+		self._logger.info("Starting flashing process...")
+		self._plugin_manager.send_plugin_message(self._identifier, dict(
+			type="platformio_flash_status",
+			step_name=gettext("Compiling"),
+			progress=0,
+			finished=False
+		))
+		pio_args = [self._settings.get_platformio_cli_path(), "run", "-d", self._firmware]
+		if env:
+			pio_args.extend(["-e", env])
+		self._logger.info("Compiling...")
+		logs = deque()
+
+		def handle_logs(stream):
+			for line in stream:
+				self._logger.info(line.rstrip())
+				logs.append(line)
+		result = self.__exec(pio_args, handle_logs, handle_logs)
+		if not result:
+			self._logger.warning("Compilation failed")
+			self._plugin_manager.send_plugin_message(self._identifier, dict(
+				type="platformio_flash_status",
+				step_name=gettext("Compilation failed"),
+				progress=100,
+				finished=True,
+				success=False,
+				error_output="".join(logs),
+				message=gettext("Compilation failed")
+			))
+			return
+		self._logger.info("Compilation success")
+		self._plugin_manager.send_plugin_message(self._identifier, dict(
+			type="platformio_flash_status",
+			step_name=gettext("Uploading"),
+			progress=50,
+			finished=False
+		))
+		transport = self._printer.get_transport()
+		if not isinstance(transport, serial.Serial):
+			self._logger.warning("The printer is not connected via a serial port")
+			self._plugin_manager.send_plugin_message(self._identifier, dict(
+				type="platformio_flash_status",
+				step_name=gettext("Upload failed"),
+				progress=100,
+				finished=True,
+				success=False,
+				message=gettext("The printer is not connected through a Serial port and thus, cannot be flashed.")
+			))
+			return
+		self._run_pre_flash_script()
+		self._wait_pre_flash_delay()
+		_, port, baudrate, profile = self._printer.get_current_connection()
+		self._logger.info("Disconnecting printer...")
+		self._printer.disconnect()
+		self._logger.info("Uploading to the board...")
+		pio_args.extend(["-t", "upload"])
+		logs.clear()
+		result = self.__exec(pio_args, handle_logs, handle_logs)
+		if not result:
+			self._logger.warning("The flashing process failed!")
+			self._printer.connect(port, baudrate, profile)
+			self._plugin_manager.send_plugin_message(self._identifier, dict(
+				type="platformio_flash_status",
+				step_name=gettext("Upload failed"),
+				progress=100,
+				finished=True,
+				success=False,
+				message=gettext("The upload process failed"),
+				error_output="".join(logs)
+			))
+			return
+		self._logger.info("Uploading success")
+		self._wait_post_flash_delay()
+		self._should_run_post_script = True
+		self._printer.connect(port, baudrate, profile)
+		self._firmware = None
+		self._firmware_version = None
+		self._firmware_author = None
+		self._firmware_upload_time = None
+		self._push_firmware_info()
+		self._plugin_manager.send_plugin_message(self._identifier, dict(
+			type="platformio_flash_status",
+			step_name=gettext("Done"),
+			progress=100,
+			finished=True,
+			success=True,
+			message=gettext("Board successfully flashed.")
+		))
 
 	def __get_available_environments(self):
 		if self._firmware is None:
