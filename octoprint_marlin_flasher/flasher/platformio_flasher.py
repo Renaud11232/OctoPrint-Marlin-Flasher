@@ -96,9 +96,7 @@ class PlatformIOFlasher(BaseFlasher):
 				return None
 		except zipfile.BadZipfile:
 			self._logger.debug("The firmware file does not have a valid file type")
-			return dict(
-				error=gettext("Invalid file type.")
-			)
+			return [gettext("Invalid file type.")]
 
 	def _handle_firmware_file(self, firmware_file_path):
 		self._firmware = None
@@ -125,9 +123,7 @@ class PlatformIOFlasher(BaseFlasher):
 					path=self._firmware,
 					file="platformio.ini"
 				), None
-			return None, dict(
-				error=gettext("No PlatformIO configuration file were found in the given file.")
-			)
+			return None, [gettext("No PlatformIO configuration file were found in the given file.")]
 
 	# def __exec(self, args):
 	# 	command = [self._settings.get_platformio_cli_path()]
@@ -160,31 +156,23 @@ class PlatformIOFlasher(BaseFlasher):
 	# 	no_platformio_path = self._settings.get_platformio_cli_path() is None
 	# 	if no_platformio_path:
 	# 		self._logger.info("No PlatformIO path was configured")
-	# 		return dict(
-	# 			error=gettext("No path has been configured, check the plugin settings.")
-	# 		)
+	# 		return [gettext("No path has been configured, check the plugin settings.")]
 	# 	try:
 	# 		bad_exec = "platformio" not in self.__exec(["--version"]).lower()
 	# 	except FlasherError:
 	# 		bad_exec = True
 	# 	if bad_exec:
 	# 		self._logger.info("The configured path does not point to PlatformIO-Core")
-	# 		return dict(
-	# 			error=gettext("The configured path does not point to PlatformIO-Core.")
-	# 		)
+	# 		return [gettext("The configured path does not point to PlatformIO-Core.")]
 	# 	return None
 	#
 	# def flash(self):
 	# 	if self._firmware is None:
 	# 		self._logger.debug("No firmware uploaded")
-	# 		return None, dict(
-	# 			error=gettext("You did not upload the firmware or it got reset by the previous flash process.")
-	# 		)
+	# 		return None, [gettext("You did not upload the firmware or it got reset by the previous flash process.")]
 	# 	if not self._printer.is_ready():
 	# 		self._logger.debug("Printer not ready")
-	# 		return None, dict(
-	# 			error=gettext("The printer may not be connected or it may be busy.")
-	# 		)
+	# 		return None, [gettext("The printer may not be connected or it may be busy.")]
 	# 	env = None
 	# 	if "env" in flask.request.values and flask.request.values["env"]:
 	# 		env = flask.request.values["env"]
@@ -266,13 +254,6 @@ class PlatformIOFlasher(BaseFlasher):
 	# 			error=gettext("The flashing process failed"),
 	# 			stderr=e.message
 	# 		))
-	#
-	# def last_flash_options(self):
-	# 	try:
-	# 		with open(os.path.join(self._plugin.get_plugin_data_folder(), "last_options_platformio.json"), "r") as jsonfile:
-	# 			return json.load(jsonfile), None
-	# 	except (OSError, IOError) as _:
-	# 		return dict(), None
 
 	def __get_available_environments(self):
 		if self._firmware is None:
@@ -307,6 +288,17 @@ class PlatformIOFlasher(BaseFlasher):
 			result=self.__get_available_environments()
 		))
 
+	def __push_last_flash_option(self):
+		self._logger.debug("Pushing last flash options through websocket...")
+		self._plugin_manager.send_plugin_message(self._identifier, dict(
+			type="platformio_last_flash_options",
+			options=self._settings.get_platformio_last_flash_options()
+		))
+
 	def _push_firmware_info(self):
 		BaseFlasher._push_firmware_info(self)
 		self.__push_available_environments()
+
+	def send_initial_state(self):
+		BaseFlasher.send_initial_state(self)
+		self.__push_last_flash_option()

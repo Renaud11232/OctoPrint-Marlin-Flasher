@@ -12,7 +12,8 @@
                     <label class="control-label" for="env">{{ _('Environment') }}</label>
                     <div class="controls">
                         <select id="env" name="env" data-bind="options: envList.sorted(),
-                                                               optionsCaption: gettext('PlatformIO default')"></select>
+                                                               optionsCaption: gettext('PlatformIO default'),
+                                                               value: selectedEnv"></select>
                     </div>
                 </div>
                 <div class="control-group">

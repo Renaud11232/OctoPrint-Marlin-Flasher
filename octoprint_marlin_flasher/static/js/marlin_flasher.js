@@ -76,6 +76,8 @@ $(function() {
                     self.handlePlatformioEnvironments(message);
                 } else if (message.type === "arduino_last_flash_options") {
                     self.handleArduinoLastFlashOptions(message);
+                } else if (message.type === "platformio_last_flash_options") {
+                    self.handlePlatformioLastFlashOptions(message);
                 }
             }
         };
@@ -150,17 +152,21 @@ $(function() {
                     }
                 }).done(function (data) {
                     if(data) {
-                        self.boardOptions(data.config_options);
-                        for (var configOption of data.config_options) {
-                            var optionSelect = $('select[name="' + configOption.option + '"]');
-                            for (var configValue of configOption.values) {
-                                if(configValue.selected) {
-                                    optionSelect.val(configValue.value);
+                        if(data.config_options) {
+                            self.boardOptions(data.config_options);
+                            for (var configOption of data.config_options) {
+                                var optionSelect = $('select[name="' + configOption.option + '"]');
+                                for (var configValue of configOption.values) {
+                                    if(configValue.selected) {
+                                        optionSelect.val(configValue.value);
+                                    }
+                                }
+                                if(self.arduinoLastFlashOptions && self.arduinoLastFlashOptions.fqbn === self.selectedBoard()) {
+                                    optionSelect.val(self.arduinoLastFlashOptions[configOption.option]);
                                 }
                             }
-                            if(self.arduinoLastFlashOptions && self.arduinoLastFlashOptions.fqbn === self.selectedBoard()) {
-                                optionSelect.val(self.arduinoLastFlashOptions[configOption.option]);
-                            }
+                        } else {
+                            self.boardOptions([]);
                         }
                     }
                 }).fail(function(jqXHR) {
@@ -446,7 +452,7 @@ $(function() {
             $.ajax({
                 type: "POST",
                 headers: OctoPrint.getRequestHeaders(),
-                url: "/plugin/marlin_flasher/flash",
+                url: "/plugin/marlin_flasher/platformio/flash",
                 data: $(form).serialize()
             }).fail(function(jqXHR) {
                 self.showErrors(gettext("Flashing failed to start"), jqXHR.responseJSON);
@@ -458,6 +464,16 @@ $(function() {
 
         self.handlePlatformioEnvironments = function(message) {
             self.envList(message.result);
+        };
+
+        self.platformioLastFlashOptions = null;
+        self.selectedEnv = ko.observable();
+
+        self.handlePlatformioLastFlashOptions = function(message) {
+            self.platformioLastFlashOptions = message.options;
+            if(!self.selectedEnv() && self.platformioLastFlashOptions && self.envList().includes(self.platformioLastFlashOptions.env)) {
+                self.selectedBoard(self.platformioLastFlashOptions.env);
+            }
         };
     }
 

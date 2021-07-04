@@ -64,8 +64,8 @@ class BaseFlasher:
 			self._run_post_flash_script()
 			self._should_run_post_script = False
 
-	def check_setup_errors(self):
-		raise FlasherError("Unsupported function call.")
+	# def check_setup_errors(self):
+	# 	raise FlasherError("Unsupported function call.")
 
 	def upload(self):
 		self._logger.debug("Firmware uploaded by the user")
