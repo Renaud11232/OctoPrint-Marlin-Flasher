@@ -455,6 +455,9 @@ class ArduinoFlasher(BaseFlasher):
 			self._logger.debug("Failed !")
 			return None, [e.result["__stderr"]]
 
+	def _firmware_info_event_name(self):
+		return "arduino_firmware_info"
+
 	def __push_last_flash_option(self):
 		self._logger.debug("Pushing last flash options through websocket...")
 		self._plugin_manager.send_plugin_message(self._identifier, dict(

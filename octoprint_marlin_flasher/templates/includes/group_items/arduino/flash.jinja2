@@ -3,7 +3,7 @@
         <a class="accordion-toggle" data-toggle="collapse" data-parent="#marlin_flasher_arduino_accordion" href="#flash">
             {{ _('Flash') }}
         </a>
-        <span data-bind="text: firmwareVersion() ? 'Version: ' + firmwareVersion() : ''"></span> <span data-bind="text: firmwareAuthor() ? 'by: ' + firmwareAuthor() : ''"></span>
+        <span data-bind="text: arduinoFirmwareVersion() ? 'Version: ' + arduinoFirmwareVersion() : ''"></span> <span data-bind="text: arduinoFirmwareAuthor() ? 'by: ' + arduinoFirmwareAuthor() : ''"></span>
     </div>
     <div id="flash" class="accordion-body collapse">
         <div class="accordion-inner">
@@ -33,7 +33,7 @@
                 <div class="control-group">
                     <div class="controls">
                         <button id="arduino_flash-button" class="btn btn-warning" type="submit" data-loading-text='<i class="fas fa-spinner fa-spin"></i> {{ _("Flashing") }}' data-bind="enable: selectedBoard,
-                                                                                                                                                      visible: !boardOptionsLoading()"><i class="icon-warning-sign"></i> {{ _('Flash') }}</button>
+                                                                                                                                                      visible: !boardOptionsLoading()"><i class="fas fa-bolt"></i> {{ _('Flash') }}</button>
                         <i class="fas fa-spinner fa-spin fa-2x" data-bind="visible: boardOptionsLoading"></i>
                     </div>
                 </div>

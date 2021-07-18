@@ -3,7 +3,7 @@
         <a class="accordion-toggle" data-toggle="collapse" data-parent="#marlin_flasher_arduino_accordion" href="#sketch">
             {{ _('Sketch') }}
         </a>
-        (<span data-bind="text: uploadTime() ? uploadTime() : gettext('No firmware')"></span>)
+        (<span data-bind="text: arduinoUploadTime() ? arduinoUploadTime() : gettext('No firmware')"></span>)
     </div>
     <div id="sketch" class="accordion-body collapse in">
         <div class="accordion-inner">
@@ -21,8 +21,8 @@
                     </div>
                 </div>
                 <div class="progress">
-                    <div class="bar" data-bind="style: {width: uploadProgress() + '%'},
-                                                css: {'bar-success': uploadProgress() >= 100}"></div>
+                    <div class="bar" data-bind="style: {width: arduinoUploadProgress() + '%'},
+                                                css: {'bar-success': arduinoUploadProgress() >= 100}"></div>
                 </div>
             </form>
             <form class="form-horizontal" data-bind="visible: settingsViewModel.settings.plugins.marlin_flasher.retrieving_method() === 'url'">

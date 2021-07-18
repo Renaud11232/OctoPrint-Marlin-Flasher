@@ -121,10 +121,13 @@ class BaseFlasher:
 								self._logger.debug("Found STRING_CONFIG_H_AUTHOR : %s" % self._firmware_author)
 								break
 
+	def _firmware_info_event_name(self):
+		raise FlasherError("Undefined function call")
+
 	def _push_firmware_info(self):
 		self._logger.debug("Sending firmware info through websocket")
 		self._plugin_manager.send_plugin_message(self._identifier, dict(
-			type="firmware_info",
+			type=self._firmware_info_event_name(),
 			version=self._firmware_version,
 			author=self._firmware_author,
 			upload_time=self._firmware_upload_time.strftime("%d/%m/%Y, %H:%M:%S") if self._firmware_upload_time is not None else None,

@@ -8,23 +8,13 @@ $(function() {
         // Common
         //////////////////////////////////////////////////////////////////////////////
 
-        self.firmwareVersion = ko.observable();
-        self.firmwareAuthor = ko.observable();
-        self.uploadTime = ko.observable();
-
-        self.handleFirmwareInfo = function(message) {
-            self.firmwareVersion(message.version);
-            self.firmwareAuthor(message.author);
-            self.uploadTime(message.upload_time);
-        };
-
         self.showErrors = function(title, errors) {
             new PNotify({
                 title: title,
                 text: errors.join("\n"),
                 type: "error"
             });
-        }
+        };
 
         self.showSuccess = function(title, text) {
             new PNotify({
@@ -32,32 +22,35 @@ $(function() {
                 text: text,
                 type: "success"
             });
-        }
-
-        self.uploadProgress = ko.observable(0);
-
-        self.fileUploadParams = {
-            maxNumberOfFiles: 1,
-            headers: OctoPrint.getRequestHeaders(),
-            done: function(e, data) {
-                self.showSuccess(gettext("Firmware upload successful"), data.result.file);
-            },
-            error: function(jqXHR, status, error) {
-                if(error === "") {
-                    self.showErrors(gettext("Firmware upload failed"), [gettext("Check the maximum firmware size")]);
-                } else {
-                    self.showErrors(gettext("Firmware upload failed"), jqXHR.responseJSON);
-                }
-                self.uploadProgress(0);
-            },
-            progress: function(e, data) {
-                self.uploadProgress((data.loaded / data.total) * 100);
-            }
         };
 
+        self.getFileUploadParams = function(uploadProgress) {
+            return {
+                maxNumberOfFiles: 1,
+                headers: OctoPrint.getRequestHeaders(),
+                done: function (e, data) {
+                    self.showSuccess(gettext("Firmware upload successful"), data.result.file);
+                },
+                error: function (jqXHR, status, error) {
+                    if (error === "") {
+                        self.showErrors(gettext("Firmware upload failed"), [gettext("Check the maximum firmware size")]);
+                    } else {
+                        self.showErrors(gettext("Firmware upload failed"), jqXHR.responseJSON);
+                    }
+                    uploadProgress(0);
+                },
+                progress: function (e, data) {
+                    uploadProgress((data.loaded / data.total) * 100);
+                }
+            };
+        };
+
+        self.arduinoUploadProgress = ko.observable(0);
+        self.platformioUploadProgress = ko.observable(0);
+
         self.onAllBound = function() {
-            $("#arduino_firmware_file").fileupload(self.fileUploadParams);
-            $("#platformio_firmware_file").fileupload(self.fileUploadParams);
+            $("#arduino_firmware_file").fileupload(self.getFileUploadParams(self.arduinoUploadProgress));
+            $("#platformio_firmware_file").fileupload(self.getFileUploadParams(self.platformioUploadProgress));
         };
 
         self.onDataUpdaterPluginMessage = function(plugin, message) {
@@ -66,8 +59,10 @@ $(function() {
                     self.handleArduinoInstallMessage(message);
                 } else if (message.type === "platformio_install") {
                     self.handlePlatformioInstallMessage(message);
-                } else if (message.type === "firmware_info") {
-                    self.handleFirmwareInfo(message);
+                } else if (message.type === "arduino_firmware_info") {
+                    self.handleArduinoFirmwareInfo(message);
+                } else if (message.type === "platformio_firmware_info") {
+                    self.handlePlatformioFirmwareInfo(message);
                 } else if (message.type === "arduino_boards") {
                     self.handleArduinoBoards(message);
                 } else if (message.type === "arduino_flash_status") {
@@ -121,6 +116,16 @@ $(function() {
         //////////////////////////////////////////////////////////////////////////////
         // Arduino
         //////////////////////////////////////////////////////////////////////////////
+
+        self.arduinoFirmwareVersion = ko.observable();
+        self.arduinoFirmwareAuthor = ko.observable();
+        self.arduinoUploadTime = ko.observable();
+
+        self.handleArduinoFirmwareInfo = function(message) {
+            self.arduinoFirmwareVersion(message.version);
+            self.arduinoFirmwareAuthor(message.author);
+            self.arduinoUploadTime(message.upload_time);
+        };
 
         self.boardList = ko.observableArray();
         self.arduinoInstallationLogs = ko.observableArray();
@@ -193,7 +198,7 @@ $(function() {
                     self.showErrors(gettext("Arduino installation"), [gettext("The installation failed")]);
                 }
             }
-        }
+        };
 
         self.installArduino = function() {
             self.arduinoInstallationLogs([]);
@@ -206,7 +211,7 @@ $(function() {
             }).fail(function(jqXHR) {
                 self.showErrors(gettext("Arduino installation"), jqXHR.responseJSON);
             });
-        }
+        };
 
         self.downloadArduinoFirmware = function() {
             self.downloadingArduinoFirmware(true);
@@ -391,6 +396,16 @@ $(function() {
         // PlatformIO
         //////////////////////////////////////////////////////////////////////////////
 
+        self.platformioFirmwareVersion = ko.observable();
+        self.platformioFirmwareAuthor = ko.observable();
+        self.platformioUploadTime = ko.observable();
+
+        self.handlePlatformioFirmwareInfo = function(message) {
+            self.platformioFirmwareVersion(message.version);
+            self.platformioFirmwareAuthor(message.author);
+            self.platformioUploadTime(message.upload_time);
+        };
+
         self.platformioInstallationLogs = ko.observableArray();
         self.installingPlatformio = ko.observable(false);
 
@@ -408,7 +423,7 @@ $(function() {
                     self.showErrors(gettext("Platformio installation"), [gettext("The installation failed")]);
                 }
             }
-        }
+        };
 
         self.installPlatformio = function() {
             self.platformioInstallationLogs([]);
@@ -421,7 +436,7 @@ $(function() {
             }).fail(function(jqXHR) {
                 self.showErrors(gettext("Platformio installation"), jqXHR.responseJSON);
             });
-        }
+        };
 
         self.platformioFirmwareURL = ko.observable();
         self.downloadingPlatformioFirmware = ko.observable(false);

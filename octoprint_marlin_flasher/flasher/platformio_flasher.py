@@ -275,6 +275,9 @@ class PlatformIOFlasher(BaseFlasher):
 			self._logger.debug("Could not open file")
 			return []
 
+	def _firmware_info_event_name(self):
+		return "platformio_firmware_info"
+
 	def __push_available_environments(self):
 		self._plugin_manager.send_plugin_message(self._identifier, dict(
 			type="platformio_environments",
