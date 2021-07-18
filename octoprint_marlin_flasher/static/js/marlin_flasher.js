@@ -3,8 +3,6 @@ $(function() {
         var self = this;
         self.settingsViewModel = parameters[0];
         self.loginStateViewModel = parameters[1];
-        self.printerStateViewModel = parameters[2];
-        self.filesViewModel = parameters[3];
 
         //////////////////////////////////////////////////////////////////////////////
         // Common
@@ -114,18 +112,6 @@ $(function() {
             }
             self.settingsViewModel.settings.plugins.marlin_flasher.post_flash_delay(parseInt(self.settingsViewModel.settings.plugins.marlin_flasher.post_flash_delay()));
         };
-
-        self.originalEnablePrint = self.printerStateViewModel.enablePrint;
-        self.originalIsLoadAndPrintActionPossible = self.filesViewModel.isLoadAndPrintActionPossible;
-
-        self.currentlyFlashing = ko.observable(false);
-
-        self.printerStateViewModel.enablePrint = ko.computed(function() {
-            return self.originalEnablePrint() && !self.currentlyFlashing();
-        }, this);
-        self.filesViewModel.isLoadAndPrintActionPossible = ko.computed(function() {
-            return self.originalIsLoadAndPrintActionPossible() && !self.currentlyFlashing();
-        }, this);
 
         //////////////////////////////////////////////////////////////////////////////
         // Arduino
@@ -533,9 +519,7 @@ $(function() {
         construct: MarlinFlasherViewModel,
         dependencies: [
             "settingsViewModel",
-            "loginStateViewModel",
-            "printerStateViewModel",
-            "filesViewModel"
+            "loginStateViewModel"
         ],
         elements: [
             "#settings_plugin_marlin_flasher",
