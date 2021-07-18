@@ -3,7 +3,8 @@
     <div class="control-group" title="{{ _('Tool used for the flashing process') }}">
         <label class="control-label" for="marlin_flasher_platform_type_{{field_suffix}}">{{ _('Platform') }}</label>
         <div class="controls">
-            <select id="marlin_flasher_platform_type_{{field_suffix}}" data-bind="value: settingsViewModel.settings.plugins.marlin_flasher.platform_type">
+            <select id="marlin_flasher_platform_type_{{field_suffix}}" data-bind="value: settingsViewModel.settings.plugins.marlin_flasher.platform_type,
+                                                                                  disable: currentlyFlashing">
                 <option value="arduino">Arduino</option>
                 <option value="platform_io">PlatformIO</option>
             </select>
@@ -12,7 +13,8 @@
     <div class="control-group" title="{{ _('Method used in order to retrieve the firmware to flash') }}">
         <label class="control-label" for="marlin_flasher_retrieving_method_{{field_suffix}}">{{ _('Retrieving method') }}</label>
         <div class="controls">
-            <select id="marlin_flasher_retrieving_method_{{field_suffix}}" data-bind="value: settingsViewModel.settings.plugins.marlin_flasher.retrieving_method">
+            <select id="marlin_flasher_retrieving_method_{{field_suffix}}" data-bind="value: settingsViewModel.settings.plugins.marlin_flasher.retrieving_method,
+                                                                                      disable: currentlyFlashing">
                 <option value="upload">Upload file</option>
                 <option value="url">Download from URL</option>
             </select>
@@ -31,7 +33,8 @@
                 <label class="control-label" for="pre_flash_delay_{{field_suffix}}">{{ _('Pre flash delay') }}</label>
                 <div class="controls">
                     <div class="input-append">
-                        <input class="input-mini text-right" type="number" min="0" max="180" data-bind="value: settingsViewModel.settings.plugins.marlin_flasher.pre_flash_delay" id="pre_flash_delay_{{field_suffix}}">
+                        <input class="input-mini text-right" type="number" min="0" max="180" data-bind="value: settingsViewModel.settings.plugins.marlin_flasher.pre_flash_delay,
+                                                                                                        disable: currentlyFlashing" id="pre_flash_delay_{{field_suffix}}">
                         <span class="add-on">{{ _('s') }}</span>
                     </div>
                 </div>
@@ -39,7 +42,8 @@
             <div class="control-group" title="{{ _('GCODE script run before flashing the firmware') }}">
                 <label class="control-label" for="pre_flash_script_{{field_suffix}}">{{ _('Pre flash script') }}</label>
                 <div class="controls">
-                    <textarea class="block monospace" id="pre_flash_script_{{field_suffix}}" rows="5" data-bind="value: settingsViewModel.settings.plugins.marlin_flasher.pre_flash_script"></textarea>
+                    <textarea class="block monospace" id="pre_flash_script_{{field_suffix}}" rows="5" data-bind="value: settingsViewModel.settings.plugins.marlin_flasher.pre_flash_script,
+                                                                                                                 disable: currentlyFlashing"></textarea>
                     <small>{{ _("Anything you put here will be executed before the flashing starts") }}</small>
                 </div>
             </div>
@@ -47,7 +51,8 @@
                 <label class="control-label" for="post_flash_delay_{{field_suffix}}">{{ _('Post flash delay') }}</label>
                 <div class="controls">
                     <div class="input-append">
-                        <input class="input-mini text-right" type="number" min="0" max="180" data-bind="value: settingsViewModel.settings.plugins.marlin_flasher.post_flash_delay" id="post_flash_delay_{{field_suffix}}">
+                        <input class="input-mini text-right" type="number" min="0" max="180" data-bind="value: settingsViewModel.settings.plugins.marlin_flasher.post_flash_delay,
+                                                                                                        disable: currentlyFlashing" id="post_flash_delay_{{field_suffix}}">
                         <span class="add-on">{{ _('s') }}</span>
                     </div>
                 </div>
@@ -55,7 +60,8 @@
             <div class="control-group" title="{{ _('GCODE script run after flashing the firmware') }}">
                 <label class="control-label" for="post_flash_script_{{field_suffix}}">{{ _('Post flash script') }}</label>
                 <div class="controls">
-                    <textarea class="block monospace" id="post_flash_script_{{field_suffix}}" rows="5" data-bind="value: settingsViewModel.settings.plugins.marlin_flasher.post_flash_script"></textarea>
+                    <textarea class="block monospace" id="post_flash_script_{{field_suffix}}" rows="5" data-bind="value: settingsViewModel.settings.plugins.marlin_flasher.post_flash_script,
+                                                                                                                  disable: currentlyFlashing"></textarea>
                     <small>{{ _("Anything you put here will be executed after the flashing ends") }}</small>
                 </div>
             </div>
@@ -63,7 +69,8 @@
                 <label class="control-label" for="upload_size_{{field_suffix}}">{{ _('Maximum upload') }}</label>
                 <div class="controls">
                     <div class="input-append">
-                        <input class="input-mini text-right" type="number" min="1" max="1024" data-bind="value: settingsViewModel.settings.plugins.marlin_flasher.max_upload_size" id="upload_size_{{field_suffix}}">
+                        <input class="input-mini text-right" type="number" min="1" max="1024" data-bind="value: settingsViewModel.settings.plugins.marlin_flasher.max_upload_size,
+                                                                                                         disable: currentlyFlashing" id="upload_size_{{field_suffix}}">
                         <span class="add-on">{{ _('MB') }}</span>
                     </div>
                     <span class="help-inline">{{ _('*requires restart') }}</span>

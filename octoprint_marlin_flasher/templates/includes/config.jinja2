@@ -1,3 +1,6 @@
+<div class="alert alert-warning" data-bind="visible: currentlyFlashing">
+    {{ _('Marlin Flasher settings cannot be edited during a flashing process.') }}
+</div>
 <form class="form-horizontal">
     {% include "includes/config_items/global.jinja2" %}
     {% include "includes/config_items/arduino.jinja2" %}

@@ -2,13 +2,15 @@
     <legend>{{ _('PlatformIO') }}</legend>
     <div class="control-group" title="{{ _('One-click installation') }}">
         <div class="controls">
-            <button role="button" class="btn btn-large" data-bind="click: installPlatformio, disable: installingPlatformio"><i class="fas fa-magic"></i> Download and install</button>
+            <button role="button" class="btn btn-large" data-bind="click: installPlatformio,
+                                                                   disable: installingPlatformio() || currentlyFlashing()"><i class="fas fa-magic"></i> Download and install</button>
         </div>
     </div>
     <div class="control-group" title="{{ _('Full path to the the platformio-core executable') }}">
         <label class="control-label" for="core_path_{{field_suffix}}">{{ _('Path to Platformio-Core') }}</label>
         <div class="controls">
-            <input type="text" class="input-block-level" data-bind="value: settingsViewModel.settings.plugins.marlin_flasher.platformio.cli_path" id="core_path_{{field_suffix}}">
+            <input type="text" class="input-block-level" data-bind="value: settingsViewModel.settings.plugins.marlin_flasher.platformio.cli_path,
+                                                                    disable: currentlyFlashing" id="core_path_{{field_suffix}}">
         </div>
     </div>
 </fieldset>

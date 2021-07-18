@@ -5,13 +5,15 @@
     </div>
     <div class="control-group" title="{{ _('One-click installation') }}">
         <div class="controls">
-            <button role="button" class="btn btn-large" data-bind="click: installArduino, disable: installingArduino"><i class="fas fa-magic"></i> Download and install</button>
+            <button role="button" class="btn btn-large" data-bind="click: installArduino,
+                                                                   disable: installingArduino() || currentlyFlashing()"><i class="fas fa-magic"></i> Download and install</button>
         </div>
     </div>
     <div class="control-group" title="{{ _('Full path to the arduino-cli executable') }}">
         <label class="control-label" for="cli_path_{{field_suffix}}">{{ _('Path to arduino-cli') }}</label>
         <div class="controls">
-            <input type="text" class="input-block-level" data-bind="value: settingsViewModel.settings.plugins.marlin_flasher.arduino.cli_path" id="cli_path_{{field_suffix}}">
+            <input type="text" class="input-block-level" data-bind="value: settingsViewModel.settings.plugins.marlin_flasher.arduino.cli_path,
+                                                                    disable: currentlyFlashing" id="cli_path_{{field_suffix}}">
         </div>
     </div>
     <div>
@@ -26,13 +28,15 @@
             <div class="control-group" title="{{ _('Name of the main sketch file') }}">
                 <label class="control-label" for="sketch_ino_{{field_suffix}}">{{ _('Sketch .ino') }}</label>
                 <div class="controls">
-                    <input type="text" data-bind="value: settingsViewModel.settings.plugins.marlin_flasher.arduino.sketch_ino" id="sketch_ino_{{field_suffix}}">
+                    <input type="text" data-bind="value: settingsViewModel.settings.plugins.marlin_flasher.arduino.sketch_ino,
+                                                  disable: currentlyFlashing" id="sketch_ino_{{field_suffix}}">
                 </div>
             </div>
             <div class="control-group" title="{{ _('List of addition board definitions to use') }}">
                 <label class="control-label" for="additional_urls_{{field_suffix}}">{{ _('Additional Board URLs') }}</label>
                 <div class="controls">
-                    <textarea class="block monospace" rows="5" id="additional_urls_{{field_suffix}}" data-bind="value: settingsViewModel.settings.plugins.marlin_flasher.arduino.additional_urls"></textarea>
+                    <textarea class="block monospace" rows="5" id="additional_urls_{{field_suffix}}" data-bind="value: settingsViewModel.settings.plugins.marlin_flasher.arduino.additional_urls,
+                                                                                                                disable: currentlyFlashing"></textarea>
                     <small>{{ _('*one per line') }}</small>
                 </div>
             </div>
