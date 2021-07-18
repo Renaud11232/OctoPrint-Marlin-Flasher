@@ -22,6 +22,7 @@ class BaseFlasher:
 		self._firmware_author = None
 		self._firmware_upload_time = None
 		self._should_run_post_script = False
+		self._flash_status = None
 
 	def _background_run(self, target, args=None):
 		thread = Thread(target=target, args=args)
@@ -133,6 +134,14 @@ class BaseFlasher:
 			upload_time=self._firmware_upload_time.strftime("%d/%m/%Y, %H:%M:%S") if self._firmware_upload_time is not None else None,
 			firmware=self._firmware
 		))
+
+	def _push_flash_status(self, event_name):
+		if self._flash_status:
+			data = dict(
+				type=event_name
+			)
+			data.update(self._flash_status)
+			self._plugin_manager.send_plugin_message(self._identifier, data)
 
 	def send_initial_state(self):
 		self._push_firmware_info()

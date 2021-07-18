@@ -340,12 +340,12 @@ class ArduinoFlasher(BaseFlasher):
 		try:
 			arduino = self.__get_arduino()
 			if self.__is_ino:
-				self._plugin_manager.send_plugin_message(self._identifier, dict(
-					type="arduino_flash_status",
+				self._flash_status = dict(
 					step_name=gettext("Compiling"),
 					progress=0,
 					finished=False
-				))
+				)
+				self._push_flash_status("arduino_flash_status")
 				self._logger.info("Compiling...")
 				result = arduino.compile(self._firmware, fqbn=fqbn)
 				if not result["result"]["success"]:
@@ -358,41 +358,41 @@ class ArduinoFlasher(BaseFlasher):
 					error = result["result"]["compiler_err"] if result["result"]["compiler_err"] else result["__stderr"]
 					for log_line in error.splitlines():
 						self._logger.warning(log_line)
-					self._plugin_manager.send_plugin_message(self._identifier, dict(
-						type="arduino_flash_status",
+					self._flash_status = dict(
 						step_name=gettext("Compilation failed"),
 						progress=100,
 						finished=True,
 						success=False,
 						error_output=error,
 						message=result["result"]["compiler_out"]
-					))
+					)
+					self._push_flash_status("arduino_flash_status")
 					return
 				self._logger.info("Compilation success")
-				self._plugin_manager.send_plugin_message(self._identifier, dict(
-					type="arduino_flash_status",
+				self._flash_status = dict(
 					step_name=gettext("Uploading"),
 					progress=50,
 					finished=False
-				))
+				)
+				self._push_flash_status("arduino_flash_status")
 			else:
-				self._plugin_manager.send_plugin_message(self._identifier, dict(
-					type="arduino_flash_status",
+				self._flash_status = dict(
 					step_name=gettext("Uploading"),
 					progress=0,
 					finished=False
-				))
+				)
+				self._push_flash_status("arduino_flash_status")
 			transport = self._printer.get_transport()
 			if not isinstance(transport, serial.Serial):
 				self._logger.warning("The printer is not connected via a serial port")
-				self._plugin_manager.send_plugin_message(self._identifier, dict(
-					type="arduino_flash_status",
+				self._flash_status = dict(
 					step_name=gettext("Upload failed"),
 					progress=100,
 					finished=True,
 					success=False,
 					message=gettext("The printer is not connected through a Serial port and thus, cannot be flashed.")
-				))
+				)
+				self._push_flash_status("arduino_flash_status")
 				return
 			self._run_pre_flash_script()
 			self._wait_pre_flash_delay()
@@ -415,14 +415,14 @@ class ArduinoFlasher(BaseFlasher):
 			self._firmware_author = None
 			self._firmware_upload_time = None
 			self._push_firmware_info()
-			self._plugin_manager.send_plugin_message(self._identifier, dict(
-				type="arduino_flash_status",
+			self._flash_status = dict(
 				step_name=gettext("Done"),
 				progress=100,
 				finished=True,
 				success=True,
 				message=gettext("Board successfully flashed.")
-			))
+			)
+			self._push_flash_status("arduino_flash_status")
 		except pyduinocli.ArduinoError as e:
 			self._logger.warning("Error : %s" % e.result["result"])
 			self._logger.warning("Error output : ")
@@ -430,15 +430,15 @@ class ArduinoFlasher(BaseFlasher):
 				self._logger.warning(log_line)
 			if disconnected:
 				self._printer.connect(port, baudrate, profile)
-			self._plugin_manager.send_plugin_message(self._identifier, dict(
-				type="arduino_flash_status",
+			self._flash_status = dict(
 				step_name=gettext("Upload failed"),
 				progress=100,
 				finished=True,
 				success=False,
 				message=e.result["result"],
 				error_output=e.result["__stderr"]
-			))
+			)
+			self._push_flash_status("arduino_flash_status")
 
 	def __push_installed_boards(self):
 		try:
@@ -469,3 +469,4 @@ class ArduinoFlasher(BaseFlasher):
 		BaseFlasher.send_initial_state(self)
 		self.__push_installed_boards()
 		self.__push_last_flash_option()
+		self._push_flash_status("arduino_flash_status")
