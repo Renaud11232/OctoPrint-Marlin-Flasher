@@ -3,6 +3,8 @@ $(function() {
         var self = this;
         self.settingsViewModel = parameters[0];
         self.loginStateViewModel = parameters[1];
+        self.printerStateViewModel = parameters[2];
+        self.filesViewModel = parameters[3];
 
         //////////////////////////////////////////////////////////////////////////////
         // Common
@@ -112,6 +114,18 @@ $(function() {
             }
             self.settingsViewModel.settings.plugins.marlin_flasher.post_flash_delay(parseInt(self.settingsViewModel.settings.plugins.marlin_flasher.post_flash_delay()));
         };
+
+        self.originalEnablePrint = self.printerStateViewModel.enablePrint;
+        self.originalIsLoadAndPrintActionPossible = self.filesViewModel.isLoadAndPrintActionPossible;
+
+        self.currentlyFlashing = ko.observable(false);
+
+        self.printerStateViewModel.enablePrint = ko.computed(function() {
+            return self.originalEnablePrint() && !self.currentlyFlashing();
+        }, this);
+        self.filesViewModel.isLoadAndPrintActionPossible = ko.computed(function() {
+            return self.originalIsLoadAndPrintActionPossible() && !self.currentlyFlashing();
+        }, this);
 
         //////////////////////////////////////////////////////////////////////////////
         // Arduino
@@ -374,6 +388,7 @@ $(function() {
             this.arduinoFlashProgress(message.progress);
             this.arduinoFlashFinished(message.finished);
             this.arduinoFlashSuccess(message.success);
+            self.currentlyFlashing(!message.finished);
             if(message.finished) {
                 $("#arduino_flash-button").button("reset");
                 if(!message.success) {
@@ -503,6 +518,7 @@ $(function() {
             this.platformioFlashProgress(message.progress);
             this.platformioFlashFinished(message.finished);
             this.platformioFlashSuccess(message.success);
+            self.currentlyFlashing(!message.finished);
             if(message.finished) {
                 $("#platformio_flash-button").button("reset");
                 if(!message.success) {
@@ -517,7 +533,9 @@ $(function() {
         construct: MarlinFlasherViewModel,
         dependencies: [
             "settingsViewModel",
-            "loginStateViewModel"
+            "loginStateViewModel",
+            "printerStateViewModel",
+            "filesViewModel"
         ],
         elements: [
             "#settings_plugin_marlin_flasher",
