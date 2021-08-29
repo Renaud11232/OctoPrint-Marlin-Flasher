@@ -113,6 +113,8 @@ $(function() {
             self.settingsViewModel.settings.plugins.marlin_flasher.post_flash_delay(parseInt(self.settingsViewModel.settings.plugins.marlin_flasher.post_flash_delay()));
         };
 
+        self.currentlyFlashing = ko.observable(false);
+
         //////////////////////////////////////////////////////////////////////////////
         // Arduino
         //////////////////////////////////////////////////////////////////////////////
@@ -484,8 +486,12 @@ $(function() {
         self.selectedEnv = ko.observable();
 
         self.preselectPlaformioOptions = function() {
-            if(!self.selectedEnv() && self.platformioLastFlashOptions && self.envList().includes(self.platformioLastFlashOptions.env)) {
-                self.selectedEnv(self.platformioLastFlashOptions.env);
+            if(!self.selectedEnv()) {
+                if(self.platformioLastFlashOptions && self.envList().includes(self.platformioLastFlashOptions.env)) {
+                    self.selectedEnv(self.platformioLastFlashOptions.env);
+                } else if (self.envList().length === 1) {
+                    self.selectedEnv(self.envList()[0]);
+                }
             }
         };
 

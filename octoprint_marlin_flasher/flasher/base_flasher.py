@@ -65,8 +65,8 @@ class BaseFlasher:
 			self._run_post_flash_script()
 			self._should_run_post_script = False
 
-	# def check_setup_errors(self):
-	# 	raise FlasherError("Unsupported function call.")
+	def check_setup_errors(self):
+		raise FlasherError("Unsupported function call.")
 
 	def upload(self):
 		self._logger.debug("Firmware uploaded by the user")
@@ -105,8 +105,8 @@ class BaseFlasher:
 			for f in files:
 				if f == "Version.h":
 					self._logger.debug("Found Version.h, opening it...")
-					with open(os.path.join(root, f), "r") as versionfile:
-						for line in versionfile:
+					with open(os.path.join(root, f), "r") as version_file:
+						for line in version_file:
 							version = re.findall(r'#define +SHORT_BUILD_VERSION +"([^"]*)"', line)
 							if version:
 								self._firmware_version = version[0]

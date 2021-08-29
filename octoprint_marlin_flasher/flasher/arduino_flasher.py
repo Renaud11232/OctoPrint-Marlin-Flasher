@@ -190,37 +190,31 @@ class ArduinoFlasher(BaseFlasher):
 			additional_urls = additional_urls.splitlines()
 		return pyduinocli.Arduino(path, additional_urls=additional_urls)
 
-	# def check_setup_errors(self):
-	# 	self._logger.debug("Checking arduino-cli configuration...")
-	# 	no_arduino_path = self._settings.get_arduino_cli_path() is None
-	# 	if no_arduino_path:
-	# 		self._logger.info("No arduino-cli path was configured")
-	# 		return dict(
-	# 			error=gettext("No path has been configured, check the plugin settings.")
-	# 		)
-	# 	not_arduino = False
-	# 	bad_version = False
-	# 	try:
-	# 		version = self.__get_arduino().version()
-	# 		if isinstance(version, dict):
-	# 			bad_version = re.match(r"0\.18\..+?\Z", version["VersionString"]) is None
-	# 		else:
-	# 			not_arduino = True
-	# 	except pyduinocli.ArduinoError:
-	# 		not_arduino = True
-	# 	except KeyError:
-	# 		bad_version = True
-	# 	if not_arduino:
-	# 		self._logger.info("The configured path is not an arduino-cli executable")
-	# 		return dict(
-	# 			error=gettext("The configured path does not point to an arduino-cli executable.")
-	# 		)
-	# 	if bad_version:
-	# 		self._logger.info("Unsupported arduino-cli version")
-	# 		return dict(
-	# 			error=gettext("The arduino-cli version you are using is not supported.")
-	# 		)
-	# 	return None
+	def check_setup_errors(self):
+		self._logger.debug("Checking arduino-cli configuration...")
+		no_arduino_path = self._settings.get_arduino_cli_path() is None
+		if no_arduino_path:
+			self._logger.info("No arduino-cli path was configured")
+			return [gettext("No path has been configured, check the plugin settings.")]
+		not_arduino = False
+		bad_version = False
+		try:
+			version = self.__get_arduino().version()["result"]
+			if isinstance(version, dict):
+				bad_version = re.match(r"0\.18\..+?\Z", version["VersionString"]) is None
+			else:
+				not_arduino = True
+		except pyduinocli.ArduinoError:
+			not_arduino = True
+		except KeyError:
+			bad_version = True
+		if not_arduino:
+			self._logger.info("The configured path is not an arduino-cli executable")
+			return [gettext("The configured path does not point to an arduino-cli executable.")]
+		if bad_version:
+			self._logger.info("Unsupported arduino-cli version")
+			return [gettext("The arduino-cli version you are using is not supported.")]
+		return []
 
 	def core_search(self):
 		try:

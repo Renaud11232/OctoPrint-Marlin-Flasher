@@ -121,20 +121,25 @@ class PlatformIOFlasher(BaseFlasher):
 				), None
 			return None, [gettext("No PlatformIO configuration file were found in the given file.")]
 
-	# def check_setup_errors(self):
-	# 	self._logger.debug("Checking PlatformIO configuration...")
-	# 	no_platformio_path = self._settings.get_platformio_cli_path() is None
-	# 	if no_platformio_path:
-	# 		self._logger.info("No PlatformIO path was configured")
-	# 		return [gettext("No path has been configured, check the plugin settings.")]
-	# 	try:
-	# 		bad_exec = "platformio" not in self.__exec(["--version"]).lower()
-	# 	except FlasherError:
-	# 		bad_exec = True
-	# 	if bad_exec:
-	# 		self._logger.info("The configured path does not point to PlatformIO-Core")
-	# 		return [gettext("The configured path does not point to PlatformIO-Core.")]
-	# 	return None
+	def check_setup_errors(self):
+		self._logger.debug("Checking PlatformIO configuration...")
+		no_platformio_path = self._settings.get_platformio_cli_path() is None
+		if no_platformio_path:
+			self._logger.info("No PlatformIO path was configured")
+			return [gettext("No path has been configured, check the plugin settings.")]
+		version_logs = deque()
+
+		def handle_logs(stream):
+			for line in stream:
+				self._logger.debug(line.rstrip())
+				version_logs.append(line)
+
+		success = self.__exec([self._settings.get_platformio_cli_path(), "--version"], handle_logs, handle_logs)
+		version_logs = "".join(version_logs)
+		if not success or "platformio" not in version_logs.lower():
+			self._logger.info("The configured path does not point to PlatformIO-Core")
+			return [gettext("The configured path does not point to PlatformIO-Core.")]
+		return []
 
 	def flash(self):
 		if self._firmware is None:

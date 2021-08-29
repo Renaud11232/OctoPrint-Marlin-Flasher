@@ -115,7 +115,10 @@ class MarlinFlasherPlugin(octoprint.plugin.SettingsPlugin,
 			return flask.make_response(flask.jsonify(errors), 400)
 		return flask.make_response(flask.jsonify(result), 200)
 
-	def __handle_validated_request(self, validator, handler):
+	def __handle_validated_request(self, validator, handler, setup_checker):
+		setup_errors = setup_checker()
+		if setup_errors:
+			return flask.make_response(flask.jsonify(setup_errors), 400)
 		errors = validator()
 		if errors:
 			return flask.make_response(flask.jsonify(errors), 400)
@@ -135,61 +138,61 @@ class MarlinFlasherPlugin(octoprint.plugin.SettingsPlugin,
 	@restricted_access
 	@admin_permission.require(403)
 	def upload_arduino_firmware(self):
-		return self.__handle_validated_request(self.__arduino_validator.validate_upload, self.__arduino.upload)
+		return self.__handle_validated_request(self.__arduino_validator.validate_upload, self.__arduino.upload, self.__arduino.check_setup_errors)
 
 	@octoprint.plugin.BlueprintPlugin.route("/arduino/download_firmware", methods=["POST"])
 	@restricted_access
 	@admin_permission.require(403)
 	def download_arduino_firmware(self):
-		return self.__handle_validated_request(self.__arduino_validator.validate_download, self.__arduino.download)
+		return self.__handle_validated_request(self.__arduino_validator.validate_download, self.__arduino.download, self.__arduino.check_setup_errors)
 
 	@octoprint.plugin.BlueprintPlugin.route("/arduino/cores/search", methods=["GET"])
 	@restricted_access
 	@admin_permission.require(403)
 	def search_arduino_cores(self):
-		return self.__handle_validated_request(self.__arduino_validator.validate_core_search, self.__arduino.core_search)
+		return self.__handle_validated_request(self.__arduino_validator.validate_core_search, self.__arduino.core_search, self.__arduino.check_setup_errors)
 
 	@octoprint.plugin.BlueprintPlugin.route("/arduino/cores/install", methods=["POST"])
 	@restricted_access
 	@admin_permission.require(403)
 	def install_arduino_core(self):
-		return self.__handle_validated_request(self.__arduino_validator.validate_core_install, self.__arduino.core_install)
+		return self.__handle_validated_request(self.__arduino_validator.validate_core_install, self.__arduino.core_install, self.__arduino.check_setup_errors)
 
 	@octoprint.plugin.BlueprintPlugin.route("/arduino/cores/uninstall", methods=["POST"])
 	@restricted_access
 	@admin_permission.require(403)
 	def uninstall_arduino_core(self):
-		return self.__handle_validated_request(self.__arduino_validator.validate_core_uninstall, self.__arduino.core_uninstall)
+		return self.__handle_validated_request(self.__arduino_validator.validate_core_uninstall, self.__arduino.core_uninstall, self.__arduino.check_setup_errors)
 
 	@octoprint.plugin.BlueprintPlugin.route("/arduino/libs/search", methods=["GET"])
 	@restricted_access
 	@admin_permission.require(403)
 	def search_arduino_libs(self):
-		return self.__handle_validated_request(self.__arduino_validator.validate_lib_search, self.__arduino.lib_search)
+		return self.__handle_validated_request(self.__arduino_validator.validate_lib_search, self.__arduino.lib_search, self.__arduino.check_setup_errors)
 
 	@octoprint.plugin.BlueprintPlugin.route("/arduino/libs/install", methods=["POST"])
 	@restricted_access
 	@admin_permission.require(403)
 	def install_arduino_lib(self):
-		return self.__handle_validated_request(self.__arduino_validator.validate_lib_install, self.__arduino.lib_install)
+		return self.__handle_validated_request(self.__arduino_validator.validate_lib_install, self.__arduino.lib_install, self.__arduino.check_setup_errors)
 
 	@octoprint.plugin.BlueprintPlugin.route("/arduino/libs/uninstall", methods=["POST"])
 	@restricted_access
 	@admin_permission.require(403)
 	def uninstall_arduino_lib(self):
-		return self.__handle_validated_request(self.__arduino_validator.validate_lib_uninstall, self.__arduino.lib_uninstall)
+		return self.__handle_validated_request(self.__arduino_validator.validate_lib_uninstall, self.__arduino.lib_uninstall, self.__arduino.check_setup_errors)
 
 	@octoprint.plugin.BlueprintPlugin.route("/arduino/board/details", methods=["GET"])
 	@restricted_access
 	@admin_permission.require(403)
 	def board_detail(self):
-		return self.__handle_validated_request(self.__arduino_validator.validate_board_details, self.__arduino.board_details)
+		return self.__handle_validated_request(self.__arduino_validator.validate_board_details, self.__arduino.board_details, self.__arduino.check_setup_errors)
 
 	@octoprint.plugin.BlueprintPlugin.route("/arduino/flash", methods=["POST"])
 	@restricted_access
 	@admin_permission.require(403)
-	def flash(self):
-		return self.__handle_validated_request(self.__arduino_validator.validate_flash, self.__arduino.flash)
+	def arduino_flash(self):
+		return self.__handle_validated_request(self.__arduino_validator.validate_flash, self.__arduino.flash, self.__arduino.check_setup_errors)
 
 	####################################################################
 	# PlatformIO
@@ -205,19 +208,19 @@ class MarlinFlasherPlugin(octoprint.plugin.SettingsPlugin,
 	@restricted_access
 	@admin_permission.require(403)
 	def upload_platformio_firmware(self):
-		return self.__handle_validated_request(self.__platformio_validator.validate_upload, self.__platformio.upload)
+		return self.__handle_validated_request(self.__platformio_validator.validate_upload, self.__platformio.upload, self.__platformio.check_setup_errors)
 
 	@octoprint.plugin.BlueprintPlugin.route("/platformio/download_firmware", methods=["POST"])
 	@restricted_access
 	@admin_permission.require(403)
 	def download_platoformio_firmware(self):
-		return self.__handle_validated_request(self.__platformio_validator.validate_download, self.__platformio.download)
+		return self.__handle_validated_request(self.__platformio_validator.validate_download, self.__platformio.download, self.__platformio.check_setup_errors)
 
 	@octoprint.plugin.BlueprintPlugin.route("/platformio/flash", methods=["POST"])
 	@restricted_access
 	@admin_permission.require(403)
-	def flash(self):
-		return self.__handle_validated_request(self.__platformio_validator.validate_flash, self.__platformio.flash)
+	def platformio_flash(self):
+		return self.__handle_validated_request(self.__platformio_validator.validate_flash, self.__platformio.flash, self.__platformio.check_setup_errors)
 
 	def get_update_information(self):
 		return dict(
