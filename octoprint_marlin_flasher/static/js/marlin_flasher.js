@@ -519,6 +519,43 @@ $(function() {
                 }
             }
         };
+
+        self.platformioLogin = function() {
+            $("#platformio_login_button").button("loading");
+            $.ajax({
+                type: "POST",
+                headers: OctoPrint.getRequestHeaders(),
+                url: "/plugin/marlin_flasher/platformio/login",
+                data: {
+                    username: $("#platformio_username").val(),
+                    password: $("#platformio_password").val()
+                }
+            }).done(function (data) {
+                self.showSuccess("Signed in", data.join("\n"));
+            }).fail(function(jqXHR) {
+                self.showErrors(gettext("Sign in failed"), jqXHR.responseJSON);
+            }).always(function() {
+                $("#platformio_login_button").button("reset");
+            });
+        };
+
+        self.platformioLogout = function() {
+            $("#platformio_logout_button").button("loading");
+            $.ajax({
+                type: "POST",
+                headers: OctoPrint.getRequestHeaders(),
+                url: "/plugin/marlin_flasher/platformio/logout"
+            }).done(function (data) {
+                self.showSuccess("Logged out", data.join("\n"));
+            }).fail(function(jqXHR) {
+                self.showErrors(gettext("Logout failed"), jqXHR.responseJSON);
+            }).always(function() {
+                $("#platformio_logout_button").button("reset");
+            });
+        };
+
+        self.platformioAccountConnected = ko.observable(false);
+
     }
 
     OCTOPRINT_VIEWMODELS.push({

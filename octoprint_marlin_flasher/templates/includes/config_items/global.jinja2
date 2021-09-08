@@ -17,6 +17,7 @@
                                                                                       disable: currentlyFlashing">
                 <option value="upload">Upload file</option>
                 <option value="url">Download from URL</option>
+                <option value="remote_upload" data-bind="visible: settingsViewModel.settings.plugins.marlin_flasher.platform_type() === 'platform_io'">Remote Upload</option>
             </select>
         </div>
     </div>

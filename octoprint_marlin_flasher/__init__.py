@@ -222,6 +222,18 @@ class MarlinFlasherPlugin(octoprint.plugin.SettingsPlugin,
 	def platformio_flash(self):
 		return self.__handle_validated_request(self.__platformio_validator.validate_flash, self.__platformio.flash, self.__platformio.check_setup_errors)
 
+	@octoprint.plugin.BlueprintPlugin.route("/platformio/login", methods=["POST"])
+	@restricted_access
+	@admin_permission.require(403)
+	def platformio_login(self):
+		return self.__handle_validated_request(self.__platformio_validator.validate_login, self.__platformio.login, self.__platformio.check_setup_errors)
+
+	@octoprint.plugin.BlueprintPlugin.route("/platformio/logout", methods=["POST"])
+	@restricted_access
+	@admin_permission.require(403)
+	def platformio_logout(self):
+		return self.__handle_validated_request(lambda: [], self.__platformio.logout, self.__platformio.check_setup_errors)
+
 	def get_update_information(self):
 		return dict(
 			marlin_flasher=dict(

@@ -14,3 +14,34 @@
         </div>
     </div>
 </fieldset>
+<fieldset id="marlin_flasher_settings_platformio_account_{{field_suffix}}" data-bind="visible: settingsViewModel.settings.plugins.marlin_flasher.platform_type() === 'platform_io'">
+    <div class="alert alert-success">
+        {{ _('You are successfully logged in to your PlatformIO Account') }}
+    </div>
+    <div class="alert">
+        {{ _('You are not logged in to your PlatformIO Account') }}
+    </div>
+    <legend>{{ _('PlatformIO Account') }}</legend>
+    <div class="control-group" title="{{ _('PlatformIO username') }}">
+        <label class="control-label" for="platformio_username">{{ _('Username') }}</label>
+        <div class="controls">
+            <input type="text" id="platformio_username" placeholder="Username">
+        </div>
+    </div>
+    <div class="control-group" title="{{ _('PlatformIO password') }}">
+        <label class="control-label" for="platformio_password">{{ _('Password') }}</label>
+        <div class="controls">
+            <input type="password" id="platformio_password" placeholder="**********" >
+        </div>
+    </div>
+    <div class="control-group">
+        <div class="controls">
+            <button id="platformio_login_button" class="btn" data-loading-text="{{ _('Logging in') }}" data-bind="click: platformioLogin">{{ _('Login') }}</button>
+        </div>
+    </div>
+    <div class="control-group">
+        <div class="controls">
+            <button id="platformio_logout_button" class="btn" data-loading-text="{{ _('Logging out') }}" data-bind="click: platformioLogout">{{ _('Logout') }}</button>
+        </div>
+    </div>
+</fieldset>

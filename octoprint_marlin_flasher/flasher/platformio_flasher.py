@@ -74,8 +74,9 @@ class PlatformIOFlasher(BaseFlasher):
 				status=gettext("The installation failed")
 			))
 
-	def __exec(self, command, stdout_handler, stderr_handler):
-		self._logger.debug("Executing command : %s" % " ".join(command))
+	def __exec(self, command, stdout_handler, stderr_handler, show_in_logs=True):
+		if show_in_logs:
+			self._logger.debug("Executing command : %s" % " ".join(command))
 		with Popen(command, stdout=PIPE, stderr=PIPE, universal_newlines=True) as p:
 			stdout_thread = Thread(target=stdout_handler, args=(p.stdout,))
 			stderr_thread = Thread(target=stderr_handler, args=(p.stderr,))
@@ -302,3 +303,38 @@ class PlatformIOFlasher(BaseFlasher):
 		BaseFlasher.send_initial_state(self)
 		self.__push_last_flash_option()
 		self._push_flash_status("platformio_flash_status")
+
+	def login(self):
+		self._logger.debug("Signing in to a PlatformioIO account")
+		pio_args = [self._settings.get_platformio_cli_path(), "account", "login", "--username", flask.request.values["username"], "--password", flask.request.values["password"]]
+		logs = []
+
+		def handle_logs(stream):
+			for line in stream:
+				l = line.rstrip()
+				self._logger.debug(l)
+				logs.append(l)
+		connected = self.__exec(pio_args, handle_logs ,handle_logs, show_in_logs=False)
+		if not connected:
+			self._logger.debug("Connection failed !")
+			return None, logs
+		self._logger.info("Successfully signed in to the PlatformIO account")
+		return logs, None
+
+	def logout(self):
+		self._logger.debug("Logging out of a PlatformioIO account")
+		pio_args = [self._settings.get_platformio_cli_path(), "account", "logout"]
+		logs = []
+
+		def handle_logs(stream):
+			for line in stream:
+				l = line.rstrip()
+				self._logger.debug(l)
+				logs.append(l)
+		connected = self.__exec(pio_args, handle_logs ,handle_logs)
+		if not connected:
+			self._logger.debug("Logout failed !")
+			return None, logs
+		self._logger.info("Successfully logged out")
+		return logs, None
+

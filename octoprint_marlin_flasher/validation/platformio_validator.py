@@ -10,3 +10,11 @@ class PlatformIOValidator(BaseValidator):
 		if "env" not in flask.request.values:
 			errors.append(gettext("The env field is missing"))
 		return errors
+
+	def validate_login(self):
+		errors = []
+		if "username" not in flask.request.values:
+			errors.append(gettext("The username is missing"))
+		if "password" not in flask.request.values:
+			errors.append(gettext("The password is missing"))
+		return errors
