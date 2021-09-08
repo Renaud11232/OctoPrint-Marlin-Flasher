@@ -75,6 +75,8 @@ $(function() {
                     self.handlePlatformioLastFlashOptions(message);
                 } else if (message.type === "platformio_flash_status") {
                     self.handlePlatformioFlashStatus(message);
+                } else if (message.type === "platformio_login_status") {
+                    self.handlePlatformioLogitStatus(message);
                 }
             }
         };
@@ -536,6 +538,7 @@ $(function() {
                 self.showErrors(gettext("Sign in failed"), jqXHR.responseJSON);
             }).always(function() {
                 $("#platformio_login_button").button("reset");
+                $("#platformio_password").val("");
             });
         };
 
@@ -554,7 +557,14 @@ $(function() {
             });
         };
 
-        self.platformioAccountConnected = ko.observable(false);
+        self.platformioAccount = ko.observable(null);
+
+        self.handlePlatformioLogitStatus = function(message) {
+            self.platformioAccount(message.account);
+            if(message.account) {
+                $("#platformio_username").val(message.account.profile.username);
+            }
+        };
 
     }
 

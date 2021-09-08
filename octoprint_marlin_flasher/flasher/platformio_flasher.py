@@ -1,3 +1,4 @@
+import json
 import sys
 from .base_flasher import BaseFlasher
 from collections import deque
@@ -303,6 +304,7 @@ class PlatformIOFlasher(BaseFlasher):
 		BaseFlasher.send_initial_state(self)
 		self.__push_last_flash_option()
 		self._push_flash_status("platformio_flash_status")
+		self._push_login_status()
 
 	def login(self):
 		self._logger.debug("Signing in to a PlatformioIO account")
@@ -314,11 +316,12 @@ class PlatformIOFlasher(BaseFlasher):
 				l = line.rstrip()
 				self._logger.debug(l)
 				logs.append(l)
-		connected = self.__exec(pio_args, handle_logs ,handle_logs, show_in_logs=False)
-		if not connected:
+		success = self.__exec(pio_args, handle_logs, handle_logs, show_in_logs=False)
+		if not success:
 			self._logger.debug("Connection failed !")
 			return None, logs
 		self._logger.info("Successfully signed in to the PlatformIO account")
+		self._push_login_status()
 		return logs, None
 
 	def logout(self):
@@ -331,10 +334,38 @@ class PlatformIOFlasher(BaseFlasher):
 				l = line.rstrip()
 				self._logger.debug(l)
 				logs.append(l)
-		connected = self.__exec(pio_args, handle_logs ,handle_logs)
-		if not connected:
+		success = self.__exec(pio_args, handle_logs, handle_logs)
+		if not success:
 			self._logger.debug("Logout failed !")
 			return None, logs
 		self._logger.info("Successfully logged out")
+		self._push_login_status()
 		return logs, None
+
+	def _push_login_status(self):
+		self._logger.debug("Checking login status...")
+		pio_args = [self._settings.get_platformio_cli_path(), "account", "show", "--json-output"]
+		logs = deque()
+
+		def handle_logs(stream):
+			for line in stream:
+				l = line.rstrip()
+				self._logger.debug(l)
+				logs.append(l)
+		success = self.__exec(pio_args, handle_logs, handle_logs, show_in_logs=False)
+		if not success:
+			message = dict(
+				type="platformio_login_status",
+				account=None
+			)
+			self._logger.debug("Could not get account information, we are not logged in")
+		else:
+			self._logger.debug("Got valid answer, we are logged in")
+			account = json.loads("".join(logs))
+			message =  dict(
+				type="platformio_login_status",
+				account=account
+			)
+		self._plugin_manager.send_plugin_message(self._identifier, message)
+
 
