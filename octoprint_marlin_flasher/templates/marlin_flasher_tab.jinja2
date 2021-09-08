@@ -5,9 +5,13 @@
     {% include "includes/group_items/arduino/flash.jinja2" %}
 </div>
 
-<div class="accordion" id="marlin_flasher_platformio_accordion" data-bind="visible: loginStateViewModel.isAdmin() && settingsViewModel.settings.plugins.marlin_flasher.platform_type() == 'platform_io'">
+<div class="accordion" id="marlin_flasher_platformio_accordion" data-bind="visible: loginStateViewModel.isAdmin() && settingsViewModel.settings.plugins.marlin_flasher.platform_type() == 'platform_io' && settingsViewModel.settings.plugins.marlin_flasher.retrieving_method() !== 'remote_upload'">
     {% include "includes/group_items/platformio/project.jinja2" %}
     {% include "includes/group_items/platformio/flash.jinja2" %}
+</div>
+
+<div data-bind="visible: loginStateViewModel.isAdmin() && settingsViewModel.settings.plugins.marlin_flasher.platform_type() == 'platform_io' && settingsViewModel.settings.plugins.marlin_flasher.retrieving_method() === 'remote_upload'">
+    {% include "includes/group_items/platformio/remote_upload.jinja2" %}
 </div>
 
 <div data-bind="visible: !loginStateViewModel.isAdmin()">

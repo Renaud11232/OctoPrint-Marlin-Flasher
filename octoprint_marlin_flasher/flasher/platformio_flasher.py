@@ -349,10 +349,8 @@ class PlatformIOFlasher(BaseFlasher):
 
 		def handle_logs(stream):
 			for line in stream:
-				l = line.rstrip()
-				self._logger.debug(l)
-				logs.append(l)
-		success = self.__exec(pio_args, handle_logs, handle_logs, show_in_logs=False)
+				logs.append(line.rstrip())
+		success = self.__exec(pio_args, handle_logs, handle_logs)
 		if not success:
 			message = dict(
 				type="platformio_login_status",
