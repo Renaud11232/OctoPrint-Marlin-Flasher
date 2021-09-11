@@ -1,1 +1,26 @@
-Remote upload...
+<div class="row-fluid">
+    <div class="span12">
+        <pre id="platformio-remote-upload-logs" class="pre-scrollable pre-output" data-bind="text: platformioRemoteAgentLogs().join('\n')"></pre>
+    </div>
+</div>
+<div class="row-fluid">
+    <div class="span3">
+        <span>{{ _('Remote agent status') }} :</span>
+    </div>
+    <div class="span3">
+        <span class="remote-agent-status starting" data-bind="visible: platformioRemoteAgentStatus() === 'starting'">{{ _('Starting') }}</span>
+        <span class="remote-agent-status running" data-bind="visible: platformioRemoteAgentStatus() === 'running'">{{ _('Running') }}</span>
+        <span class="remote-agent-status stopping" data-bind="visible: platformioRemoteAgentStatus() === 'stopping'">{{ _('Stopping') }}</span>
+        <span class="remote-agent-status stopped" data-bind="visible: platformioRemoteAgentStatus() === 'stopped'">{{ _('Stopped') }}</span>
+    </div>
+</div>
+<div class="row-fluid">
+    <div class="span3 offset3">
+        <button class="btn" data-bind="visible: platformioRemoteAgentStatus() === 'starting' || platformioRemoteAgentStatus() === 'stopped',
+                                                   disable: platformioRemoteAgentStatus() === 'starting',
+                                                   click: platformioStartRemoteAgent"><i class="fas fa-play"></i></button>
+        <button class="btn" data-bind="visible: platformioRemoteAgentStatus() === 'stopping' || platformioRemoteAgentStatus() === 'running',
+                                                  disable: platformioRemoteAgentStatus() === 'stopping',
+                                                  click: platformioStopRemoteAgent"><i class="fas fa-stop"></i></button>
+    </div>
+</div>

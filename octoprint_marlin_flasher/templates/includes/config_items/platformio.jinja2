@@ -14,7 +14,7 @@
         </div>
     </div>
 </fieldset>
-<fieldset id="marlin_flasher_settings_platformio_account_{{field_suffix}}" data-bind="visible: settingsViewModel.settings.plugins.marlin_flasher.platform_type() === 'platform_io'">
+<fieldset id="marlin_flasher_settings_platformio_account_{{field_suffix}}" data-bind="visible: settingsViewModel.settings.plugins.marlin_flasher.platform_type() === 'platform_io' && settingsViewModel.settings.plugins.marlin_flasher.retrieving_method() === 'remote_upload'">
     <div class="alert alert-success" data-bind="visible: platformioAccount()">
         {{ _('You are successfully logged in to your PlatformIO Account') }}
     </div>
@@ -23,13 +23,13 @@
     </div>
     <legend>{{ _('PlatformIO Account') }}</legend>
     <div class="control-group" title="{{ _('PlatformIO username') }}">
-        <label class="control-label" for="platformio_username">{{ _('Username') }}</label>
+        <label class="control-label" for="platformio_username">{{ _('Username') }} <small><i id="platformio-username-tooltip" class="fas fa-info-circle" data-toggle="tooltip" title="{{ _('Your username will not be saved in the OctoPrint configuration but will be handled directly by PlatformIO-Core') }}"></i></small></label>
         <div class="controls">
             <input type="text" id="platformio_username" placeholder="Username" data-bind="disable: platformioAccount() || currentlyFlashing()">
         </div>
     </div>
     <div class="control-group" title="{{ _('PlatformIO password') }}">
-        <label class="control-label" for="platformio_password">{{ _('Password') }}</label>
+        <label class="control-label" for="platformio_password">{{ _('Password') }} <small><i id="platformio-password-tooltip" class="fas fa-info-circle" data-toggle="tooltip" title="{{ _('Your password will not be saved in the OctoPrint configuration but will be handled directly by PlatformIO-Core') }}"></i></small></label>
         <div class="controls">
             <input type="password" id="platformio_password" placeholder="**********" data-bind="disable: platformioAccount() || currentlyFlashing()">
         </div>

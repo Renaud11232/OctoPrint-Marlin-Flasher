@@ -13,9 +13,16 @@ import serial
 import flask
 import platform
 from flask_babel import gettext
+from .platformio_remote import PlatformIoRemoteAgent
 
 
 class PlatformIOFlasher(BaseFlasher):
+
+	def __init__(self, settings, printer, plugin, plugin_manager, identifier, logger):
+		BaseFlasher.__init__(self, settings, printer, plugin, plugin_manager, identifier, logger)
+		self.__remote_agent = PlatformIoRemoteAgent(settings)
+		self.__remote_agent.add_status_observer(self.__push_remote_agent_status)
+		self.__remote_agent.add_log_observer(self.__push_remote_agent_log)
 
 	def start_install(self):
 		system = platform.system()
@@ -304,7 +311,8 @@ class PlatformIOFlasher(BaseFlasher):
 		BaseFlasher.send_initial_state(self)
 		self.__push_last_flash_option()
 		self._push_flash_status("platformio_flash_status")
-		self._push_login_status()
+		self.__push_login_status()
+		self.__push_remote_agent_status()
 
 	def login(self):
 		self._logger.debug("Signing in to a PlatformioIO account")
@@ -321,7 +329,7 @@ class PlatformIOFlasher(BaseFlasher):
 			self._logger.debug("Connection failed !")
 			return None, logs
 		self._logger.info("Successfully signed in to the PlatformIO account")
-		self._push_login_status()
+		self.__push_login_status()
 		return logs, None
 
 	def logout(self):
@@ -339,10 +347,10 @@ class PlatformIOFlasher(BaseFlasher):
 			self._logger.debug("Logout failed !")
 			return None, logs
 		self._logger.info("Successfully logged out")
-		self._push_login_status()
+		self.__push_login_status()
 		return logs, None
 
-	def _push_login_status(self):
+	def __push_login_status(self):
 		self._logger.debug("Checking login status...")
 		pio_args = [self._settings.get_platformio_cli_path(), "account", "show", "--json-output"]
 		logs = deque()
@@ -366,4 +374,15 @@ class PlatformIOFlasher(BaseFlasher):
 			)
 		self._plugin_manager.send_plugin_message(self._identifier, message)
 
+	def __push_remote_agent_status(self):
+		self._plugin_manager.send_plugin_message(self._identifier, dict(
+			type="platformio_remote_agent_status",
+			status=self.__remote_agent.get_status()
+		))
+
+	def __push_remote_agent_log(self, log):
+		self._plugin_manager.send_plugin_message(self._identifier, dict(
+			type="platformio_remote_agent_log",
+			content=log
+		))
 

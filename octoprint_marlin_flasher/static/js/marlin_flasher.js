@@ -51,6 +51,8 @@ $(function() {
         self.onAllBound = function() {
             $("#arduino_firmware_file").fileupload(self.getFileUploadParams(self.arduinoUploadProgress));
             $("#platformio_firmware_file").fileupload(self.getFileUploadParams(self.platformioUploadProgress));
+            $("#platformio-username-tooltip").tooltip();
+            $("#platformio-password-tooltip").tooltip();
         };
 
         self.onDataUpdaterPluginMessage = function(plugin, message) {
@@ -76,7 +78,11 @@ $(function() {
                 } else if (message.type === "platformio_flash_status") {
                     self.handlePlatformioFlashStatus(message);
                 } else if (message.type === "platformio_login_status") {
-                    self.handlePlatformioLogitStatus(message);
+                    self.handlePlatformioLoginStatus(message);
+                } else if (message.type === "platformio_remote_agent_log") {
+                    self.handlePlatformioRemoteAgentLog(message);
+                } else if (message.type === "platformio_remote_agent_status") {
+                    self.handlePlatformioRemoteAgentStatus(message);
                 }
             }
         };
@@ -559,11 +565,33 @@ $(function() {
 
         self.platformioAccount = ko.observable(null);
 
-        self.handlePlatformioLogitStatus = function(message) {
+        self.handlePlatformioLoginStatus = function (message) {
             self.platformioAccount(message.account);
             if(message.account) {
                 $("#platformio_username").val(message.account.profile.username);
             }
+        };
+
+        self.platformioRemoteAgentStatus = ko.observable();
+
+        self.handlePlatformioRemoteAgentStatus = function(message) {
+            self.platformioRemoteAgentStatus(message.status);
+        };
+
+        self.platformioStartRemoteAgent = function() {
+
+        };
+
+        self.platformioStopRemoteAgent = function() {
+
+        };
+
+        self.platformioRemoteAgentLogs = ko.observableArray();
+
+        self.handlePlatformioRemoteAgentLog = function(message) {
+            self.platformioRemoteAgentLogs.push(message.content);
+            var pre = $("#platformio-remote-upload-logs")
+            pre.scrollTop(pre.prop("scrollHeight"));
         };
 
     }

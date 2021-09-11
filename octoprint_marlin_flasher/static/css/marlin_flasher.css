@@ -34,3 +34,19 @@ pre.scrollable-pre {
 .uninstall-col > i {
     color: #d34843;
 }
+
+.remote-agent-status {
+    font-weight: bold;
+}
+
+.remote-agent-status.running {
+    color: green;
+}
+
+.remote-agent-status.starting, .remote-agent-status.stopping {
+    color: goldenrod;
+}
+
+.remote-agent-status.stopped {
+    color: red;
+}
