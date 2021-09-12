@@ -533,7 +533,7 @@ $(function() {
             $.ajax({
                 type: "POST",
                 headers: OctoPrint.getRequestHeaders(),
-                url: "/plugin/marlin_flasher/platformio/login",
+                url: "/plugin/marlin_flasher/platformio/account/login",
                 data: {
                     username: $("#platformio_username").val(),
                     password: $("#platformio_password").val()
@@ -553,7 +553,7 @@ $(function() {
             $.ajax({
                 type: "POST",
                 headers: OctoPrint.getRequestHeaders(),
-                url: "/plugin/marlin_flasher/platformio/logout"
+                url: "/plugin/marlin_flasher/platformio/account/logout"
             }).done(function (data) {
                 self.showSuccess("Logged out", data.join("\n"));
             }).fail(function(jqXHR) {
@@ -574,16 +574,38 @@ $(function() {
 
         self.platformioRemoteAgentStatus = ko.observable();
 
+        self.platformioRemoteAgentStatus.subscribe(function(newValue) {
+            self.currentlyFlashing(newValue === "running" || newValue === "starting" || newValue === "stopping");
+        });
+
         self.handlePlatformioRemoteAgentStatus = function(message) {
             self.platformioRemoteAgentStatus(message.status);
         };
 
         self.platformioStartRemoteAgent = function() {
-
+            self.platformioRemoteAgentStatus("starting");
+            $.ajax({
+                type: "POST",
+                headers: OctoPrint.getRequestHeaders(),
+                url: "/plugin/marlin_flasher/platformio/agent/start"
+            }).done(function (data) {
+                self.showSuccess("Remote Agent", data.join("\n"));
+            }).fail(function(jqXHR) {
+                self.showErrors(gettext("Remote Agent"), jqXHR.responseJSON);
+            });
         };
 
         self.platformioStopRemoteAgent = function() {
-
+            self.platformioRemoteAgentStatus("stopping");
+            $.ajax({
+                type: "POST",
+                headers: OctoPrint.getRequestHeaders(),
+                url: "/plugin/marlin_flasher/platformio/agent/stop"
+            }).done(function (data) {
+                self.showSuccess("Remote Agent", data.join("\n"));
+            }).fail(function(jqXHR) {
+                self.showErrors(gettext("Remote Agent"), jqXHR.responseJSON);
+            });
         };
 
         self.platformioRemoteAgentLogs = ko.observableArray();

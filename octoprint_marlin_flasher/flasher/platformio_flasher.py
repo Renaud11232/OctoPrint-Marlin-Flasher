@@ -20,7 +20,7 @@ class PlatformIOFlasher(BaseFlasher):
 
 	def __init__(self, settings, printer, plugin, plugin_manager, identifier, logger):
 		BaseFlasher.__init__(self, settings, printer, plugin, plugin_manager, identifier, logger)
-		self.__remote_agent = PlatformIoRemoteAgent(settings)
+		self.__remote_agent = PlatformIoRemoteAgent(settings, logger, printer)
 		self.__remote_agent.add_status_observer(self.__push_remote_agent_status)
 		self.__remote_agent.add_log_observer(self.__push_remote_agent_log)
 
@@ -385,4 +385,20 @@ class PlatformIOFlasher(BaseFlasher):
 			type="platformio_remote_agent_log",
 			content=log
 		))
+
+	def start_remote_agent(self):
+		if not self._printer.is_ready():
+			self._logger.debug("Printer not ready")
+			return None, [gettext("The printer may not be connected or it may be busy.")]
+		try:
+			if self.__remote_agent.start():
+				return [gettext("The remote agent is now starting")], None
+			return None, [gettext("The remote agent was already running.")]
+		except OSError:
+			return None, [gettext("The PlatformIO executable cannot be found, check your configuration")]
+
+	def stop_remote_agent(self):
+		if self.__remote_agent.stop():
+			return [gettext("The remote agent is stopping")], None
+		return None, [gettext("The remote agent was not running")]
 

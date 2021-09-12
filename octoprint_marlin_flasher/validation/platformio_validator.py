@@ -18,3 +18,12 @@ class PlatformIOValidator(BaseValidator):
 		if "password" not in flask.request.values:
 			errors.append(gettext("The password is missing"))
 		return errors
+
+	def validate_logout(self):
+		return []
+
+	def validate_start_remote_agent(self):
+		return []
+
+	def validate_stop_remote_agent(self):
+		return []

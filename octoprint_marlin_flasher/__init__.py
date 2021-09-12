@@ -222,17 +222,29 @@ class MarlinFlasherPlugin(octoprint.plugin.SettingsPlugin,
 	def platformio_flash(self):
 		return self.__handle_validated_request(self.__platformio_validator.validate_flash, self.__platformio.flash, self.__platformio.check_setup_errors)
 
-	@octoprint.plugin.BlueprintPlugin.route("/platformio/login", methods=["POST"])
+	@octoprint.plugin.BlueprintPlugin.route("/platformio/account/login", methods=["POST"])
 	@restricted_access
 	@admin_permission.require(403)
 	def platformio_login(self):
 		return self.__handle_validated_request(self.__platformio_validator.validate_login, self.__platformio.login, self.__platformio.check_setup_errors)
 
-	@octoprint.plugin.BlueprintPlugin.route("/platformio/logout", methods=["POST"])
+	@octoprint.plugin.BlueprintPlugin.route("/platformio/account/logout", methods=["POST"])
 	@restricted_access
 	@admin_permission.require(403)
 	def platformio_logout(self):
-		return self.__handle_validated_request(lambda: [], self.__platformio.logout, self.__platformio.check_setup_errors)
+		return self.__handle_validated_request(self.__platformio_validator.validate_logout, self.__platformio.logout, self.__platformio.check_setup_errors)
+
+	@octoprint.plugin.BlueprintPlugin.route("/platformio/agent/start", methods=["POST"])
+	@restricted_access
+	@admin_permission.require(403)
+	def platformio_start_remote_agent(self):
+		return self.__handle_validated_request(self.__platformio_validator.validate_start_remote_agent, self.__platformio.start_remote_agent, self.__platformio.check_setup_errors)
+
+	@octoprint.plugin.BlueprintPlugin.route("/platformio/agent/stop", methods=["POST"])
+	@restricted_access
+	@admin_permission.require(403)
+	def platformio_stop_remote_agent(self):
+		return self.__handle_validated_request(self.__platformio_validator.validate_stop_remote_agent, self.__platformio.stop_remote_agent, self.__platformio.check_setup_errors)
 
 	def get_update_information(self):
 		return dict(

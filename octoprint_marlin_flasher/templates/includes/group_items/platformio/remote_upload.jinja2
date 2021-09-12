@@ -10,17 +10,17 @@
     <div class="span3">
         <span class="remote-agent-status starting" data-bind="visible: platformioRemoteAgentStatus() === 'starting'">{{ _('Starting') }}</span>
         <span class="remote-agent-status running" data-bind="visible: platformioRemoteAgentStatus() === 'running'">{{ _('Running') }}</span>
+        <span class="remote-agent-status flashing" data-bind="visible: platformioRemoteAgentStatus() === 'flashing'"><i class="fas fa-bolt"></i> {{ _('Flashing') }}</span>
         <span class="remote-agent-status stopping" data-bind="visible: platformioRemoteAgentStatus() === 'stopping'">{{ _('Stopping') }}</span>
         <span class="remote-agent-status stopped" data-bind="visible: platformioRemoteAgentStatus() === 'stopped'">{{ _('Stopped') }}</span>
     </div>
 </div>
 <div class="row-fluid">
     <div class="span3 offset3">
-        <button class="btn" data-bind="visible: platformioRemoteAgentStatus() === 'starting' || platformioRemoteAgentStatus() === 'stopped',
-                                                   disable: platformioRemoteAgentStatus() === 'starting',
-                                                   click: platformioStartRemoteAgent"><i class="fas fa-play"></i></button>
-        <button class="btn" data-bind="visible: platformioRemoteAgentStatus() === 'stopping' || platformioRemoteAgentStatus() === 'running',
-                                                  disable: platformioRemoteAgentStatus() === 'stopping',
-                                                  click: platformioStopRemoteAgent"><i class="fas fa-stop"></i></button>
+        <button class="btn" data-bind="visible: platformioRemoteAgentStatus() === 'stopped',
+                                       click: platformioStartRemoteAgent"><i class="fas fa-play"></i></button>
+        <button class="btn" data-bind="visible: platformioRemoteAgentStatus() === 'stopping' || platformioRemoteAgentStatus() === 'running' || platformioRemoteAgentStatus() === 'starting',
+                                       disable: platformioRemoteAgentStatus() === 'stopping' || platformioRemoteAgentStatus() === 'flashing',
+                                       click: platformioStopRemoteAgent"><i class="fas fa-stop"></i></button>
     </div>
 </div>

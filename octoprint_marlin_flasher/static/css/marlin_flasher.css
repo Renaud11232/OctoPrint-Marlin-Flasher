@@ -50,3 +50,7 @@ pre.scrollable-pre {
 .remote-agent-status.stopped {
     color: red;
 }
+
+.remote-agent-status.flashing {
+    color: dodgerblue;
+}
