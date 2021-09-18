@@ -53,6 +53,12 @@ $(function() {
             $("#platformio_firmware_file").fileupload(self.getFileUploadParams(self.platformioUploadProgress));
             $("#platformio-username-tooltip").tooltip();
             $("#platformio-password-tooltip").tooltip();
+
+            self.settingsViewModel.settings.plugins.marlin_flasher.platform_type.subscribe(function(newValue) {
+                if(newValue !== "platform_io" && self.settingsViewModel.settings.plugins.marlin_flasher.retrieving_method() === "remote_upload") {
+                    self.settingsViewModel.settings.plugins.marlin_flasher.retrieving_method("upload");
+                }
+            });
         };
 
         self.onDataUpdaterPluginMessage = function(plugin, message) {
@@ -391,6 +397,8 @@ $(function() {
                     self.showErrors(gettext("Flashing failed"), [message.message]);
                     self.showCompilationError(message.error_output);
                 }
+            } else {
+                $("#arduino_flash-button").button("loading");
             }
         };
 
