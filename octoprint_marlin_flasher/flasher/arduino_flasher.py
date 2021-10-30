@@ -62,7 +62,7 @@ class ArduinoFlasher(BaseFlasher):
 
 	def __install(self, operating_system, arch, ext):
 		installation_path = os.path.join(self._plugin.get_plugin_data_folder(), "arduino-cli")
-		installed_version = "0.19.0"
+		installed_version = "0.19.3"
 		url = "https://github.com/arduino/arduino-cli/releases/download/{version}/arduino-cli_{version}_{os}_{arch}.{ext}"
 		download_url = url.format(version=installed_version, os=operating_system, arch=arch, ext=ext)
 		self._logger.info("Downloading %s" % download_url)
