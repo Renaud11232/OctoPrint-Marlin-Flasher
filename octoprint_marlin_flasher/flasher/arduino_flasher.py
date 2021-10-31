@@ -25,7 +25,6 @@ class ArduinoFlasher(BaseFlasher):
 
 	def start_install(self):
 		self._logger.info("Starting the installation of arduino-cli")
-		errors = []
 		system = platform.system()
 		self._logger.debug("platform.system() is %s" % system)
 		system_os_map = {
@@ -35,7 +34,7 @@ class ArduinoFlasher(BaseFlasher):
 		}
 		if system not in system_os_map:
 			self._logger.warning("Unknown system %s" % system)
-			errors.append(gettext("Unable to detect OS : ") + system)
+			return None, [gettext("Unable to detect OS : ") + system]
 		os = system_os_map[system]
 		os_ext_map = {
 			"Linux": "tar.gz",
@@ -47,14 +46,13 @@ class ArduinoFlasher(BaseFlasher):
 		self._logger.debug("platform.machine() is %s" % machine)
 		machine_arch_map = {
 			"AMD64": "64bit",
-			"i386": "32bit"
+			"i386": "32bit",
+			"armv71": "ARMv7"
 		}
 		if machine not in machine_arch_map:
 			self._logger.warning("Unknown machine %s" % machine)
-			errors.append(gettext("Unable to detect architecture : ") + machine)
+			return None, [gettext("Unable to detect architecture : ") + machine]
 		arch = machine_arch_map[machine]
-		if errors:
-			return None, errors
 		self._background_run(self.__install, args=(os, arch, ext))
 		return dict(
 			message=gettext("The installation of arduino-cli is started")
