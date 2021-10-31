@@ -47,7 +47,7 @@ class ArduinoFlasher(BaseFlasher):
 		machine_arch_map = {
 			"AMD64": "64bit",
 			"i386": "32bit",
-			"armv71": "ARMv7"
+			"armv7l": "ARMv7"
 		}
 		if machine not in machine_arch_map:
 			self._logger.warning("Unknown machine %s" % machine)
