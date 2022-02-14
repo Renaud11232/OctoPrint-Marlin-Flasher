@@ -591,7 +591,6 @@ $(function() {
         };
 
         self.platformioStartRemoteAgent = function() {
-            self.platformioRemoteAgentStatus("starting");
             $.ajax({
                 type: "POST",
                 headers: OctoPrint.getRequestHeaders(),
@@ -604,7 +603,6 @@ $(function() {
         };
 
         self.platformioStopRemoteAgent = function() {
-            self.platformioRemoteAgentStatus("stopping");
             $.ajax({
                 type: "POST",
                 headers: OctoPrint.getRequestHeaders(),
