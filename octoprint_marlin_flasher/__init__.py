@@ -78,7 +78,7 @@ class MarlinFlasherPlugin(octoprint.plugin.SettingsPlugin,
 			else:
 				flasher = self.__platformio
 			flasher.send_initial_state()
-		return super(MarlinFlasherPlugin, self).on_settings_save(data)
+		octoprint.plugin.SettingsPlugin.on_settings_save(self, data)
 
 	def get_assets(self):
 		return dict(
