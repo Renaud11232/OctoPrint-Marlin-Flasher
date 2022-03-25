@@ -71,14 +71,13 @@ class MarlinFlasherPlugin(octoprint.plugin.SettingsPlugin,
 			self._settings.set(["arduino", "additional_urls"], additional_urls)
 
 	def on_settings_save(self, data):
-		if "platform_type" in data:
-			platform = data["platform_type"]
-			if platform == PlatformType.ARDUINO:
-				flasher = self.__arduino
-			else:
-				flasher = self.__platformio
-			flasher.send_initial_state()
 		octoprint.plugin.SettingsPlugin.on_settings_save(self, data)
+		platform = self.__settings_wrapper.get_platform_type()
+		if platform == PlatformType.ARDUINO:
+			flasher = self.__arduino
+		else:
+			flasher = self.__platformio
+		flasher.send_initial_state()
 
 	def get_assets(self):
 		return dict(

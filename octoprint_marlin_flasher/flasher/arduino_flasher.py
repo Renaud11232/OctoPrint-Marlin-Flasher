@@ -47,7 +47,8 @@ class ArduinoFlasher(BaseFlasher):
 		machine_arch_map = {
 			"AMD64": "64bit",
 			"i386": "32bit",
-			"armv7l": "ARMv7"
+			"armv7l": "ARMv7",
+			"armv6l": "ARMv6"
 		}
 		if machine not in machine_arch_map:
 			self._logger.warning("Unknown machine %s" % machine)
@@ -203,6 +204,8 @@ class ArduinoFlasher(BaseFlasher):
 			else:
 				not_arduino = True
 		except pyduinocli.ArduinoError:
+			not_arduino = True
+		except OSError:
 			not_arduino = True
 		except KeyError:
 			bad_version = True
@@ -433,6 +436,8 @@ class ArduinoFlasher(BaseFlasher):
 			self._push_flash_status("arduino_flash_status")
 
 	def __push_installed_boards(self):
+		if self.check_setup_errors():
+			return
 		try:
 			arduino = self.__get_arduino()
 			self._logger.debug("Listing installed boards...")
@@ -444,8 +449,8 @@ class ArduinoFlasher(BaseFlasher):
 				result=result
 			))
 		except pyduinocli.ArduinoError as e:
-			self._logger.debug("Failed !")
-			return None, [e.result["__stderr"]]
+			self._logger.debug("Failed to push the list of installed boards")
+			self._logger.debug(e.result["__stderr"])
 
 	def _firmware_info_event_name(self):
 		return "arduino_firmware_info"
