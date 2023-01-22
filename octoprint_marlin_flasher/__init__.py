@@ -32,11 +32,11 @@ class MarlinFlasherPlugin(octoprint.plugin.SettingsPlugin,
 				sketch_ino="Marlin.ino",
 				cli_path=None,
 				additional_urls=None,
-				last_flash_options=None
+				last_flash_options={}
 			),
 			platformio=dict(
 				cli_path=None,
-				last_flash_options=None
+				last_flash_options={}
 			),
 			max_upload_size=20,
 			platform_type=PlatformType.ARDUINO,
