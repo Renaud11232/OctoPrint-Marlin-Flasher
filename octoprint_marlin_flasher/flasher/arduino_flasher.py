@@ -107,14 +107,39 @@ class ArduinoFlasher(BaseFlasher):
 				else:
 					executable_name = "arduino-cli"
 				executable_path = os.path.join(installation_path, executable_name)
-				self._logger.info("Successfully installed arduino-cli in %s" % installation_path)
+				self._logger.info("Installing arduino:avr core")
 				self._plugin_manager.send_plugin_message(self._identifier, dict(
 					type="arduino_install",
-					finished=True,
-					success=True,
-					path=executable_path,
-					status=gettext("Successfully installed arduino-cli in %s") % installation_path
+					finished=False,
+					status=gettext("Installing arduino:avr core")
 				))
+				try:
+					temp_arduino = pyduinocli.Arduino(executable_path)
+					temp_arduino.core.update_index()
+					temp_arduino.core.install(["arduino:avr"])
+					self._logger.info("arduino:avr core installed successfully")
+					self._plugin_manager.send_plugin_message(self._identifier, dict(
+						type="arduino_install",
+						finished=False,
+						status=gettext("arduino:avr core installed successfully")
+					))
+					self._logger.info("Successfully installed arduino-cli in %s" % installation_path)
+					self._plugin_manager.send_plugin_message(self._identifier, dict(
+						type="arduino_install",
+						finished=True,
+						success=True,
+						path=executable_path,
+						status=gettext("Successfully installed arduino-cli in %s") % installation_path
+					))
+				except pyduinocli.ArduinoError:
+					self._logger.warning("Failed to install arduino:avr core")
+					self._plugin_manager.send_plugin_message(self._identifier, dict(
+						type="arduino_install",
+						finished=True,
+						success=False,
+						status=gettext("Failed to install arduino:avr core")
+					))
+					return
 		except:
 			self._logger.warning("Failed to extract downloaded archive")
 			self._plugin_manager.send_plugin_message(self._identifier, dict(
