@@ -245,6 +245,9 @@ class MarlinFlasherPlugin(octoprint.plugin.SettingsPlugin,
 	def platformio_stop_remote_agent(self):
 		return self.__handle_validated_request(self.__platformio_validator.validate_stop_remote_agent, self.__platformio.stop_remote_agent, self.__platformio.check_setup_errors)
 
+	def is_blueprint_csrf_protected(self):
+		return True
+
 	def get_update_information(self):
 		return dict(
 			marlin_flasher=dict(
