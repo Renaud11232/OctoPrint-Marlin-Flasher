@@ -61,7 +61,7 @@ class ArduinoFlasher(BaseFlasher):
 
 	def __install(self, operating_system, arch, ext):
 		installation_path = os.path.join(self._plugin.get_plugin_data_folder(), "arduino-cli")
-		installed_version = "0.31.0"
+		installed_version = "0.33.0"
 		url = "https://github.com/arduino/arduino-cli/releases/download/{version}/arduino-cli_{version}_{os}_{arch}.{ext}"
 		download_url = url.format(version=installed_version, os=operating_system, arch=arch, ext=ext)
 		self._logger.info("Downloading %s" % download_url)
@@ -225,7 +225,7 @@ class ArduinoFlasher(BaseFlasher):
 		try:
 			version = self.__get_arduino().version()["result"]
 			if isinstance(version, dict):
-				bad_version = re.match(r"0\.(?:18|19|20|21|22|23|24|25|26|27|28|29|30|31)\..+?\Z", version["VersionString"]) is None
+				bad_version = re.match(r"0\.(?:18|19|20|21|22|23|24|25|26|27|28|29|30|31|32|33)\..+?\Z", version["VersionString"]) is None
 			else:
 				not_arduino = True
 		except pyduinocli.ArduinoError:
