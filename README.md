@@ -3,7 +3,7 @@
 This plugins makes the upgrade of your Marlin firmware possible directly within OctoPrint.
 Simply connect to your printer, upload your firmware code, select your motherboard type, and click flash. **DONE**.
 
-It also supports PlatformIO so even 32 bits boards can be flashed!.
+It also supports PlatformIO so even 32 bits boards can be flashed!
 
 ## Screenshots
 
