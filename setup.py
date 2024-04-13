@@ -8,7 +8,7 @@ plugin_author_email = "gaspardrenaud@hotmail.com"
 plugin_url = "https://github.com/Renaud11232/Octoprint-Marlin-Flasher"
 plugin_license = "MIT"
 plugin_requires = [
-	"pyduinocli>=0.33.0,<0.34",
+	"pyduinocli>=0.35.0,<0.36",
 	"intelhex",
 	"requests",
 	"virtualenv",
