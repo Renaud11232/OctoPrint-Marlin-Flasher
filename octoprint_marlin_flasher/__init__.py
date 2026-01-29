@@ -248,6 +248,9 @@ class MarlinFlasherPlugin(octoprint.plugin.SettingsPlugin,
 	def is_blueprint_csrf_protected(self):
 		return True
 
+	def is_template_autoescaped(self):
+		return True
+
 	def get_update_information(self):
 		return dict(
 			marlin_flasher=dict(

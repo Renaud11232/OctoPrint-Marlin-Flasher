@@ -27,7 +27,7 @@ $(function() {
         self.getFileUploadParams = function(uploadProgress) {
             return {
                 maxNumberOfFiles: 1,
-                headers: OctoPrint.getRequestHeaders(),
+                headers: OctoPrint.getRequestHeaders("POST"),
                 done: function (e, data) {
                     self.showSuccess(gettext("Firmware upload successful"), data.result.file);
                 },
@@ -168,7 +168,7 @@ $(function() {
                 self.boardOptionsLoading(true);
                 $.ajax({
                     type: "GET",
-                    headers: OctoPrint.getRequestHeaders(),
+                    headers: OctoPrint.getRequestHeaders("GET"),
                     url: "/plugin/marlin_flasher/arduino/board/details",
                     data: {
                         fqbn: newValue
@@ -220,7 +220,7 @@ $(function() {
             self.arduinoInstallationLogs([]);
             $.ajax({
                 type: "POST",
-                headers: OctoPrint.getRequestHeaders(),
+                headers: OctoPrint.getRequestHeaders("POST"),
                 url: "/plugin/marlin_flasher/arduino/install"
             }).done(function(data) {
                 self.showSuccess(gettext("Arduino installation"), data.message);
@@ -233,7 +233,7 @@ $(function() {
             self.downloadingArduinoFirmware(true);
             $.ajax({
                 type: "POST",
-                headers: OctoPrint.getRequestHeaders(),
+                headers: OctoPrint.getRequestHeaders("POST"),
                 url: "/plugin/marlin_flasher/arduino/download_firmware",
                 data: {
                     url: self.arduinoFirmwareURL()
@@ -251,7 +251,7 @@ $(function() {
             $("#search-core-btn").button("loading");
             $.ajax({
                 type: "GET",
-                headers: OctoPrint.getRequestHeaders(),
+                headers: OctoPrint.getRequestHeaders("GET"),
                 url: "/plugin/marlin_flasher/arduino/cores/search",
                 data: $(form).serialize()
             }).done(function (data) {
@@ -269,7 +269,7 @@ $(function() {
             $(event.currentTarget).after(loader);
             $.ajax({
                 type: "POST",
-                headers: OctoPrint.getRequestHeaders(),
+                headers: OctoPrint.getRequestHeaders("POST"),
                 url: "/plugin/marlin_flasher/arduino/cores/install",
                 data: {
                     core: data.id
@@ -290,7 +290,7 @@ $(function() {
             $(event.currentTarget).after(loader);
             $.ajax({
                 type: "POST",
-                headers: OctoPrint.getRequestHeaders(),
+                headers: OctoPrint.getRequestHeaders("POST"),
                 url: "/plugin/marlin_flasher/arduino/cores/uninstall",
                 data: {
                     core: data.id
@@ -309,7 +309,7 @@ $(function() {
             $("#search-lib-btn").button("loading");
             $.ajax({
                 type: "GET",
-                headers: OctoPrint.getRequestHeaders(),
+                headers: OctoPrint.getRequestHeaders("GET"),
                 url: "/plugin/marlin_flasher/arduino/libs/search",
                 data: $(form).serialize()
             }).done(function (data) {
@@ -331,7 +331,7 @@ $(function() {
             $(event.currentTarget).after(loader);
             $.ajax({
                 type: "POST",
-                headers: OctoPrint.getRequestHeaders(),
+                headers: OctoPrint.getRequestHeaders("POST"),
                 url: "/plugin/marlin_flasher/arduino/libs/install",
                 data: {
                     lib: data.name
@@ -352,7 +352,7 @@ $(function() {
             $(event.currentTarget).after(loader);
             $.ajax({
                 type: "POST",
-                headers: OctoPrint.getRequestHeaders(),
+                headers: OctoPrint.getRequestHeaders("POST"),
                 url: "/plugin/marlin_flasher/arduino/libs/uninstall",
                 data: {
                     lib: data.name
@@ -371,7 +371,7 @@ $(function() {
             $("#arduino_flash-button").button("loading");
             $.ajax({
                 type: "POST",
-                headers: OctoPrint.getRequestHeaders(),
+                headers: OctoPrint.getRequestHeaders("POST"),
                 url: "/plugin/marlin_flasher/arduino/flash",
                 data: $(form).serialize()
             }).fail(function(jqXHR) {
@@ -448,7 +448,7 @@ $(function() {
             self.platformioInstallationLogs([]);
             $.ajax({
                 type: "POST",
-                headers: OctoPrint.getRequestHeaders(),
+                headers: OctoPrint.getRequestHeaders("POST"),
                 url: "/plugin/marlin_flasher/platformio/install"
             }).done(function(data) {
                 self.showSuccess(gettext("Platformio installation"), data.message);
@@ -464,7 +464,7 @@ $(function() {
             self.downloadingPlatformioFirmware(true);
             $.ajax({
                 type: "POST",
-                headers: OctoPrint.getRequestHeaders(),
+                headers: OctoPrint.getRequestHeaders("POST"),
                 url: "/plugin/marlin_flasher/platformio/download_firmware",
                 data: {
                     url: self.platformioFirmwareURL()
@@ -482,7 +482,7 @@ $(function() {
             $("#platformio_flash-button").button("loading");
             $.ajax({
                 type: "POST",
-                headers: OctoPrint.getRequestHeaders(),
+                headers: OctoPrint.getRequestHeaders("POST"),
                 url: "/plugin/marlin_flasher/platformio/flash",
                 data: $(form).serialize()
             }).fail(function(jqXHR) {
@@ -540,7 +540,7 @@ $(function() {
             $("#platformio_login_button").button("loading");
             $.ajax({
                 type: "POST",
-                headers: OctoPrint.getRequestHeaders(),
+                headers: OctoPrint.getRequestHeaders("POST"),
                 url: "/plugin/marlin_flasher/platformio/account/login",
                 data: {
                     username: $("#platformio_username").val(),
@@ -560,7 +560,7 @@ $(function() {
             $("#platformio_logout_button").button("loading");
             $.ajax({
                 type: "POST",
-                headers: OctoPrint.getRequestHeaders(),
+                headers: OctoPrint.getRequestHeaders("POST"),
                 url: "/plugin/marlin_flasher/platformio/account/logout"
             }).done(function (data) {
                 self.showSuccess("Logged out", data.join("\n"));
@@ -593,7 +593,7 @@ $(function() {
         self.platformioStartRemoteAgent = function() {
             $.ajax({
                 type: "POST",
-                headers: OctoPrint.getRequestHeaders(),
+                headers: OctoPrint.getRequestHeaders("POST"),
                 url: "/plugin/marlin_flasher/platformio/agent/start"
             }).done(function (data) {
                 self.showSuccess("Remote Agent", data.join("\n"));
@@ -605,7 +605,7 @@ $(function() {
         self.platformioStopRemoteAgent = function() {
             $.ajax({
                 type: "POST",
-                headers: OctoPrint.getRequestHeaders(),
+                headers: OctoPrint.getRequestHeaders("POST"),
                 url: "/plugin/marlin_flasher/platformio/agent/stop"
             }).done(function (data) {
                 self.showSuccess("Remote Agent", data.join("\n"));
