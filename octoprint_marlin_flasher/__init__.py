@@ -289,7 +289,7 @@ class MarlinFlasherPlugin(octoprint.plugin.SettingsPlugin,
 
 
 __plugin_name__ = "Marlin Flasher"
-__plugin_pythoncompat__ = ">=2.7,<4"
+__plugin_pythoncompat__ = ">=3.7,<4"
 
 
 def __plugin_load__():
