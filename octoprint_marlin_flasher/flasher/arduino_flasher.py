@@ -177,7 +177,7 @@ class ArduinoFlasher(BaseFlasher):
 			self._logger.debug("Trying to open firmware as zip file...")
 			with zipfile.ZipFile(firmware_file_path, "r") as zip_file:
 				self.__is_ino = True
-				sketch_dir = os.path.join(firmware_dir, os.path.splitext(self._settings.get_arduino_sketch_ino())[0])
+				sketch_dir = os.path.join(firmware_dir, *os.path.splitext(self._settings.get_arduino_sketch_ino())[0])
 				os.makedirs(sketch_dir)
 				self._logger.debug("Extracting firmware archive...")
 				zip_file.extractall(sketch_dir)
@@ -340,11 +340,11 @@ class ArduinoFlasher(BaseFlasher):
 		options = []
 		for param in flask.request.values:
 			if param != "fqbn":
-				options.append("{}={}".format(param, flask.request.values[param]))
+				options.append(f"{param}={flask.request.values[param]}")
 		options = ",".join(options)
 		fqbn = flask.request.values["fqbn"]
 		if options:
-			fqbn = "{}:{}".format(fqbn, options)
+			fqbn = f"{fqbn}:{options}"
 		thread = Thread(target=self.__background_flash, args=(fqbn,))
 		thread.start()
 		self._logger.debug("Saving options")
