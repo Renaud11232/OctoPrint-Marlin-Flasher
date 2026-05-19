@@ -340,11 +340,11 @@ class ArduinoFlasher(BaseFlasher):
 		options = []
 		for param in flask.request.values:
 			if param != "fqbn":
-				options.append("%s=%s" % (param, flask.request.values[param]))
+				options.append("{}={}".format(param, flask.request.values[param]))
 		options = ",".join(options)
 		fqbn = flask.request.values["fqbn"]
 		if options:
-			fqbn = "%s:%s" % (fqbn, options)
+			fqbn = "{}:{}".format(fqbn, options)
 		thread = Thread(target=self.__background_flash, args=(fqbn,))
 		thread.start()
 		self._logger.debug("Saving options")

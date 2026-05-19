@@ -1,5 +1,3 @@
-# coding=utf-8
-from __future__ import absolute_import
 import octoprint.plugin
 from octoprint.server.util.flask import restricted_access
 from octoprint.server import admin_permission

@@ -265,7 +265,7 @@ class PlatformIOFlasher(BaseFlasher):
 			return []
 		try:
 			self._logger.debug("Trying to open Configuration.h")
-			with open(os.path.join(self._firmware, "Marlin", "Configuration.h"), "r") as configuration_h:
+			with open(os.path.join(self._firmware, "Marlin", "Configuration.h")) as configuration_h:
 				configuration_h_content = configuration_h.read()
 				match = re.search(r"^\s*?#define\s+?MOTHERBOARD\s+?(\S*?)\s*?$", configuration_h_content, re.MULTILINE)
 				if not match:
@@ -274,7 +274,7 @@ class PlatformIOFlasher(BaseFlasher):
 				self._logger.debug("Found motherboard %s" % match.group(1))
 				motherboard = match.group(1)[6:]
 				self._logger.debug("Trying to open pins.h")
-				with open(os.path.join(self._firmware, "Marlin", "src", "pins", "pins.h"), "r") as pins_h:
+				with open(os.path.join(self._firmware, "Marlin", "src", "pins", "pins.h")) as pins_h:
 					pins_h_content = pins_h.read()
 					match = re.search(r"^\s*?#(el)?if\s+?MB\([^)]*?%s[^)]*?\)\s*?\n.*?(env:.*?)\s*?$" % re.escape(motherboard), pins_h_content, re.MULTILINE)
 					if not match:
@@ -282,7 +282,7 @@ class PlatformIOFlasher(BaseFlasher):
 					self._logger.debug("Found environments %s" % match.group(2))
 					envs = [env[4:] for env in match.group(2).strip().split(" ") if env.startswith("env:")]
 					return envs
-		except (OSError, IOError) as _:
+		except OSError as _:
 			# Files are not where they should, maybe it's not Marlin... No env found, the user will select the default one
 			self._logger.debug("Could not open file")
 			return []

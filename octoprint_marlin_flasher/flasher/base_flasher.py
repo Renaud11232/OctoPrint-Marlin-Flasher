@@ -105,7 +105,7 @@ class BaseFlasher:
 			for f in files:
 				if f == "Version.h":
 					self._logger.debug("Found Version.h, opening it...")
-					with open(os.path.join(root, f), "r") as version_file:
+					with open(os.path.join(root, f)) as version_file:
 						for line in version_file:
 							version = re.findall(r'#define +SHORT_BUILD_VERSION +"([^"]*)"', line)
 							if version:
@@ -114,7 +114,7 @@ class BaseFlasher:
 								break
 				elif f == "Configuration.h":
 					self._logger.debug("Found Configuration.h, opening it...")
-					with open(os.path.join(root, f), "r") as configfile:
+					with open(os.path.join(root, f)) as configfile:
 						for line in configfile:
 							author = re.findall(r'#define +STRING_CONFIG_H_AUTHOR +"([^"]*)"', line)
 							if author:
