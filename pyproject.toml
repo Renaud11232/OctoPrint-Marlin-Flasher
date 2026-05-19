@@ -6,7 +6,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "OctoPrint-Marlin-Flasher"
-version = "1.1.0rc2"
+version = "1.1.0"
 description = "Plugin that allows you to flash your printer with the latest Marlin version, or Arduino code"
 authors = [
     { name = "Renaud Gaspard", email = "gaspardrenaud@hotmail.com" },
